@@ -1,0 +1,8 @@
+{
+  "version": "0.2",
+  "edition": "open",
+  "phone": true,
+  "port": 18765,
+  "builtAt": "2026-11-05",
+  "notes": []
+}

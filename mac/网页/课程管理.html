@@ -1,0 +1,747 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>课程管理 · 排课</title><style>*{box-sizing:border-box}body{margin:0;background:#f6f7fa;color:#223047;font:16px -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}main{max-width:1100px;margin:auto;padding:40px 28px}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}h1{font-size:28px;margin:0}small,.muted{color:#8190a4}button,input,select{font:inherit;border:1px solid #dce1e9;border-radius:10px;padding:12px;background:white;color:inherit}button{cursor:pointer}.primary{background:#275de0;color:white;border-color:#275de0}.layout{display:grid;grid-template-columns:310px 1fr;gap:30px}.panel{background:white;padding:24px;border-radius:16px;border:1px solid #e5e9ef}h2{font-size:18px;margin:0 0 22px}label{display:block;font-size:14px;color:#68788d;margin-top:20px}input,select{width:100%;margin-top:8px}.pair{display:flex;gap:12px}.pair>*{flex:1;min-width:0}.choices{display:flex;gap:8px;margin-top:8px}.choices button{flex:1}.red[aria-pressed=true]{background:#fce8e8;border-color:#d45858;color:#b83e3e}.blue[aria-pressed=true]{background:#e8efff;border-color:#4778d8;color:#275de0}.submit{width:100%;margin-top:24px}.dropline{position:fixed;z-index:60;height:0;border-top:3px solid #275de0;margin-top:-1.5px;border-radius:2px;pointer-events:none}.dropline span{position:absolute;right:0;top:-11px;font-size:12px;line-height:18px;background:#275de0;color:#fff;border-radius:6px;padding:0 6px}.time .whole{display:block;color:#8190a4;font-size:11px}.day{margin-bottom:28px}.day h3{font-size:16px;color:#65748a;font-weight:500}.row{display:flex;gap:20px;align-items:center;padding:20px 0;border-bottom:1px solid #edf0f4}.time{border-left:4px solid #4778d8;padding-left:12px;min-width:135px}.name{font-size:19px;flex:1}.row button{border:0;color:#8190a4;padding:6px}.empty{padding:70px 15px;text-align:center;color:#8b98aa;line-height:2}#hint{font-size:13px;color:#78879b;margin-top:14px;line-height:1.6}@media(max-width:700px){.layout{grid-template-columns:1fr}main{padding:24px 16px}}main{max-width:1600px;padding:24px}.layout{grid-template-columns:260px 170px minmax(600px,1fr);gap:16px}.panel{padding:18px}.rosterlist{max-height:70vh;overflow:auto}.studentchip{padding:12px;margin:8px 0;background:#f2f5fb;border:1px solid #dde5f1;border-radius:9px;cursor:grab}.studentchip:active{cursor:grabbing}.calendarpanel{min-width:0}.calbar{display:flex;justify-content:space-between;align-items:center;gap:12px}.calbar h2{margin:0}.calendar{height:70vh;overflow:auto;margin-top:16px;border:1px solid #e0e6ef;border-radius:10px;position:relative}.gridhead{display:grid;grid-template-columns:50px repeat(7,minmax(95px,1fr));position:sticky;top:0;background:#f7f9fc;z-index:5;min-width:715px}.gridhead span{text-align:center;padding:12px 0;border-bottom:1px solid #dce3ed}.gridbody{display:grid;grid-template-columns:50px repeat(7,minmax(95px,1fr));min-width:715px;height:1440px}.axis,.daycolumn{position:relative;height:1440px}.axis span{position:absolute;font-size:11px;color:#8693a6;right:6px}.daycolumn{border-left:1px solid #e3e8f0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 14px,#f0f3f7 14px,#f0f3f7 15px)}.event{position:absolute;padding:4px;border-radius:5px;background:#e8efff;border-left:3px solid #4778d8;font-size:12px;overflow:hidden;cursor:grab;line-height:1.3;color:#20324a}.event.red{background:#fff0ee;border-color:#d45858}.event small{display:block;font-size:10px;color:inherit}.droptime{position:absolute;left:0;right:0;pointer-events:none;background:#275de033;border-top:2px solid #275de0;font-size:12px;z-index:8}.hint{font-size:12px;color:#8290a2;margin-top:10px}@media(max-width:1100px){.layout{grid-template-columns:240px 150px minmax(600px,1fr)}main{overflow:auto}} input[type=time]::-webkit-calendar-picker-indicator{display:none}input[type=time]{cursor:pointer}.colorpick{position:relative;margin-top:8px}#palette{position:absolute;bottom:calc(100% + 8px);left:0;right:0;background:white;padding:10px;border:1px solid #dce1e9;border-radius:10px;box-shadow:0 8px 24px #22304722;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}#palette[hidden]{display:none}#palette button{height:34px;padding:0;border:2px solid transparent}#palette button[aria-pressed=true]{outline:2px solid #20324a;outline-offset:2px}.rosterpanel{min-height:320px}.rosterpanel.dragover{outline:2px dashed #275de0;background:#eef3ff}.pickbuttons{display:flex;gap:6px;margin-top:8px}.pickbuttons button{flex:1;padding:10px 4px}.pickbuttons button[aria-pressed="true"]{background:#275de0;color:white;border-color:#275de0}.timeanchor{position:relative}#timepopup{position:absolute;top:100%;left:0;width:245px;padding:14px;background:white;border:1px solid #dce1e9;border-radius:12px;box-shadow:0 8px 24px #22304722;z-index:30}#timepopup[hidden]{display:none}#durationchoices label{display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer}#durationchoices input{position:absolute;opacity:0;width:1px;height:1px;margin:0}#durationchoices label{padding:10px;border:1px solid #dce1e9;border-radius:8px}#durationchoices label:has(input:checked){background:#e8efff;border-color:#4778d8;color:#275de0}#durationchoices label:focus-within{outline:2px solid #4778d8}.layout{grid-template-columns:280px minmax(600px,1fr)}.leftcolumn{display:flex;flex-direction:column;gap:16px;min-width:0}.leftcolumn .rosterpanel{min-height:240px}.leftcolumn .rosterlist{max-height:45vh}@media(max-width:1100px){.layout{grid-template-columns:260px minmax(600px,1fr)}}.weekdrop{border:1px solid #e5e9ef;border-radius:12px;padding:12px 16px;margin-top:14px;min-height:95px;transition:background .15s,transform .15s,box-shadow .15s}.weekdrop h3{margin:0 0 8px}.weekdrop.dropactive{background:#edf3ff;box-shadow:inset 0 0 0 2px #4778d8;transform:scale(1.01)}.dayempty{color:#9aa6b5;font-size:13px;padding:12px 0}.dropdone{animation:dropflash .45s}.formfocus{box-shadow:0 0 0 2px #4778d8}.row{cursor:grab}@keyframes dropflash{50%{background:#dbe8ff;transform:scale(1.015)}}.teacherpanel>label{margin-top:0}#courseoptions{padding:16px;margin:8px 0 16px;background:#f5f7fc;border:1px solid #dce5f4;border-radius:12px}#courseoptions[hidden]{display:none}#teachertoggle{border:0;padding:0;background:none;font-size:18px;font-weight:600;text-align:left;width:100%}#teacherbody[hidden]{display:none}.row.editing{flex-wrap:wrap;align-items:flex-start}.row.editing .name{flex:0 1 120px}.row.editing #courseoptions{flex:1 1 260px;min-width:0;margin:0;animation:settingsin .2s ease-out}@keyframes settingsin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}.row .name{font-size:20px;font-weight:650;color:#1c2d46}.studentchip{font-size:17px;font-weight:600;color:#1c2d46}.row.editing{cursor:default}#courseoptions input[type=range]{cursor:ew-resize;touch-action:pan-y}#form>.pair>label{flex:0 0 78px}#form>.pair>.timeanchor{flex:1;min-width:0}#day{padding-left:8px;padding-right:4px}#timeopen{padding-left:6px;padding-right:6px;white-space:nowrap}.studentunits{display:flex;align-items:flex-end;gap:8px}.studentunits>label{flex:1;min-width:0}.studentunits>div{flex:0 0 112px}.studentunits .pickbuttons{gap:4px}.studentunits .pickbuttons button{font-size:13px;padding:13px 2px;white-space:nowrap}.studentunits #student{padding-left:8px;padding-right:6px}#submit[hidden]{display:none}#timepopup{width:280px;max-width:calc(100vw - 48px)}.timecolumns{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px}#weekdaybuttons{display:flex;flex-direction:column;gap:5px}#weekdaybuttons button{padding:7px 5px;font-size:14px}#weekdaybuttons button[aria-pressed=true]{background:#275de0;color:white;border-color:#275de0}.row .time{border-left:0;padding-left:0}.row>i{flex-shrink:0;border-radius:3px}
+.layout{align-items:start}.calendarpanel{height:calc(100vh - 130px);min-height:360px;display:flex;flex-direction:column}.calendarpanel #schedule{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:6px}.calendarpanel>.hint{flex-shrink:0}.leftcolumn{position:sticky;top:24px}#pairdialog{border:1px solid #e0e6ef;border-radius:18px;max-width:calc(100vw - 32px);width:400px;padding:24px;text-align:center;color:#223047;box-shadow:0 20px 80px #22304733}#pairdialog::backdrop{background:#22304766}#pairdialog img{display:block;width:300px;max-width:100%;margin:16px auto;border:12px solid white}#pairdialog .dialoghead{display:flex;justify-content:space-between;align-items:center}#pairdialog .dialoghead h2{margin:0}#pairdialog p{font-size:14px;color:#68788d;line-height:1.6}@media(max-width:700px){.leftcolumn{position:static}}
+#weekbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
+.wkseg{display:inline-flex;border:1px solid #dce1e9;border-radius:10px;overflow:hidden}
+.wkseg button{border:0;border-radius:0;padding:7px 14px;font-size:14px;background:#fff}
+.wkseg button[aria-pressed=true]{background:#223047;color:#fff}
+.wknav{display:flex;gap:8px;align-items:center;font-size:14px}.wknav button{padding:5px 10px;font-size:14px}
+.wknote{font-size:13px;color:#8a6a00;display:inline-flex;gap:6px;align-items:center}
+.linkbtn{border:0;background:none;color:#275de0;padding:0 4px;cursor:pointer;font-size:13px}
+.wkbanner{flex:1 1 100%;background:#fff3d6;border:1px solid #e5c76b;border-radius:10px;padding:8px 12px;font-size:13px;color:#7a5a00;line-height:1.6}
+#weekinfo:empty{display:none}#weekinfo{margin-top:12px;display:grid;gap:10px}
+.wkwarn{background:#fdecec;border:1px solid #f0b4b4;color:#a33;border-radius:10px;padding:8px 12px;font-size:14px;line-height:1.7}
+.wkcancel{background:#fafafa;border:1px dashed #cfd6e0;border-radius:10px;padding:8px 12px;font-size:14px}
+.wkcancel>div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;color:#8190a4}.wkcancel button{padding:4px 10px;font-size:13px}
+.chg{font-size:11px;margin-left:8px;padding:1px 6px;border-radius:5px;background:#fff3d6;color:#a56a00;white-space:nowrap;align-self:center}.chg.add{background:#e3f4ea;color:#2f8f5b}
+body.weekmode .teacherpanel,body.weekmode #courseoptions{display:none!important}
+body.weekmode .calendarpanel{outline:2px solid #e5c76b}
+/* —— Mac 宽屏：课表多列、行更紧凑；点开课程只显示必要信息 —— */
+main{max-width:1560px;padding:22px 24px}
+header{display:none}
+.layout{grid-template-columns:290px 1fr;gap:20px}
+.calendarpanel{padding:16px 18px}
+.calbar{margin-bottom:8px}.calbar h2{margin:0}
+#schedule{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:10px;align-content:start;padding-right:0}
+.day{margin-bottom:0}
+.weekdrop{margin-top:0;min-height:0;padding:8px 10px;border-radius:10px}
+.day h3{margin:0 0 2px;font-size:13px;color:#68788d;font-weight:600}
+.row{gap:8px;padding:5px 0}
+.row>i{height:20px!important;width:4px!important;flex:none}
+.time{border-left:0;padding-left:0;min-width:0;font-size:12.5px;color:#68788d;white-space:nowrap;flex:none}
+.name{font-size:14.5px;text-align:left;white-space:normal;line-height:1.35;padding:2px 0;border:0;background:none}
+.dayempty{padding:4px 0;font-size:12px}
+#courseoptions{display:none}
+body.showopts .row.editing #courseoptions{display:block;grid-column:1/-1}
+#moretoggle{display:none;border:0;background:none;color:#68788d;font-size:13px;padding:6px 0;text-align:left}
+#unschedule:not([hidden])+#moretoggle{display:block}
+body.weekmode #moretoggle{display:none!important}
+#schedule{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:1000px){#schedule{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1380px){#schedule{grid-template-columns:repeat(7,minmax(0,1fr))}}
+.row{display:grid;grid-template-columns:6px minmax(0,1fr);column-gap:8px;row-gap:0;align-items:start;padding:6px 0}
+.row>i{grid-row:1/4;height:auto!important;align-self:stretch;width:6px!important;border-radius:3px}
+.dualnote{grid-column:2;font-size:11.5px;color:#68788d;line-height:1.3;margin-top:1px}
+.row .time{grid-column:2;font-size:12px;line-height:1.3}
+.row .name{grid-column:2;font-size:13.5px;line-height:1.35;padding:0;text-align:left;font-weight:500}
+.row .chg{grid-column:2;justify-self:start;margin:3px 0 0}
+.weekdrop.today{border-color:#275de0;box-shadow:0 0 0 1px #275de0 inset;background:#f7faff}.weekdrop.today h3{color:#275de0}
+#weekorder{display:none}
+.calendarpanel{height:auto!important;min-height:0!important;display:block!important}
+.calendarpanel #schedule,#schedule{overflow:visible!important;max-height:none!important;flex:none!important}
+.leftcolumn{position:static!important}
+#schedule{align-items:start!important}
+.weekdrop{align-self:start;min-height:64px!important}
+.dayempty{padding:2px 0!important;font-size:12px}
+@media(min-width:1380px){
+ #schedule{grid-template-columns:repeat(10,minmax(0,1fr))}
+ .weekdrop{grid-column:span 2}
+ .weekdrop[data-week="周六"],.weekdrop[data-week="周日"]{grid-column:span 5;column-count:2;column-gap:18px}
+ .weekdrop[data-week="周六"] h3,.weekdrop[data-week="周日"] h3{column-span:all}
+ .weekdrop[data-week="周六"] .row,.weekdrop[data-week="周日"] .row{break-inside:avoid}
+}
+/* 添加课程：默认只留一条，需要时自动展开；未排课列表独立滚动，学生再多也不挤 */
+#form h2{cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
+#form h2::after{content:'▾';color:#8190a4;font-size:15px}
+#form.collapsed{padding:14px 20px}#form.collapsed h2{margin:0}#form.collapsed h2::after{content:'＋'}
+#form.collapsed>*:not(h2):not(#hint){display:none!important}
+#form.collapsed #hint{margin-top:6px;font-size:13px}
+.leftcolumn .rosterlist{max-height:calc(100vh - 360px);min-height:120px;overflow:auto}
+/* —— 授课方式 / 扣课时 —— */
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.seg button{padding:7px 12px;font-size:14px;border-radius:9px;border:1px solid #dce1e9;background:#fff;color:#223047}
+.seg button[aria-pressed=true]{background:#223047;color:#fff;border-color:#223047}
+.seg .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--dot)}
+#coursesetup label{display:block;margin-top:12px;font-size:14px;color:#68788d}
+#coursesetup>small,#setupnote{display:block;margin-top:8px;color:#68788d;font-size:13px;line-height:1.5}
+.chg.u2{background:#eef1f6;color:#68788d}
+.teacherpanel,#courseoptions,#moretoggle{display:none!important}
+#setupbar{display:flex;gap:3px;margin:10px 0 2px}
+#setupbar[hidden]{display:none}
+#setupbar div{min-width:0;padding:7px 5px;border-radius:6px;color:#fff;font-size:12px;line-height:1.35;text-align:center;overflow-wrap:anywhere}
+#setupbar b{font-weight:600;display:block}
+#weekoff{padding:6px 12px;font-size:14px;border-radius:10px}
+.wknav b{min-width:150px;text-align:center}
+.wkcancel summary{cursor:pointer}
+#form[data-mode=tempadd] #formtitle,#form[data-mode=tempedit] #formtitle,#form[data-mode=weekedit] #formtitle{font-size:0}
+#form[data-mode=tempadd] #formtitle::before{content:'临时约课（只这一周）';font-size:18px}
+#form[data-mode=tempedit] #formtitle::before{content:'修改临时课';font-size:18px}
+#form[data-mode=weekedit] #formtitle::before{content:'只改这一周的时间';font-size:18px}
+/* 取消排课只有一个做法：把课拖到“未排课学生”那一栏 */
+#unschedule{display:none!important}
+/* —— 卡片列表上的拖拽 —— */
+#schedule .row{position:relative;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:6px;transition:background .12s}
+#schedule .row:hover{background:#f6f8fc}
+#schedule .row.editing{background:#eef4ff;box-shadow:0 0 0 2px #275de0 inset}
+#schedule .row.lifting{opacity:.28}
+#schedule .row .grip{position:absolute;left:10px;right:0;bottom:-4px;height:10px;cursor:ns-resize}
+#schedule .row .grip::after{content:'';position:absolute;left:50%;bottom:3px;width:24px;height:3px;margin-left:-12px;border-radius:2px;background:#b9c5d8;opacity:0;transition:opacity .12s}
+#schedule .row:hover .grip::after,#schedule .row.resizing .grip::after{opacity:1}
+#schedule .row.resizing{background:#eef4ff}
+#schedule .row.resizing .time,.floating .time{color:#275de0!important;font-weight:600}
+#schedule .row.jointarget{box-shadow:0 0 0 2px #2f8f5b inset;background:#e9f7ef}
+.nm{cursor:grab;border-radius:4px;padding:0 1px}.nm:hover{background:#dfe8fb}.nm.lifting{opacity:.3}
+.floating{position:fixed!important;z-index:999;pointer-events:none;margin:0!important;background:#fff!important;border-radius:8px;box-shadow:0 14px 34px #0005;transform:rotate(-1.5deg) scale(1.04);padding:6px 8px!important;border-bottom:0!important}
+.floatchip{position:fixed;z-index:999;pointer-events:none;background:#223047;color:#fff;border-radius:10px;padding:7px 12px;font-size:14px;box-shadow:0 14px 34px #0005;white-space:nowrap;transform:rotate(-1.5deg)}
+.floatchip .fl{margin-left:8px;color:#bcd0ff;font-size:13px}
+#roster .studentchip{touch-action:none;user-select:none;-webkit-user-select:none}
+#undobtn{padding:6px 12px;font-size:14px;border-radius:10px;border:1px solid #275de0;background:#fff;color:#275de0}
+#undobtn[hidden]{display:none}
+.marquee{position:fixed;border:1.5px dashed #275de0;background:#275de014;border-radius:6px;pointer-events:none;z-index:50}#schedule .row.picked{outline:2px solid #d45858;outline-offset:1px;background:#fff5f5}.pickbar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#223047;color:#fff;border-radius:12px;padding:8px 10px 8px 16px;display:flex;align-items:center;gap:10px;z-index:60;box-shadow:0 8px 24px #0003;font-size:14px}.pickbar button{padding:6px 12px;font-size:14px}.pickbar button.primary{background:#d45858;border-color:#d45858;color:#fff}.weekmode #schedule{cursor:crosshair}.weekmode #schedule .row{cursor:grab}
+</style><main>@@NAV@@<a id="pendbanner" href="/lesson#pending" hidden style="display:none;margin:0 0 10px;padding:12px 16px;border-radius:12px;background:#fff1d6;color:#8a5200;font-weight:700;text-decoration:none;border:1px solid #f0cf94"></a><header style="justify-content:flex-end"><button type="button" id="connectionstatus" style="font-size:13px;color:#68788d;padding:8px 12px" title="点击生成配对二维码">正在检查设备连接…</button></header><div class="layout"><div class="leftcolumn"><section class="panel teacherpanel"><h2><button type="button" id="teachertoggle" aria-expanded="false">老师设置 ▾</button></h2><div id="teacherbody" hidden><label style="margin-top:0">人数<input type="hidden" id="teachercount" value="1"><div class="pickbuttons" id="countchoices"><button type="button" data-count="1">1</button><button type="button" data-count="2">2</button><button type="button" data-count="3">3</button></div></label><div class="colorpick"><div id="teacherchips" style="display:flex;gap:6px"></div><div id="palette" hidden></div></div></div></section><form class="panel collapsed" id="form"><h2 id="formtitle">添加课程</h2><div class="studentunits"><label>学生姓名<input id="student" placeholder="输入学生姓名" required autocomplete="off" list="allstudents"><datalist id="allstudents"></datalist><small id="twicehint" style="display:block;color:#68788d;margin-top:4px">一周上两节：已经排了课的学生，在这里再输入名字、选另一个时间就行。</small></label></div><div id="coursesetup"><label>授课方式</label><div class="seg" id="modeseg"></div>
+<div id="rowSingle"><label>老师</label><div class="seg" id="singleteacher"></div></div>
+<div id="rowRotate" hidden><label>前段老师</label><div class="seg" id="leftteacher"></div><label>后段老师</label><div class="seg" id="rightteacher"></div><label>前段时长</label><div class="seg" id="cutseg"></div></div>
+<div class="dualblocks" id="setupbar" hidden></div>
+<label>每次上课扣几课时</label><div class="seg" id="unitseg"></div></div><label>时间</label><div class="timeanchor"><input type="hidden" id="day" value="周一"><button type="button" id="timeopen" style="width:100%;margin-top:8px">选择星期和时间 ▾</button><div id="timepopup" hidden><div class="timecolumns"><div id="weekdaybuttons"></div><div><label style="margin:0">开始时间<input type="time" id="start" required></label><div id="durationchoices"><label><input type="radio" name="durationpick" data-duration="30" value="30">30 分钟</label><label><input type="radio" name="durationpick" data-duration="45" value="45" checked>45 分钟</label><label><input type="radio" name="durationpick" data-duration="60" value="60">60 分钟</label><label><input type="radio" name="durationpick" data-duration="90" value="90">90 分钟</label></div></div></div><input type="hidden" id="duration" value="45"><strong id="durationlabel" hidden></strong><small id="endpreview">请选择开始时间</small><input type="hidden" id="end"><button type="button" id="timeadd" class="primary" style="width:100%;margin-top:14px">加入课表</button></div></div><div id="optionshome"></div><div id="courseoptions" hidden><label>每次上课扣几课时<input type="hidden" id="units" value="1"><div class="pickbuttons"><button type="button" data-units="1" aria-label="每次扣一课时">1 课时</button><button type="button" data-units="2" aria-label="每次扣两课时">2 课时</button></div><small>通常选 1；一次连上两节的课选 2。记课时账时按这个数扣，记账时也可以单独改。</small></label><label>授课方式<div class="pickbuttons"><button type="button" data-mode="single">单师</button><button type="button" data-mode="dual">双师</button></div></label><div id="dualsettings" hidden><label>前段时长 <strong id="cutlabel"></strong><input type="range" id="cut" min="15" max="30" step="15" value="15"></label><label>前段老师</label><div class="pickbuttons" id="leftcolors"></div><label>后段老师</label><div class="pickbuttons" id="rightcolors"></div><small id="dualpreview"></small></div></div><button class="primary submit" id="submit" hidden>加入课表</button><button type="button" id="unschedule" class="submit" hidden>移回待排</button><button type="button" id="moretoggle">更多设置：老师、课时、双师 ▾</button><div id="hint">拖动学生到星期，再选时间；修改会自动保存。</div></form><section class="panel rosterpanel" id="rosterpanel"><h2>未排课学生 <small id="count"></small></h2><small>课程拖回此栏即可取消排课</small><small id="pausednote" style="display:block;color:#a56a00"></small><input id="search" placeholder="搜索姓名"><div id="roster" class="rosterlist"></div></section><button type="button" id="connectdevice" hidden></button></div><section class="panel calendarpanel"><div class="calbar"><h2>每周课表</h2><select id="viewteacher" title="只看某位老师的课" hidden style="width:auto;margin:0 0 0 8px;padding:6px 8px;font-size:14px"></select><button type="button" id="freebtn" title="看某位老师哪些时间还空着，复制发给家长">空档</button><button type="button" id="undobtn" hidden title="也可以按 ⌘Z">↩ 撤销上一步</button><button type="button" id="weekorder" aria-expanded="false" aria-label="展开固定星期顺序" title="展开按周一到周日，收起按当天优先" style="padding:6px 12px">⌄</button></div><div id="weekbar"></div><div id="schedule"></div><div id="weekinfo"></div><div class="hint">拖动改时间和星期 · 拉卡片下边缘改时长 · 班课可单独拖出一位学生 · 拖到“未排课学生”取消 · 按住（或右键）一节课：记上课、标请假（固定课表里是本周那一次）</div></section></div></main><dialog id="pairdialog"><div class="dialoghead"><h2>连接设备</h2><button type="button" id="pairclose" aria-label="关闭二维码">✕</button></div><p id="pairstatus" role="status">正在生成二维码…</p><img id="pairimage" alt="手机配对二维码" hidden><p>手机左滑，点“扫码连接 Mac”扫描。<br>二维码五分钟有效，仅可使用一次。</p><button type="button" id="pairregen">重新生成</button></dialog><script>
+const $=id=>document.getElementById(id),days=['周一','周二','周三','周四','周五','周六','周日'];
+const roster=[];let rows=[],teacher='blue',edit=null,drag=null,teacherColors=['blue'],selectedTeacher=0;let courseMode='single',dualLeft='red',dualRight='blue';
+let teacherDefaults=['blue'];try{const v=JSON.parse(localStorage.getItem('schedule-design-teachers')||'null');if(Array.isArray(v)&&v.length&&v.length<=3&&v.every(c=>['red','orange','yellow','green','cyan','blue','purple'].includes(c)))teacherDefaults=v}catch(e){}teacherColors=teacherDefaults.slice();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function minutes(v){const [h,m]=v.split(':').map(Number);return h*60+m}function clock(v){return String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0')}
+function updateDuration(){document.querySelectorAll('[data-duration]').forEach(b=>b.checked=b.dataset.duration===$('duration').value);$('durationlabel').textContent=$('duration').value+' 分钟';const t=$('start').value;$('timeopen').textContent=$('day').value+' · '+(t?t+' · '+$('duration').value+'分钟':'选择时间')+' ▾';document.querySelectorAll('[data-weekday]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.weekday===$('day').value));const end=t?minutes(t)+Number($('duration').value):1440;$('end').value=end<1440?clock(end):'';$('endpreview').textContent=!t?'请选择开始时间':end<1440?'结束于 '+clock(end):'时段不能跨到次日'}
+const colors={red:'#d45858',orange:'#e58c38',yellow:'#d7b633',green:'#48a373',cyan:'#38aeb5',blue:'#4778d8',purple:'#9164c9'},colorNames={red:'红',orange:'橙',yellow:'黄',green:'绿',cyan:'青',blue:'蓝',purple:'紫'};
+function drawTeacherColors(){document.querySelectorAll('[data-count]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.count)===teacherColors.length));$('teacherchips').innerHTML=teacherColors.map((c,i)=>'<button type="button" data-teacher-index="'+i+'" aria-label="第'+(i+1)+'位老师：'+colorNames[c]+'色" style="flex:1;min-width:0;height:44px;background:'+(colors[c]||colors.blue)+'"></button>').join('');document.querySelectorAll('[data-teacher-index]').forEach(b=>b.onclick=()=>{selectedTeacher=Number(b.dataset.teacherIndex);$('palette').hidden=false;document.querySelectorAll('[data-color]').forEach(c=>c.setAttribute('aria-pressed',c.dataset.color===teacherColors[selectedTeacher]))})}
+function color(v){const old=teacherColors[selectedTeacher];teacher=v;teacherColors[selectedTeacher]=v;if(dualLeft===old)dualLeft=v;if(dualRight===old)dualRight=v;drawTeacherColors();drawCourseOptions()}
+$('palette').innerHTML=Object.entries(colors).map(([key,value])=>'<button type="button" data-color="'+key+'" aria-label="'+colorNames[key]+'色" title="'+colorNames[key]+'色" style="background:'+value+'"></button>').join('');document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{color(b.dataset.color);teacher=teacherColors[0];$('palette').hidden=true});document.addEventListener('click',e=>{if(!e.target.closest('.colorpick'))$('palette').hidden=true});$('teachercount').onchange=()=>{const n=Number($('teachercount').value),keys=Object.keys(colors);teacherColors=Array.from({length:n},(_,i)=>teacherColors[i]||keys.find(c=>!teacherColors.includes(c))||keys[i]);selectedTeacher=0;teacher=teacherColors[0];$('palette').hidden=true;drawTeacherColors();if(!teacherColors.includes(dualLeft))dualLeft=teacherColors[0];if(!teacherColors.includes(dualRight))dualRight=teacherColors[1]||teacherColors[0];drawCourseOptions()};drawTeacherColors();
+$('weekdaybuttons').innerHTML=days.map(d=>'<button type="button" data-weekday="'+d+'">'+d+'</button>').join('');document.querySelectorAll('[data-weekday]').forEach(b=>b.onclick=()=>{$('day').value=b.dataset.weekday;updateDuration()});
+$('timeopen').onclick=()=>{$('timepopup').hidden=!$('timepopup').hidden};document.addEventListener('click',e=>{if(!e.target.closest('.timeanchor'))$('timepopup').hidden=true});$('start').oninput=()=>{updateDuration();drawCourseOptions()};$('duration').oninput=updateDuration;$('start').onclick=()=>{try{$('start').showPicker()}catch(e){$('start').focus()}};
+let scheduleRevision=null,scheduleLocked=false,saveChain=Promise.resolve(),weekMode=null,weekPayload=null;
+function save(){
+ if(weekMode){saveWeek();return}
+ if(scheduleLocked){$('hint').textContent='本页没有连上数据文件，改动不会保存。请用“启动课程管理”重新打开。';return}
+ const snapshot=JSON.stringify(rows);
+ saveChain=saveChain.then(async()=>{
+  if(scheduleLocked)return;
+  try{
+   const r=await fetch('/schedule/save',{method:'POST',headers:{'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'},body:JSON.stringify({rows:JSON.parse(snapshot),revision:scheduleRevision})});
+   const out=await r.json().catch(()=>({}));
+   if(r.ok){scheduleRevision=out.revision;if(out.added?.length){roster.push(...out.added.filter(n=>!roster.includes(n)));$('hint').textContent='已保存，并新建学生：'+out.added.join('、')+'。'}else if(out.changed)$('hint').textContent='已保存到数据文件，手机刷新后可见；改动前的版本已备份。';return}
+   if(r.status===409){scheduleLocked=true;$('hint').textContent='数据文件已在别处更新，本页不再保存。请刷新页面后重新修改。';alert('课表刚在别的窗口里改过，这一下的改动没有保存。\n\n点“好”会刷新成最新的课表，请再改一次。');location.reload();return}  // 10-20：以前只在角落里一行小字，没保存的课还留在页面上，容易以为存好了
+   $('hint').textContent='未能保存：'+(out.error||'请重试')+'。请勿关闭本页。';
+  }catch(e){$('hint').textContent='连接服务不可用，未保存。请勿关闭本页，先启动课程管理。'}
+ });
+}
+function people(r){return r.studentNames||r.name.split('、')}
+let pausedNames=new Set();
+function rosterView(){if($('allstudents'))$('allstudents').innerHTML=roster.map(n=>'<option value="'+esc(n)+'">').join('');const used=new Set(rows.flatMap(people)),hidden=roster.filter(n=>!used.has(n)&&pausedNames.has(n)).length,available=roster.filter(n=>!used.has(n)&&!pausedNames.has(n));$('pausednote').textContent=hidden?'暂停上课的 '+hidden+' 人没列出（在课时管理里恢复）':'';$('count').textContent=available.length;$('roster').innerHTML=available.filter(n=>n.includes($('search').value.trim())).map(n=>'<div class="studentchip" draggable="true" data-name="'+esc(n)+'">'+esc(n)+'</div>').join('')||'<small>没有符合条件的学生</small>';document.querySelectorAll('[data-name]').forEach(b=>{b.ondragstart=e=>{drag={name:b.dataset.name};e.dataTransfer.setData('text/plain',b.dataset.name)};b.onclick=()=>{$('student').value=b.dataset.name;$('student').focus();drawCourseOptions()}})}
+function editRow(id){const r=rows.find(x=>x.id===id);if(!r)return;edit=id;$('student').value=r.name;$('day').value=r.day;$('start').value=r.start;$('duration').value=minutes(r.end)-minutes(r.start);updateDuration();$('units').value=r.units;teacherColors=r.teachers?.slice()||(r.dual?[...new Set([r.dual.left,r.dual.right].flatMap(c=>c==='both'?['red','blue']:[c]))]:[r.teacher]);selectedTeacher=0;teacher=teacherColors[0];$('teachercount').value=teacherColors.length;drawTeacherColors();$('formtitle').textContent='编辑课程';courseMode=r.dual?'dual':'single';dualLeft=r.dual?.left||teacherColors[0]||'red';dualRight=r.dual?.right||teacherColors[1]||'blue';$('cut').value=r.dual?.minutes||15;drawCourseOptions();$('timeadd').textContent='保存修改';$('submit').textContent='保存修改';$('unschedule').hidden=false}
+let fixedWeekOrder=false;$('weekorder').onclick=()=>{fixedWeekOrder=!fixedWeekOrder;$('weekorder').textContent=fixedWeekOrder?'⌃':'⌄';$('weekorder').setAttribute('aria-expanded',String(fixedWeekOrder));$('weekorder').setAttribute('aria-label',fixedWeekOrder?'收起恢复当天优先':'展开固定星期顺序');render()};
+function orderedWeekdays(){return days.slice()}
+function teacherPaint(r){
+ const col=c=>colors[c]||colors.blue;
+ const seg=c=>c==='both'?'linear-gradient(90deg,'+col('red')+' 50%,'+col('blue')+' 50%)':'linear-gradient(0deg,'+col(c)+','+col(c)+')';
+ if(r.dual){
+  const L=r.dual.left,R=r.dual.right;if(L==='both'&&R==='both')return seg('both');
+  const dur=Math.max(2,minutes(r.end)-minutes(r.start)),cut=Math.max(1,Math.min(r.dual.minutes,dur-1)),p=Math.round(cut*100/dur);
+  return seg(L)+' 0 0/100% '+p+'% no-repeat,'+seg(R)+' 0 100%/'+(100-p)+'% no-repeat';
+ }
+ return col(r.teacher||r.teachers?.[0]||'blue');
+}
+// 10-20：只看某位老师。选了以后按这位老师真正带这个学生的时间排、也只显示那一段（双师课以前按整节开始时间排，红老师后半段带的学生会排在先来的学生前面）
+let viewTeacher='*';try{viewTeacher=localStorage.getItem('view-teacher')||'*'}catch(e){}
+function teacherSpans(r,t){const a=minutes(r.start),b=minutes(r.end),d=r.dual;
+ if(d&&d.left==='both'&&d.right==='both')return [[a,b]];
+ if(d){const m=a+(d.minutes||0),out=[];if(d.left===t||d.left==='both')out.push([a,m]);if(d.right===t||d.right==='both')out.push([m,b]);return out}
+ return (r.teacher===t||(r.teachers||[]).includes(t))?[[a,b]]:[]}
+function paintViewTeacher(){const sel=$('viewteacher');if(!sel)return;sel.hidden=TEACHERS.length<2;if(sel.hidden){viewTeacher='*';return}if(viewTeacher!=='*'&&!TEACHERS.some(t=>t.key===viewTeacher))viewTeacher='*';sel.innerHTML='<option value="*">全部老师</option>'+TEACHERS.map(t=>'<option value="'+t.key+'">只看 '+esc(t.name)+'</option>').join('');sel.value=viewTeacher}
+function dayItems(day){
+ const all=rows.filter(r=>r.day===day);
+ if(viewTeacher==='*')return all.sort((a,b)=>a.start.localeCompare(b.start)).map(r=>[r,r.start+'–'+r.end]);
+ return all.map(r=>[r,teacherSpans(r,viewTeacher)]).filter(([r,sp])=>sp.length).sort((x,y)=>x[1][0][0]-y[1][0][0]).map(([r,sp])=>[r,sp.map(([a,b])=>clock(a)+'–'+clock(b)).join('、')+(sp.length===1&&sp[0][0]===minutes(r.start)&&sp[0][1]===minutes(r.end)?'':' <small class="whole">整节 '+r.start+'–'+r.end+'</small>')]);
+}
+function render(){document.body.classList.remove('showopts');$('moretoggle').textContent='更多设置：老师、课时、双师 ▾';$('optionshome').after($('courseoptions'));$('courseoptions').hidden=true;rosterView();$('schedule').innerHTML=orderedWeekdays().map(day=>{const items=dayItems(day);return '<section class="day weekdrop" data-week="'+day+'"><h3>'+day+'</h3>'+items.map(([r,when])=>'<div class="row" draggable="true" data-id="'+esc(r.id)+'"><i style="display:block;width:7px;height:36px;background:'+teacherPaint(r)+'"></i><span class="time">'+when+'</span><button type="button" class="name">'+esc(r.name)+'</button>'+(typeof dualNote==='function'?dualNote(r):'')+(r.units===2?'<small class="chg u2">扣2课时</small>':'')+(r.changed==='move'?'<small class="chg">本周改时间</small>':r.changed==='add'?'<small class="chg add">临时加课</small>':'')+'</div>').join('')+(items.length?'':'<div class="dayempty">'+(viewTeacher==='*'?'拖入学生安排课程':'这天没有这位老师的课')+'</div>')+'</section>'}).join('');document.querySelectorAll('[data-id]').forEach(b=>{b.onclick=e=>{if(e.target.closest('#courseoptions'))return;if(b.classList.contains('editing')){$('form').requestSubmit();return}editRow(b.dataset.id);document.querySelectorAll('.row.editing').forEach(e=>{e.classList.remove('editing');e.draggable=true});b.classList.add('editing');b.draggable=false;b.append($('courseoptions'));$('courseoptions').hidden=false};b.ondragstart=e=>{if(b.classList.contains('editing')||e.target.closest('#courseoptions')){e.preventDefault();return}drag={id:b.dataset.id};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',b.dataset.id)}});document.querySelectorAll('[data-week]').forEach(zone=>{zone.ondragover=e=>{if(!drag)return;e.preventDefault();zone.classList.add('dropactive');e.dataTransfer.dropEffect='move'};zone.ondragleave=e=>{if(!zone.contains(e.relatedTarget))zone.classList.remove('dropactive')};zone.ondrop=e=>{e.preventDefault();zone.classList.remove('dropactive');if(!drag)return;const current=drag.id?rows.find(r=>r.id===drag.id):null;if(current)editRow(current.id);else{edit=null;$('student').value=drag.name;$('formtitle').textContent='添加课程';$('submit').textContent='加入课表';$('timeadd').textContent='加入课表';$('unschedule').hidden=true;$('start').value=''}$('day').value=zone.dataset.week;updateDuration();$('timepopup').hidden=false;zone.classList.add('dropdone');setTimeout(()=>zone.classList.remove('dropdone'),450);$('form').classList.add('formfocus');setTimeout(()=>$('form').classList.remove('formfocus'),800);$('hint').textContent='已选'+zone.dataset.week+'，请选择时间后点“'+(edit?'保存修改':'加入课表')+'”。';$('form').scrollIntoView({behavior:'smooth',block:'nearest'});$('start').focus();drag=null}})}
+$('search').oninput=rosterView;const dropzone=$('rosterpanel');dropzone.ondragover=e=>{if(!drag?.id)return;e.preventDefault();e.dataTransfer.dropEffect='move';dropzone.classList.add('dragover')};dropzone.ondragleave=e=>{if(!dropzone.contains(e.relatedTarget))dropzone.classList.remove('dragover')};dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');if(drag?.id)unschedule(drag.id);drag=null};document.addEventListener('dragend',()=>{document.querySelectorAll('.dropactive').forEach(e=>e.classList.remove('dropactive'));drag=null;dropzone.classList.remove('dragover');document.querySelectorAll('.droptime').forEach(e=>e.remove())});
+function unschedule(id){const row=rows.find(r=>r.id===id);if(!row)return;for(const name of people(row))if(!roster.includes(name))roster.push(name);rows=rows.filter(r=>r.id!==id);if(edit===id){edit=null;$('student').value='';$('formtitle').textContent='添加课程';$('submit').textContent='加入课表';$('unschedule').hidden=true}$('search').value='';save();render();$('hint').textContent=row.name+'的这次排课已移除。仍有其他课程的学生会继续显示在课表中。'}
+$('unschedule').onclick=()=>unschedule(edit);
+document.querySelectorAll('[data-count]').forEach(b=>b.onclick=()=>{$('teachercount').value=b.dataset.count;$('teachercount').onchange()});
+document.querySelectorAll('[data-duration]').forEach(b=>b.onclick=()=>{$('duration').value=b.dataset.duration;updateDuration();drawCourseOptions()});updateDuration();
+
+function drawCourseOptions(){document.querySelectorAll('[data-units]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.units===$('units').value));document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===courseMode));$('dualsettings').hidden=courseMode!=='dual';const max=Math.max(15,Math.floor((Number($('duration').value)-1)/15)*15);$('cut').max=max;if(Number($('cut').value)>max)$('cut').value=max;$('cutlabel').textContent=$('cut').value+' 分钟';for(const side of ['left','right']){const selected=side==='left'?dualLeft:dualRight;$(side+'colors').innerHTML=[...new Set([...teacherDefaults,...teacherColors])].map(c=>'<button type="button" aria-label="'+colorNames[c]+'色老师" data-side="'+side+'" data-course-color="'+c+'" style="background:'+colors[c]+';height:28px;padding:0;min-width:16px;outline:'+(selected===c?'2px solid #223047':'none')+'"></button>').join('')+'<button type="button" data-side="'+side+'" data-course-color="both" aria-pressed="'+(selected==='both')+'">共同</button>'}document.querySelectorAll('[data-course-color]').forEach(b=>b.onclick=()=>{if(b.dataset.side==='left')dualLeft=b.dataset.courseColor;else dualRight=b.dataset.courseColor;drawCourseOptions()});const t=$('start').value,cut=Number($('cut').value);$('dualpreview').textContent=t?'前段 '+t+'–'+clock(minutes(t)+cut)+'，后段 '+clock(minutes(t)+cut)+'–'+$('end').value:''}
+document.querySelectorAll('[data-units]').forEach(b=>b.onclick=()=>{$('units').value=b.dataset.units;drawCourseOptions()});document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{courseMode=b.dataset.mode;if(courseMode==='dual'){if(teacherColors.length<2){$('teachercount').value='2';$('teachercount').onchange()}dualLeft=teacherColors[0];dualRight=teacherColors[1]}drawCourseOptions()});$('cut').oninput=drawCourseOptions;drawCourseOptions();
+
+$('teachertoggle').onclick=()=>{const open=$('teacherbody').hidden;if(open){teacherColors=teacherDefaults.slice();$('teachercount').value=teacherColors.length;drawTeacherColors()}else{try{localStorage.setItem('schedule-design-teachers',JSON.stringify(teacherColors));teacherDefaults=teacherColors.slice();$('hint').textContent='老师设置已保存，之后排课可使用这些老师。';drawCourseOptions()}catch(e){$('hint').textContent='老师设置未保存，请重试。';return}}$('teacherbody').hidden=!open;$('teachertoggle').setAttribute('aria-expanded',open);$('teachertoggle').textContent=open?'老师设置：收起并保存 ▴':'老师设置 ▾'};
+$('timeadd').onclick=()=>{$('form').requestSubmit()};
+// 10-20：时间弹窗不小心点掉了也能登记——弹窗关着、时间已选好时，表单下面的按钮露出来（文字跟弹窗里的一样）
+function syncSubmit(){$('submit').textContent=$('timeadd').textContent;$('submit').hidden=!$('timepopup').hidden||!$('end').value}
+new MutationObserver(syncSubmit).observe($('timepopup'),{attributes:true,attributeFilter:['hidden']});
+new MutationObserver(syncSubmit).observe($('timeadd'),{childList:true,characterData:true,subtree:true});
+['start','end','duration'].forEach(id=>$(id).addEventListener('input',syncSubmit));setInterval(syncSubmit,700);
+$('connectdevice').onclick=()=>openPairDialog('http://127.0.0.1:18765/device-pair?key=@@LOCAL_KEY@@');
+$('form').onsubmit=e=>{e.preventDefault();if(!$('end').value){$('hint').textContent='请选择当天有效时间';return}const name=$('student').value.trim();if(!name)return;if(edit){const gone=droppedNames(name);if(gone.length&&!confirm('这样保存会把 '+gone.join('、')+' 从这节课里去掉（他们会回到“未排课学生”）。\n\n只想把某一个学生挪到别的时间，请直接拖他的名字。\n\n确定要去掉吗？'))return}const row=buildRow(name);{const c=clashes(row);if(c.length&&!confirm(c.join('\n')+'\n\n时间撞了。确定还要这样排吗？'))return}if(edit)rows=rows.map(r=>r.id===edit?row:r);else rows.push(row);edit=null;$('units').value='1';$('timepopup').hidden=true;$('timeadd').textContent='加入课表';$('unschedule').hidden=true;save();render();$('student').value='';$('formtitle').textContent='添加课程';$('submit').textContent='加入课表'};render();
+</script></html>
+<script>let displayedDay=codaNow().toDateString();function refreshDayOrder(){const day=codaNow().toDateString();if(day!==displayedDay&&!edit){displayedDay=day;render()}}window.addEventListener("focus",refreshDayOrder);setInterval(refreshDayOrder,60000);</script>
+
+<script>async function refreshConnectionStatus(){const label=document.getElementById('connectionstatus');if(location.protocol==='file:'){label.textContent='未连接 · 请通过启动入口打开';return}try{const response=await fetch('/connection-status',{cache:'no-store'});if(!response.ok)throw Error();const result=await response.json();label.textContent=result.devices.length?'已连接 · '+result.devices.join('、'):'未连接手机'}catch(e){label.textContent='连接服务不可用'}}refreshConnectionStatus();setInterval(refreshConnectionStatus,5000);</script>
+<script>document.getElementById('connectionstatus').onclick=()=>document.getElementById('connectdevice').click();</script>
+<script>let pairURL='',pairGeneration=0;async function openPairDialog(url){pairURL=url;const dialog=document.getElementById('pairdialog'),image=document.getElementById('pairimage'),status=document.getElementById('pairstatus');if(!dialog.open)dialog.showModal();const generation=++pairGeneration;image.hidden=true;status.textContent='正在生成二维码…';try{const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw Error();const html=new DOMParser().parseFromString(await response.text(),'text/html');const source=html.querySelector('img')?.getAttribute('src');if(!source?.startsWith('data:image/png;base64,'))throw Error();if(generation!==pairGeneration)return;image.src=source;image.hidden=false;status.textContent='请使用手机扫码连接'}catch(e){if(generation===pairGeneration)status.textContent='二维码生成失败，请确认连接服务已开启'}}document.getElementById('pairclose').onclick=()=>document.getElementById('pairdialog').close();document.getElementById('pairregen').onclick=()=>openPairDialog(pairURL);document.getElementById('pairdialog').addEventListener('click',event=>{if(event.target===event.currentTarget){const r=event.currentTarget.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)event.currentTarget.close()}});</script>
+<script>
+(async()=>{
+ try{
+  const r=await fetch('/schedule',{cache:'no-store'});if(!r.ok)throw Error();
+  const data=await r.json();
+  rows=data.rows;roster.splice(0,roster.length,...data.roster);scheduleRevision=data.revision;pausedNames=new Set(data.paused||[]);
+  render();$('hint').textContent='课表已从数据文件载入，修改会自动保存。';
+ }catch(e){scheduleLocked=true;$('hint').textContent='没有读到数据文件，改动不会保存。请用“启动课程管理”打开。'}
+})();
+</script>
+<script>
+// ===== 周模式：固定课表 / 本周 / 下周。周模式下编辑的是这一周的副本，保存时只记录和固定课表的差异 =====
+const mondayISO=d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.toLocaleDateString('sv')};
+const addDays=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return d.toLocaleDateString('sv')};
+const copyRow=r=>JSON.parse(JSON.stringify(r));
+function closeEditing(){edit=null;$('student').value='';$('formtitle').textContent='添加课程';$('submit').textContent='加入课表';$('timeadd').textContent='加入课表';$('unschedule').hidden=true;$('timepopup').hidden=true;if(typeof paintSetup==='function')paintSetup()}
+async function setWeek(week){
+ closeEditing();
+ try{
+  if(!week){
+   const d=await (await fetch('/schedule',{cache:'no-store'})).json();
+   rows=d.rows;scheduleRevision=d.revision;roster.splice(0,roster.length,...d.roster);pausedNames=new Set(d.paused||[]);weekMode=null;weekPayload=null;render();paintWeekBar();$('hint').textContent='已回到固定课表，修改会自动保存。';return
+  }
+  const r=await fetch('/api/adjust?week='+week,{cache:'no-store'}),d=await r.json();if(!r.ok)throw new Error(d.error);
+  weekMode=week;applyWeek(d);$('hint').textContent='正在调整 '+week.slice(5)+' 起这一周：只对这一周有效。'
+ }catch(e){$('hint').textContent='读取失败：'+(e.message||'请重试')}
+}
+function applyWeek(d){weekPayload=d;rows=d.effective.map(copyRow);roster.splice(0,roster.length,...d.roster);if(d.paused)pausedNames=new Set(d.paused);render();paintWeekBar()}
+function opsFromRows(){
+ const base=new Map(weekPayload.base.map(r=>[r.id,r])),cur=new Map(rows.map(r=>[r.id,r])),old=new Map(weekPayload.ops.map(o=>[o.type==='add'?o.id:o.course,o])),ops=[];
+ for(const b of weekPayload.base){
+  const r=cur.get(b.id),id=old.get(b.id)?.id||crypto.randomUUID();
+  if(!r)ops.push({id,type:'cancel',course:b.id});
+  else if(r.day!==b.day||r.start!==b.start||r.end!==b.end)ops.push({id,type:'move',course:b.id,day:r.day,start:r.start,end:r.end});
+ }
+ for(const r of rows)if(!base.has(r.id))ops.push({id:r.id,type:'add',name:r.name,studentNames:r.studentNames||r.name.split('、'),day:r.day,start:r.start,end:r.end,teacher:r.teacher||'blue',teachers:r.teachers||[r.teacher||'blue'],units:r.units||1,dual:r.dual||null});
+ return ops;
+}
+function saveWeek(){
+ const week=weekMode,payload=weekPayload;if(!week||!payload)return;
+ const base=new Map(payload.base.map(r=>[r.id,r]));
+ const ignored=rows.some(r=>{const b=base.get(r.id);return b&&(r.name!==b.name||r.teacher!==b.teacher||r.units!==b.units||JSON.stringify(r.dual)!==JSON.stringify(b.dual))});
+ const ops=opsFromRows();
+ saveChain=saveChain.then(async()=>{
+  try{
+   const r=await fetch('/api/adjust/save',{method:'POST',headers:{'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'},body:JSON.stringify({week,ops,revision:weekPayload.revision})});
+   const out=await r.json().catch(()=>({}));
+   if(r.ok){if(weekMode===week)applyWeek(out);$('hint').textContent=(out.added?.length?'已新建学生：'+out.added.join('、')+'。':'')+(ignored?'已保存。这一周只能改时间、取消或加临时课；老师和课时请在“固定课表”里改。':'已保存，只影响这一周，固定课表没变。');return}
+   if(r.status===409){alert('这一周刚在别的窗口里改过，这一下的改动没有保存。\n\n点“好”会刷新成最新的样子，请再改一次。');await setWeek(week);$('hint').textContent=(out.error||'这一周刚被别处改过')+'，已刷新，请重新操作。';return}
+   $('hint').textContent='未能保存：'+(out.error||'请重试')
+  }catch(e){$('hint').textContent='连接服务不可用，未保存。请勿关闭本页。'}
+ });
+}
+let lastWeek=null;
+function weekLabel(w){
+ const cur=mondayISO(codaNow()),d=Math.round((new Date(w+'T00:00:00')-new Date(cur+'T00:00:00'))/6048e5);
+ return (d===0?'本周 ':d===1?'下周 ':d===-1?'上周 ':'')+w.slice(5).replace('-','/')+'–'+addDays(w,6).slice(5).replace('-','/');
+}
+function paintWeekBar(){
+ const cur=mondayISO(codaNow());if(weekMode)lastWeek=weekMode;
+ const seg=(label,w,on)=>'<button type="button" data-go="'+w+'" aria-pressed="'+on+'">'+label+'</button>';
+ let html='<div class="wkseg">'+seg('固定课表','',!weekMode)+seg('临时安排',lastWeek||cur,!!weekMode)+'</div>';
+ if(weekMode)html+='<div class="wknav"><button type="button" data-go="'+addDays(weekMode,-7)+'" aria-label="上一周">‹</button><b>'+weekLabel(weekMode)+'</b><button type="button" data-go="'+addDays(weekMode,7)+'" aria-label="下一周">›</button></div>'
+  +'<button type="button" id="weekoff">整周停课</button>'+(weekPayload&&weekPayload.ops.length?'<button type="button" class="linkbtn" id="weekreset">恢复原样</button>':'')
+  +'<span class="wknote">只改这一周，固定课表不变</span>';
+ $('weekbar').innerHTML=html;document.body.classList.toggle('weekmode',!!weekMode);if(typeof paintSetup==='function')paintSetup();
+ const info=[];
+ if(weekMode&&weekPayload){
+  if(weekPayload.warnings.length)info.push('<div class="wkwarn"><b>注意：</b><br>'+weekPayload.warnings.map(esc).join('<br>')+'</div>');
+  if(weekPayload.cancelled.length){const all=weekPayload.cancelled.length===weekPayload.base.length;info.push('<details class="wkcancel"'+(weekPayload.cancelled.length<=6?' open':'')+'><summary><b style="color:#68788d">'+(all?'这一周整周停课（'+weekPayload.cancelled.length+' 节）':'这一周停了 '+weekPayload.cancelled.length+' 节课')+'</b></summary>'+weekPayload.cancelled.map(r=>'<div><span>'+r.day+' '+r.start+'–'+r.end+' '+esc(r.name)+'</span><button type="button" data-restore="'+esc(r.id)+'">恢复</button></div>').join('')+'</details>')}
+ }
+ $('weekinfo').innerHTML=info.join('');
+}
+$('weekbar').onclick=e=>{
+ if(e.target.id==='weekoff'){
+  const n=rows.filter(r=>weekPayload.base.some(b=>b.id===r.id)).length;
+  if(!n){$('hint').textContent='这一周的固定课已经全部停了。';return}
+  if(confirm(weekLabel(weekMode)+' 的 '+n+' 节固定课全部停课？\n固定课表不变；之后可以逐节恢复，或点“恢复原样”。')){rows=rows.filter(r=>!weekPayload.base.some(b=>b.id===r.id));saveWeek()}
+  return}
+ const go=e.target.closest('button[data-go]');if(go){setWeek(go.dataset.go||null);return}
+ if(e.target.id==='weekreset'&&confirm('把这一周的所有调整恢复成固定课表？')){rows=weekPayload.base.map(copyRow);saveWeek()}
+};
+$('weekinfo').onclick=e=>{
+ const b=e.target.closest('button[data-restore]');if(!b)return;
+ const r=weekPayload.base.find(x=>x.id===b.dataset.restore);if(r){rows.push(copyRow(r));saveWeek()}
+};
+const _render=render;
+render=function(){_render();markToday()};
+function markToday(){
+ const names=['周日','周一','周二','周三','周四','周五','周六'],today=names[codaNow().getDay()],cur=mondayISO(codaNow());
+ document.querySelectorAll('.weekdrop').forEach(sec=>{
+  const h=sec.querySelector('h3'),i=days.indexOf(sec.dataset.week);
+  h.textContent=weekMode?sec.dataset.week+' '+addDays(weekMode,i).slice(5).replace('-','/'):sec.dataset.week;
+  sec.classList.toggle('today',sec.dataset.week===today&&(!weekMode||weekMode===cur));
+ });
+}
+markToday();
+paintWeekBar();
+</script>
+<script>
+$('moretoggle').onclick=()=>{const on=document.body.classList.toggle('showopts');$('moretoggle').textContent=on?'收起更多设置 ▴':'更多设置：老师、课时、双师 ▾'};
+</script>
+<script>
+// 添加课程：折叠/展开。拖动、点学生、点开课程时自动展开；保存或移回待排后自动收起
+const formBox=$('form');
+const openForm=()=>formBox.classList.remove('collapsed');
+const closeForm=()=>setTimeout(()=>{if(!$('student').value.trim())formBox.classList.add('collapsed')},90);
+$('formtitle').onclick=()=>formBox.classList.toggle('collapsed');
+document.addEventListener('click',e=>{if(e.target.closest('.studentchip,.row[data-id]'))openForm()},true);
+document.addEventListener('drop',openForm,true);
+formBox.addEventListener('submit',closeForm);
+$('unschedule').addEventListener('click',closeForm);
+</script>
+<script>
+// ===== 授课方式：单师 / 双师轮流 / 双师一同；每次扣 1 或 2 课时 =====
+// 试用版：老师名字来自设置向导（window.LESSON_TEACHERS）；只有一位老师时不显示红色
+const LT=window.LESSON_TEACHERS||null;
+const TEACHERS=[{key:'red',name:(LT&&LT.red)||'红老师',color:'#d45858'},{key:'blue',name:(LT&&LT.blue)||'蓝老师',color:'#4778d8'}].filter(t=>!LT||LT[t.key]);
+setTimeout(()=>{paintViewTeacher();$('viewteacher')&&($('viewteacher').onchange=e=>{viewTeacher=e.target.value;try{localStorage.setItem('view-teacher',viewTeacher)}catch(x){}render()});if(viewTeacher!=='*')render()},0);
+const tname=k=>k==='both'?'两位老师一起':(TEACHERS.find(x=>x.key===k)?.name||k);
+const newTeacher=(()=>{let v='blue';try{v=localStorage.getItem('coda-new-teacher')||'blue'}catch(e){}return TEACHERS.some(x=>x.key===v)?v:'blue'})();
+let setup={mode:'single',teacher:newTeacher,left:'red',right:'blue',cut:30,units:1};
+const segHTML=(items,cur,attr)=>items.map(([v,l,c])=>'<button type="button" '+attr+'="'+v+'" aria-pressed="'+(String(cur)===String(v))+'"'+(c?' style="--dot:'+c+'"':'')+'>'+(c?'<i class="dot"></i>':'')+l+'</button>').join('');
+function courseMinutes(){const d=Number($('duration').value);return d>0?d:45}
+const SHORT=k=>k==='both'?'一起':(TEACHERS.find(x=>x.key===k)?.name||k).replace('老师','');
+const PAINT=k=>k==='both'?'linear-gradient(90deg,#bf4141 50%,#3465c0 50%)':({red:'#bf4141',blue:'#3465c0'}[k]||(TEACHERS.find(x=>x.key===k)?.color)||'#3465c0');
+function dualNote(r){
+ if(!r.dual)return '';const L=r.dual.left,R=r.dual.right;
+ if(L==='both'&&R==='both')return '<small class="dualnote">两位老师一起</small>';
+ const dur=minutes(r.end)-minutes(r.start),cut=r.dual.minutes;
+ return '<small class="dualnote">'+SHORT(L)+' '+cut+'′ → '+SHORT(R)+' '+(dur-cut)+'′</small>';
+}
+function paintSetup(){
+ const baseCourse=!!(weekMode&&edit&&weekPayload&&weekPayload.base.some(r=>r.id===edit));
+ $('coursesetup').hidden=baseCourse;
+ $('form').dataset.mode=weekMode?(edit?(baseCourse?'weekedit':'tempedit'):'tempadd'):(edit?'edit':'add');
+ const dur=courseMinutes(),tchoices=TEACHERS.map(x=>[x.key,x.name,x.color]),side=tchoices.concat([['both','一起']]);
+ const cuts=[15,30,45,60,75].filter(c=>c<dur);if(cuts.length&&!cuts.includes(setup.cut))setup.cut=cuts.reduce((a,b)=>Math.abs(b-setup.cut)<Math.abs(a-setup.cut)?b:a);
+ $('modeseg').innerHTML=segHTML([['single','单师'],['rotate','双师轮流'],['together','双师一同']],setup.mode,'data-m');
+ $('singleteacher').innerHTML=segHTML(tchoices,setup.teacher,'data-st');
+ $('leftteacher').innerHTML=segHTML(side,setup.left,'data-l');$('rightteacher').innerHTML=segHTML(side,setup.right,'data-r');
+ $('cutseg').innerHTML=segHTML(cuts.map(c=>[c,c+' 分钟']),setup.cut,'data-c');
+ $('unitseg').innerHTML=segHTML([[1,'1 课时'],[2,'2 课时']],setup.units,'data-u');
+ $('rowSingle').hidden=setup.mode!=='single';$('rowRotate').hidden=setup.mode!=='rotate';
+ const bar=$('setupbar'),start=$('start').value,t0=start?minutes(start):null,hm=v=>clock(v);
+ if(setup.mode==='single'){bar.hidden=true;bar.innerHTML=''}
+ else{
+  bar.hidden=false;
+  const part=(k,from,len)=>'<div style="flex:'+len+';background:'+PAINT(k)+'"><b>'+SHORT(k)+'</b>'+(t0==null?len+' 分钟':hm(t0+from)+'–'+hm(t0+from+len))+'</div>';
+  bar.innerHTML=setup.mode==='together'?'<div style="flex:1;background:'+PAINT('both')+'"><b>两位老师一起</b>'+(t0==null?dur+' 分钟':hm(t0)+'–'+hm(t0+dur))+'</div>':part(setup.left,0,setup.cut)+part(setup.right,setup.cut,dur-setup.cut);
+ }
+}
+$('coursesetup').onclick=e=>{
+ const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.m){if(d.m==='rotate'&&setup.mode!=='rotate'){const dur=courseMinutes(),other=TEACHERS.find(x=>x.key!==setup.teacher)?.key||'red';setup.cut=Math.max(15,Math.floor(dur/30)*15);setup.left=setup.teacher;setup.right=other}setup.mode=d.m}else if(d.st)setup.teacher=d.st;else if(d.l)setup.left=d.l;else if(d.r)setup.right=d.r;else if(d.c)setup.cut=Number(d.c);else if(d.u)setup.units=Number(d.u);
+ paintSetup();saveEditing();
+};
+// 正在编辑一节已有的课：改老师、扣几课时、授课方式，点了就存（以前要再点一次卡片才存，新用户不知道；10-19）
+// 10-20：编辑班课时，学生框里少了人，以前会悄悄把这些人从课表里去掉。现在自动保存遇到这种情况先不存，点保存时再问
+function droppedNames(name){const r=rows.find(x=>x.id===edit);if(!r)return [];const now=name.split(/[、,，\s]+/).filter(Boolean);return (r.studentNames||[]).filter(n=>!now.includes(n))}
+function saveEditing(){if(!edit||!$('end').value)return;const name=$('student').value.trim();if(!name)return;if(droppedNames(name).length)return;const row=buildRow(name);rows=rows.map(r=>r.id===edit?row:r);save();render()}
+// 10-20：同一位老师、或同一个学生，同一时间排了两节课，加课时先问一下（新老师测试时排重了没发现）
+function clashes(row){const a=minutes(row.start),b=minutes(row.end),who=new Set(row.teachers||[row.teacher]),kids=new Set(row.studentNames||[]);
+ return rows.filter(r=>r.id!==row.id&&r.day===row.day&&minutes(r.start)<b&&a<minutes(r.end)).flatMap(r=>{const out=[],same=(r.studentNames||[]).filter(n=>kids.has(n));
+  if(same.length)out.push(same.join('、')+' 在 '+r.day+' '+r.start+'–'+r.end+' 已经有课了');
+  else if((r.teachers||[r.teacher]).some(t=>who.has(t)))out.push(r.day+' '+r.start+'–'+r.end+' 这位老师已经在上「'+r.name+'」');
+  return out})}
+function buildRow(name){
+ const dur=minutes($('end').value)-minutes($('start').value),all=TEACHERS.map(x=>x.key);let teacher,teachers,dual=null;
+ if(setup.mode==='single'){teacher=setup.teacher;teachers=[teacher]}
+ else if(setup.mode==='rotate'){teacher=setup.left==='both'?setup.right:setup.left;if(teacher==='both')teacher=all[0];teachers=[...new Set([setup.left,setup.right].flatMap(c=>c==='both'?all:[c]))];dual={minutes:Math.min(setup.cut,dur-15),left:setup.left,right:setup.right}}
+ else{teachers=all;teacher=all[0];dual={minutes:15,left:'both',right:'both'}}
+ return {id:edit||crypto.randomUUID(),name,studentNames:name.split('、'),day:$('day').value,start:$('start').value,end:$('end').value,teacher,teachers,units:setup.units,dual};
+}
+function loadSetup(r){
+ for(const c of [r.teacher,r.dual?.left,r.dual?.right,...(r.teachers||[])])if(c&&c!=='both'&&!TEACHERS.some(x=>x.key===c))TEACHERS.push({key:c,name:(colorNames[c]||c)+'老师',color:colors[c]||'#888'});
+ setup.units=r.units===2?2:1;
+ if(!r.dual){setup.mode='single';setup.teacher=r.teacher||'blue'}
+ else if(r.dual.left==='both'&&r.dual.right==='both'){setup.mode='together'}
+ else{setup.mode='rotate';setup.left=r.dual.left;setup.right=r.dual.right;setup.cut=r.dual.minutes}
+ paintSetup();
+}
+const _editRow=editRow;editRow=function(id){_editRow(id);const r=rows.find(x=>x.id===id);if(r)loadSetup(r)};
+const _dco=drawCourseOptions;drawCourseOptions=function(){_dco();paintSetup()};
+// 新课程：保存或移回待排后，授课方式回到“单师、扣 1 课时”，保留上次选的老师
+const resetSetup=()=>setTimeout(()=>{if(!$('student').value.trim()){setup.mode='single';setup.units=1;setup.left='red';setup.right='blue';setup.cut=30;paintSetup()}},120);
+$('form').addEventListener('submit',resetSetup);$('unschedule').addEventListener('click',resetSetup);
+paintSetup();
+</script>
+<script>
+// ===== 卡片列表上的拖拽：整节课 / 班课里的一位学生 / 未排课学生；拉下边缘改时长（都以 15 分钟为一格） =====
+const STEP=14,RSTEP=9;let lastDuration=45,lastStart='18:00',dnd=null;
+const snap15=v=>Math.round(v/15)*15,clampMin=(v,a,b)=>Math.max(a,Math.min(b,v)),cardHeight=dur=>Math.round(24+dur/15*6);
+function enhanceList(){
+ document.querySelectorAll('#schedule .row[data-id]').forEach(el=>{
+  const r=rows.find(x=>x.id===el.dataset.id);if(!r)return;
+  el.draggable=false;el.onclick=null;el.ondragstart=null;
+  el.style.minHeight=cardHeight(minutes(r.end)-minutes(r.start))+'px';el.classList.toggle('editing',edit===r.id);
+  const names=people(r),btn=el.querySelector('.name');
+  if(btn&&names.length>1&&!weekMode)btn.innerHTML=names.map(n=>'<span class="nm" data-nm="'+esc(n)+'" title="可单独拖出这位学生">'+esc(n)+'</span>').join('、');
+  if(!el.querySelector('.grip')){const g=document.createElement('div');g.className='grip';g.title='上下拉动调整时长';el.appendChild(g)}
+ });
+ document.querySelectorAll('#roster .studentchip').forEach(c=>{c.draggable=false;c.ondragstart=null});
+}
+function selectCard(id){openForm();editRow(id);document.querySelectorAll('#schedule .row.editing').forEach(x=>x.classList.remove('editing'));document.querySelector('#schedule .row[data-id="'+CSS.escape(id)+'"]')?.classList.add('editing')}
+const takeOut=(g,name)=>{g.studentNames=people(g).filter(n=>n!==name);g.name=g.studentNames.join('、');if(!g.studentNames.length)rows=rows.filter(x=>x!==g)};
+const addInto=(c,name)=>{if(!people(c).includes(name)){c.studentNames=people(c).concat(name);c.name=c.studentNames.join('、')}};
+function defaultStart(zone,y,dur){
+ const cards=[...zone.querySelectorAll('.row[data-id]')].filter(c=>!c.classList.contains('lifting'));let above=null;
+ for(const c of cards)if(c.getBoundingClientRect().bottom<=y+2)above=c;
+ if(above)return minutes(rows.find(x=>x.id===above.dataset.id).end);
+ if(cards.length)return Math.max(360,minutes(rows.find(x=>x.id===cards[0].dataset.id).start)-dur);
+ return minutes(lastStart);
+}
+// 拖到哪：周六、周日是两栏（先排满左栏再右栏），先看鼠标在哪一栏，再看在这一栏的哪两张卡片中间。
+// 返回 idx（插在全天第几张卡片前面，卡片按时间排）和蓝线的位置（屏幕坐标）。
+function dropSlot(zone,cards,x,y){
+ const z=zone.getBoundingClientRect(),rects=cards.map(c=>c.getBoundingClientRect());
+ if(!cards.length){const h=zone.querySelector('h3')?.getBoundingClientRect();return {idx:0,line:{left:z.left+10,width:z.width-20,top:(h?h.bottom:z.top)+6}}}
+ const cols=[];rects.forEach((r,i)=>{let c=cols.find(c=>Math.abs(c.left-r.left)<20);if(!c)cols.push(c={left:r.left,right:r.right,items:[]});c.items.push(i)});
+ cols.sort((a,b)=>a.left-b.left);
+ let col=cols.find(c=>x>=c.left-12&&x<=c.right+12)||cols.reduce((a,b)=>Math.abs((a.left+a.right)/2-x)<=Math.abs((b.left+b.right)/2-x)?a:b);
+ const at=col.items.find(i=>y<rects[i].top+rects[i].height/2);
+ const width=col.right-col.left;
+ if(at!=null){const prev=col.items[col.items.indexOf(at)-1];return {idx:at,line:{left:col.left,width,top:prev!=null?(rects[prev].bottom+rects[at].top)/2:rects[at].top-5}}}
+ const last=col.items[col.items.length-1];
+ return {idx:last+1,line:{left:col.left,width,top:rects[last].bottom+5}};
+}
+function dndCleanup(d){
+ d.float?.remove();d.src?.classList.remove('lifting','resizing');d.nmEl?.classList.remove('lifting');
+ document.querySelectorAll('.weekdrop.dropactive').forEach(z=>z.classList.remove('dropactive'));
+ document.querySelectorAll('.row.jointarget').forEach(c=>c.classList.remove('jointarget'));$('rosterpanel').classList.remove('dragover');
+ d.line?.remove();
+}
+document.addEventListener('pointerdown',e=>{
+ if(e.button!==0||dnd)return;
+ const grip=e.target.closest('#schedule .row .grip');
+ if(grip){const el=grip.parentElement,r=rows.find(x=>x.id===el.dataset.id);if(!r)return;e.preventDefault();const dur=minutes(r.end)-minutes(r.start);
+  dnd={resize:true,id:r.id,src:el,y0:e.clientY,dur0:dur,dur,min:r.dual?r.dual.minutes+15:15,max:Math.floor((1440-minutes(r.start))/15)*15-15,label:el.querySelector('.time')};el.classList.add('resizing');return}
+ const row=e.target.closest('#schedule .row[data-id]'),nm=e.target.closest('#schedule .nm'),chip=e.target.closest('#roster .studentchip');
+ if(!row&&!chip)return;let d;
+ if(row){const r=rows.find(x=>x.id===row.dataset.id);if(!r)return;const dur=minutes(r.end)-minutes(r.start);
+  d={kind:nm?'person':'course',id:r.id,name:nm?nm.dataset.nm:r.name,base:minutes(r.start),dur,src:row,nmEl:nm||null,zone:row.closest('.weekdrop')};e.preventDefault()}
+ else d={kind:'new',name:chip.dataset.name,base:null,dur:lastDuration,src:null,zone:null};
+ Object.assign(d,{x0:e.clientX,y0:e.clientY,anchorY:e.clientY,start:d.base,day:d.zone?.dataset.week||null,moved:false,valid:false});dnd=d;
+});
+document.addEventListener('pointermove',e=>{
+ const d=dnd;if(!d)return;
+ if(d.resize){const r=rows.find(x=>x.id===d.id);d.dur=clampMin(d.dur0+Math.round((e.clientY-d.y0)/RSTEP)*15,d.min,Math.max(d.min,d.max));d.src.style.minHeight=cardHeight(d.dur)+'px';d.label.textContent=r.start+'–'+clock(minutes(r.start)+d.dur)+' · '+d.dur+'分钟';return}
+ if(!d.moved){
+  if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<6)return;d.moved=true;
+  if(d.kind==='course'){const b=d.src.getBoundingClientRect();d.float=d.src.cloneNode(true);d.float.classList.add('floating');d.float.classList.remove('editing');d.float.style.width=b.width+'px';d.dx=e.clientX-b.left;d.dy=e.clientY-b.top;d.src.classList.add('lifting');d.label=d.float.querySelector('.time')}
+  else{d.float=document.createElement('div');d.float.className='floatchip';d.float.innerHTML='<b>'+esc(d.name)+'</b><span class="fl"></span>';d.dx=18;d.dy=16;d.label=d.float.querySelector('.fl');d.nmEl?.classList.add('lifting')}
+  document.body.appendChild(d.float);
+ }
+ d.float.style.left=(e.clientX-d.dx)+'px';d.float.style.top=(e.clientY-d.dy)+'px';
+ const under=document.elementFromPoint(e.clientX,e.clientY),zone=under?.closest('#schedule .weekdrop')||null,card=under?.closest('#schedule .row[data-id]')||null;
+ d.overRoster=d.kind!=='new'&&!!under?.closest('#rosterpanel');$('rosterpanel').classList.toggle('dragover',d.overRoster);
+ document.querySelectorAll('.weekdrop.dropactive').forEach(z=>z!==zone&&z.classList.remove('dropactive'));zone?.classList.add('dropactive');
+ // 10-20：经过别人的卡片不再自动加入；时间跟着“拖到哪两张卡片中间”走（默认接在上一节后面）；松手时和哪节课时间重合，再问要不要并成班课。
+ // 10-23：具体几点松手后在卡片下面的小条里调（−15 / +15 / 改时间），不再靠拖的时候上下挪
+ d.join=null;
+ d.valid=!!zone;
+ if(zone){
+  const cards=[...zone.querySelectorAll('.row[data-id]')].filter(c=>c.dataset.id!==d.id&&!c.classList.contains('lifting'));
+  const {idx,line}=dropSlot(zone,cards,e.clientX,e.clientY);
+  const prev=idx>0?rows.find(x=>x.id===cards[idx-1].dataset.id):null,next=idx<cards.length?rows.find(x=>x.id===cards[idx].dataset.id):null;
+  const lo=Math.max(360,prev?minutes(prev.start):360),hi=Math.max(lo,Math.min(1425-d.dur,next?minutes(next.start):1425-d.dur));
+  const slot=zone.dataset.week+'#'+idx;
+  if(slot!==d.slot){d.slot=slot;d.zone=zone;d.anchorY=e.clientY;
+   const own=d.kind==='course'?rows.find(x=>x.id===d.id):null;
+   d.base=own&&own.day===zone.dataset.week&&minutes(own.start)>=lo&&minutes(own.start)<=hi?minutes(own.start):prev?minutes(prev.end):next?minutes(next.start)-d.dur:(own?minutes(own.start):minutes(lastStart));}
+  d.day=zone.dataset.week;d.start=clampMin(snap15(d.base),360,1425-d.dur);
+  // 10-30：松手时鼠标压在别人的卡片上＝想和他排在同一时间（重合）：开始时间取那张卡片的开始，不再接到上一节后面；点“并成班课”的“取消”就单独排在这个重合的时间，不会跑到别的钟点
+  d.onCard=null;const hov=card&&card.dataset.id!==d.id?rows.find(x=>x.id===card.dataset.id):null;
+  if(hov&&hov.day===d.day){d.start=clampMin(snap15(minutes(hov.start)),360,1425-d.dur);d.onCard=hov.id}   // 10-23：不再上下微调（和换位置打架，周日 17:30 怎么都拖不到）；松手后用小条调
+  if(!d.line){d.line=document.createElement('div');d.line.className='dropline';d.line.innerHTML='<span></span>';document.body.appendChild(d.line)}
+  Object.assign(d.line.style,{left:line.left+'px',top:line.top+'px',width:line.width+'px'});   // 浮在上面画线，不插进卡片中间（插进去会把卡片挤动，两栏的周六日还会跳栏）
+  d.line.firstChild.textContent=clock(d.start)+'–'+clock(d.start+d.dur);
+ }else if(d.line){d.line.remove()}
+ d.label.textContent=d.overRoster?(d.kind==='person'?'退出这节课':'取消排课'):zone?d.day+' '+clock(d.start)+'–'+clock(d.start+d.dur):'';
+});
+function dndFinish(e,cancelled){
+ const d=dnd;if(!d)return;dnd=null;dndCleanup(d);
+ if(d.resize){const r=rows.find(x=>x.id===d.id);if(!cancelled&&r&&d.dur!==d.dur0){r.end=clock(minutes(r.start)+d.dur);save()}render();return}
+ if(cancelled){render();return}
+ if(!d.moved){if(d.kind!=='new')selectCard(d.id);return}
+ const g=d.id?rows.find(x=>x.id===d.id):null;
+ // 松手时和哪节课时间重合（不是自己这节）：问要不要并成一节班课
+ if(d.valid&&!d.overRoster&&!weekMode){
+  const c=rows.filter(r=>r.id!==d.id&&r.day===d.day&&minutes(r.start)<d.start+d.dur&&d.start<minutes(r.end)&&!(d.kind!=='course'&&(r.studentNames||[]).includes(d.name))).sort((a,b)=>Math.abs(minutes(a.start)-d.start)-Math.abs(minutes(b.start)-d.start))[0];
+  if(c&&confirm('和「'+c.name+'」（'+c.day+' '+c.start+'–'+c.end+'）时间重合了。\n\n要并成一节班课吗？\n\n点“取消”就单独排在 '+clock(d.start)+'–'+clock(d.start+d.dur)+'。')){
+   if(d.kind==='course'&&g){c.studentNames=[...new Set([...(c.studentNames||[]),...(g.studentNames||[])])];c.name=c.studentNames.join('、');rows=rows.filter(r=>r.id!==g.id);save();render();$('hint').textContent=g.name+' 已并进 '+c.day+' '+c.start+' 这节课，现在是：'+c.name+'。';return}
+   d.join=c.id;
+  }
+ }
+ if(d.kind==='course'){
+  if(d.overRoster){unschedule(d.id);return}
+  const placed=g&&d.valid&&(d.day!==g.day||d.start!==minutes(g.start));
+  if(placed){g.day=d.day;g.start=clock(d.start);g.end=clock(d.start+d.dur);lastStart=g.start;save()}
+  render();if(placed)showAdjust(g.id);return;
+ }
+ const fresh=()=>({id:crypto.randomUUID(),name:d.name,studentNames:[d.name],day:d.day,start:clock(d.start),end:clock(d.start+d.dur),teacher:g?g.teacher:setup.teacher,teachers:g?(g.teachers||[g.teacher]).slice():[setup.teacher],units:g?g.units:1,dual:g&&g.dual?JSON.parse(JSON.stringify(g.dual)):null});
+ if(d.kind==='person'){
+  if(!g){render();return}
+  if(d.overRoster){takeOut(g,d.name);save();render();$('hint').textContent=d.name+' 已退出这节课，回到未排课学生。';return}
+  if(d.join){const c=rows.find(x=>x.id===d.join);takeOut(g,d.name);addInto(c,d.name);save();render();$('hint').textContent=d.name+' 已并入 '+c.day+' '+c.start+' 这节课。';return}
+  if(d.valid&&!(d.day===g.day&&d.start===minutes(g.start))){const row=fresh();takeOut(g,d.name);rows.push(row);lastStart=row.start;save();render();selectCard(row.id);showAdjust(row.id);$('hint').textContent=d.name+' 已单独排到 '+row.day+' '+row.start+'–'+row.end+'。';return}
+  render();return;
+ }
+ if(d.join){const c=rows.find(x=>x.id===d.join);addInto(c,d.name);save();render();$('hint').textContent=d.name+' 已加入 '+c.day+' '+c.start+' 这节课。';return}
+ if(d.valid){const row=fresh();rows.push(row);lastStart=row.start;save();render();selectCard(row.id);showAdjust(row.id);$('hint').textContent=d.name+' 已排到 '+row.day+' '+row.start+'–'+row.end+'。拉卡片下边缘可改时长，左边可改老师和课时。'}
+}
+document.addEventListener('pointerup',e=>dndFinish(e,false));
+document.addEventListener('pointercancel',e=>dndFinish(e,true));
+// ---- 10-23 松手后的小条：卡片下面「周日 18:00–18:45 [−15 分] [+15 分] [改时间] [好]」，和别的课重合时多一个「并成班课」。
+// Mac 触控板没有滚轮，拖的时候上下挪又会换位置，所以具体几点放到松手以后调；点别处、按 Esc 就收起。
+const adj=document.createElement('div');adj.className='adjbar';adj.hidden=true;document.body.appendChild(adj);let adjId=null;
+document.head.insertAdjacentHTML('beforeend','<style>.adjbar{position:fixed;z-index:55;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:min(520px,calc(100vw - 16px));background:#fff;border:1px solid #c9d5ea;border-radius:12px;padding:7px 9px;box-shadow:0 6px 20px #2230471f;font-size:14px}.adjbar[hidden]{display:none}.adjbar button{font-size:13px;padding:5px 10px}.adjbar input{width:72px;font:inherit;padding:4px 6px;border:1px solid #9fb3d6;border-radius:8px}.adjbar .adjwarn{color:#a56a00;font-size:13px}</style>');
+const adjHit=r=>weekMode?null:rows.filter(x=>x.id!==r.id&&x.day===r.day&&minutes(x.start)<minutes(r.end)&&minutes(r.start)<minutes(x.end)&&!(x.studentNames||[]).some(n=>(r.studentNames||[]).includes(n)))[0]||null;
+function placeAdjust(){
+ const el=adjId&&document.querySelector('#schedule .row[data-id="'+CSS.escape(adjId)+'"]');if(!el){adj.hidden=true;return}
+ const b=el.getBoundingClientRect();adj.style.left=Math.max(8,Math.min(innerWidth-adj.offsetWidth-8,b.left))+'px';adj.style.top=Math.min(innerHeight-adj.offsetHeight-8,b.bottom+6)+'px';
+}
+function showAdjust(id){
+ const r=rows.find(x=>x.id===id);if(!r){adj.hidden=true;adjId=null;return}adjId=id;const hit=adjHit(r);
+ adj.innerHTML='<b>'+esc(r.day+' '+r.start+'–'+r.end)+'</b><button type="button" data-adj="-15">−15 分</button><button type="button" data-adj="15">+15 分</button><button type="button" data-adj="type">改时间</button>'
+  +(hit?'<span class="adjwarn">和「'+esc(hit.name)+'」'+hit.start+'–'+hit.end+' 重合</span><button type="button" data-adj="merge">并成班课</button>':'')+'<button type="button" class="primary" data-adj="ok">好</button>';
+ adj.hidden=false;placeAdjust();
+}
+function adjMove(r,start){const dur=minutes(r.end)-minutes(r.start);start=clampMin(snap15(start),360,1440-dur);r.start=clock(start);r.end=clock(start+dur);lastStart=r.start;save();render();showAdjust(r.id)}
+function adjTime(text){const m=String(text).trim().match(/^(\d{1,2})[:：.]?(\d{2})$/);if(!m||+m[1]>23||+m[2]>59)return null;return +m[1]*60+ +m[2]}
+adj.addEventListener('click',e=>{
+ const b=e.target.closest('[data-adj]');if(!b)return;const r=rows.find(x=>x.id===adjId);if(!r){adj.hidden=true;return}const a=b.dataset.adj;
+ if(a==='ok'){adj.hidden=true;adjId=null;return}
+ if(a==='type'){
+  const input=document.createElement('input');input.value=r.start;input.placeholder='17:30';b.replaceWith(input);input.focus();input.select();placeAdjust();
+  input.onkeydown=ev=>{if(ev.key==='Escape'){showAdjust(r.id);return}if(ev.key!=='Enter')return;const t=adjTime(input.value);if(t==null){input.style.borderColor='#d64545';return}adjMove(r,t)};
+  return;
+ }
+ if(a==='merge'){
+  const c=adjHit(r);if(!c)return;c.studentNames=[...new Set([...(c.studentNames||[]),...(r.studentNames||[])])];c.name=c.studentNames.join('、');rows=rows.filter(x=>x.id!==r.id);
+  save();render();adj.hidden=true;adjId=null;$('hint').textContent=r.name+' 已并进 '+c.day+' '+c.start+' 这节课，现在是：'+c.name+'。';return;
+ }
+ adjMove(r,minutes(r.start)+Number(a));
+});
+document.addEventListener('pointerdown',e=>{if(!adj.hidden&&!e.target.closest('.adjbar')){adj.hidden=true;adjId=null}},true);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!adj.hidden){adj.hidden=true;adjId=null}});
+addEventListener('scroll',()=>{if(!adj.hidden)placeAdjust()},true);addEventListener('resize',()=>{if(!adj.hidden)placeAdjust()});
+const _renderBase=render;render=function(){_renderBase();enhanceList();if(!adj.hidden)requestAnimationFrame(placeAdjust)};
+enhanceList();
+</script>
+<script>
+// ===== 撤销上一步：每次保存前记下之前的样子（本次打开页面期间最多 50 步；切换固定课表/临时安排或换周时清空） =====
+const undoStack=[];let lastSavedJson=JSON.stringify(rows),undoing=false;
+const paintUndo=()=>{$('undobtn').hidden=!undoStack.length;$('undobtn').textContent='↩ 撤销上一步'+(undoStack.length>1?'（'+undoStack.length+'）':'')};
+const _saveReal=save;
+save=function(){
+ const now=JSON.stringify(rows.map(({changed,was,...r})=>r));
+ if(!undoing&&now!==lastSavedJson){undoStack.push(lastSavedJson);if(undoStack.length>50)undoStack.shift()}
+ lastSavedJson=now;paintUndo();_saveReal();
+};
+function undoLast(){
+ if(!undoStack.length||scheduleLocked)return;
+ const prev=undoStack.pop();closeEditing();rows=JSON.parse(prev);undoing=true;save();undoing=false;render();paintUndo();
+ $('hint').textContent='已撤销上一步'+(undoStack.length?'，还可以再撤销 '+undoStack.length+' 步。':'。');
+}
+$('undobtn').onclick=undoLast;
+addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||'')){e.preventDefault();undoLast()}});
+// 载入或换周后，以当时的课表为起点
+const _setWeekU=setWeek;setWeek=async function(w){undoStack.length=0;await _setWeekU(w);lastSavedJson=JSON.stringify(rows.map(({changed,was,...r})=>r));paintUndo()};
+// ---- 临时安排：在空白处拖出一个框，框住的课一起停课（只对这一周；固定课表里不开放）
+let pick=null,picked=new Set();
+const pickbar=document.createElement('div');pickbar.className='pickbar';pickbar.hidden=true;document.body.appendChild(pickbar);
+function paintPicked(){
+ document.querySelectorAll('#schedule .row.picked').forEach(x=>x.classList.toggle('picked',picked.has(x.dataset.id)));
+ picked.forEach(id=>document.querySelector('#schedule .row[data-id="'+CSS.escape(id)+'"]')?.classList.add('picked'));
+ pickbar.hidden=!picked.size;pickbar.innerHTML=picked.size?'<span>已框选 '+picked.size+' 节</span><button type="button" data-pick="cancel" class="primary">这一周停课</button><button type="button" data-pick="clear">取消</button>':'';
+}
+function clearPicked(){picked.clear();paintPicked()}
+document.addEventListener('pointerdown',e=>{
+ if(!weekMode||e.button!==0||dnd||e.target.closest('.pickbar'))return;
+ const sch=$('schedule');if(!sch.contains(e.target)||e.target.closest('#schedule .row, button, input, select, a, summary, details'))return;
+ e.preventDefault();pick={x0:e.clientX,y0:e.clientY,box:null,add:e.shiftKey||e.metaKey};if(!pick.add)clearPicked();
+});
+document.addEventListener('pointermove',e=>{
+ if(!pick)return;
+ if(!pick.box){if(Math.hypot(e.clientX-pick.x0,e.clientY-pick.y0)<6)return;pick.box=document.createElement('div');pick.box.className='marquee';document.body.appendChild(pick.box);pick.base=new Set(picked)}
+ const l=Math.min(pick.x0,e.clientX),t=Math.min(pick.y0,e.clientY),w=Math.abs(e.clientX-pick.x0),h=Math.abs(e.clientY-pick.y0);
+ Object.assign(pick.box.style,{left:l+'px',top:t+'px',width:w+'px',height:h+'px'});
+ picked=new Set(pick.base);
+ document.querySelectorAll('#schedule .row[data-id]').forEach(el=>{const r=el.getBoundingClientRect();if(r.left<l+w&&r.right>l&&r.top<t+h&&r.bottom>t)picked.add(el.dataset.id)});
+ paintPicked();
+});
+document.addEventListener('pointerup',()=>{if(!pick)return;pick.box?.remove();pick=null});
+pickbar.onclick=e=>{
+ const b=e.target.closest('[data-pick]');if(!b)return;
+ if(b.dataset.pick==='clear'){clearPicked();return}
+ const n=picked.size,ids=new Set(picked);rows=rows.filter(r=>!ids.has(r.id));clearPicked();save();render();
+ $('hint').textContent='已把框选的 '+n+' 节课在 '+weekLabel(weekMode)+' 停课；固定课表没变。点“撤销上一步”或 ⌘Z 可以撤回。';
+};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&picked.size)clearPicked()});
+const _renderPick=render;render=function(...a){const out=_renderPick.apply(this,a);if(!weekMode)picked.clear();paintPicked();return out};
+const _applyWeekU=applyWeek;applyWeek=function(d){_applyWeekU(d);lastSavedJson=JSON.stringify(rows.map(({changed,was,...r})=>r))};
+setTimeout(()=>{lastSavedJson=JSON.stringify(rows.map(({changed,was,...r})=>r))},1500);
+</script>
+<style>
+.chg.leave{background:#fde8e8;color:#b23b3b}
+.chg.done{background:#e3f4ea;color:#2f8f5b}
+.leavemenu{position:fixed;z-index:70;background:#fff;border:1px solid #d7dde6;border-radius:10px;box-shadow:0 8px 24px #0002;padding:6px;min-width:170px;font-size:14px}
+.leavemenu div{padding:4px 8px 6px;color:#68788d;font-size:12px}
+.leavemenu button{display:block;width:100%;text-align:left;border:0;background:none;padding:7px 8px;border-radius:7px;font-size:14px;color:#223047}
+.leavemenu button:hover{background:#f1f4f8}
+</style>
+<script>
+// ---- 临时安排：按住一节课半秒（或右键）弹出菜单：给这一周的某位学生记“上课了”（直接扣课时）或标“请假”（只是标记）
+// 上课了 用的流水编号和签课表那一行一样，以后在纸上签了字也不会重复扣
+const leaveMenu=document.createElement('div');leaveMenu.className='leavemenu';leaveMenu.hidden=true;document.body.appendChild(leaveMenu);
+const leaveOf=id=>(weekMode&&weekPayload&&weekPayload.leave&&weekPayload.leave[id])||{};
+const bookedOf=id=>(weekMode&&weekPayload&&weekPayload.booked&&weekPayload.booked[id])||{};
+function paintLeave(){
+ if(!weekMode)return;
+ document.querySelectorAll('#schedule .row[data-id]').forEach(el=>{
+  const r=rows.find(x=>x.id===el.dataset.id);if(!r)return;
+  const marks=leaveOf(r.id),booked=bookedOf(r.id),solo=people(r).length===1,tags=[];
+  const done=Object.keys(booked).filter(n=>booked[n]==='lesson'),off=Object.keys(booked).filter(n=>booked[n]==='leave'),marked=Object.keys(marks).filter(n=>!booked[n]);
+  if(done.length)tags.push(['done',(solo?'':done.join('、')+' ')+'已记上课']);
+  if(off.length)tags.push(['leave',(solo?'':off.join('、')+' ')+'已记请假']);
+  if(marked.length)tags.push(['leave',(solo?'':marked.join('、')+' ')+'请假']);
+  let at=el.querySelector('.name');
+  for(const [cls,text] of tags){const t=document.createElement('small');t.className='chg '+cls;t.textContent=text;at?.after(t);at=t}
+ });
+}
+const _renderLeave=render;render=function(...a){const out=_renderLeave.apply(this,a);paintLeave();return out};
+// 菜单作用的那一周：临时安排里是选中的那周；固定课表里是本周（固定课表这节课本周实际那一次）
+let menuCtx=null;
+async function openLessonMenu(el,x,y){
+ let week=weekMode,payload=weekPayload;
+ if(!weekMode){
+  week=mondayISO(codaNow());
+  try{const res=await fetch('/api/adjust?week='+week,{cache:'no-store'});payload=await res.json();if(!res.ok)throw new Error(payload.error)}catch(e){$('hint').textContent='读取本周课表失败：'+(e.message||'请重试');return}
+ }
+ const r=payload.effective.find(q=>q.id===el.dataset.id);
+ if(!r){$('hint').textContent=weekMode?'这节课还没保存好，稍等一下再操作。':'这节课本周停了（或还没保存好），没有可记的。';return}
+ const marks=payload.leave?.[r.id]||{},booked=payload.booked?.[r.id]||{},date=addDays(week,days.indexOf(r.day)).slice(5).replace('-','/');
+ leaveMenu.innerHTML='<div>'+(weekMode?'':'本周 ')+r.day+' '+date+' '+r.start+'–'+r.end+'</div>'+people(r).map(n=>{
+  if(booked[n])return '<div>'+esc(n)+'：'+({lesson:'已记上课',noshow:'已记旷课'}[booked[n]]||'已记请假')+'（要改到课时管理撤销）</div>';
+  return '<button type="button" data-attend="'+esc(n)+'">上课了：'+esc(n)+'（扣 '+(r.units||1)+' 节）</button><button type="button" data-noshow="'+esc(n)+'">旷课：'+esc(n)+'（扣 '+(r.units||1)+' 节）</button><button type="button" data-leave="'+esc(n)+'" data-on="'+(marks[n]?'':'1')+'">'+(marks[n]?'取消请假：':'请假：')+esc(n)+'</button>'}).join('');
+ menuCtx={week,course:r.id};leaveMenu.hidden=false;
+ const w=leaveMenu.offsetWidth,h=leaveMenu.offsetHeight;
+ leaveMenu.style.left=Math.min(x,innerWidth-w-8)+'px';leaveMenu.style.top=Math.min(y,innerHeight-h-8)+'px';
+}
+document.addEventListener('contextmenu',e=>{const el=e.target.closest('#schedule .row[data-id]');if(!el)return;e.preventDefault();openLessonMenu(el,e.clientX,e.clientY)});
+// 按住不动半秒：取消这次拖动，弹出菜单（一动就还是拖动；单击还是打开编辑）
+let hold=null;
+document.addEventListener('pointerdown',e=>{
+ clearTimeout(hold?.timer);hold=null;
+ const el=e.button===0&&!e.target.closest('.grip')&&e.target.closest('#schedule .row[data-id]');if(!el)return;
+ hold={x:e.clientX,y:e.clientY,timer:setTimeout(()=>{if(dnd&&!dnd.moved){dndCleanup(dnd);dnd=null}hold=null;openLessonMenu(el,e.clientX,e.clientY)},500)};
+});
+document.addEventListener('pointermove',e=>{if(hold&&Math.hypot(e.clientX-hold.x,e.clientY-hold.y)>=6){clearTimeout(hold.timer);hold=null}});
+document.addEventListener('pointerup',()=>{if(hold){clearTimeout(hold.timer);hold=null}});
+document.addEventListener('pointerdown',e=>{if(!leaveMenu.hidden&&!leaveMenu.contains(e.target))leaveMenu.hidden=true},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')leaveMenu.hidden=true});
+leaveMenu.onclick=async e=>{
+ const b=e.target.closest('[data-leave],[data-attend],[data-noshow]');if(!b)return;leaveMenu.hidden=true;
+ const {week,course}=menuCtx||{},noshow=b.dataset.noshow!==undefined,attend=noshow||b.dataset.attend!==undefined,student=noshow?b.dataset.noshow:attend?b.dataset.attend:b.dataset.leave,on=!!b.dataset.on;
+ try{
+  const res=await fetch(attend?'/api/attend':'/api/leave/set',{method:'POST',headers:{'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'},body:JSON.stringify({week,course,student,on,by:'Mac',kind:noshow?'noshow':'lesson'})});
+  const out=await res.json().catch(()=>({}));
+  if(!res.ok){$('hint').textContent=(attend?'没记上：':'没标上：')+(out.error||'请重试');return}
+  if(weekMode===week&&weekPayload){weekPayload.leave=out.leave;weekPayload.booked=out.booked;render()}
+  $('hint').textContent=(weekMode?'':'（本周 '+week.slice(5).replace('-','/')+' 起）')+(attend?student+(noshow?' 已记旷课':' 已记上课')+'，扣 '+out.units+' 节。以后纸上签了字也不会重复扣；记错了到课时管理的流水里撤销。':student+(on?' 已标请假（只是标记，不扣课时）。签课表核对时：纸上勾了请假就算请假；纸上没勾会请你确认。':' 的请假标记已取消。'));
+ }catch(err){$('hint').textContent='连接服务不可用，没记上。'}
+};
+</script>
+
+<style>
+#freedlg{width:min(980px,96vw);border:0;border-radius:18px;padding:20px 24px;box-shadow:0 12px 40px #0003}
+#freedlg::backdrop{background:#0006}
+.fbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
+.fbar select,.fbar button{font:inherit;font-size:14px;padding:6px 12px;border:1px solid #dce1e9;border-radius:10px;background:#fff;cursor:pointer}
+.fbar .seg button[aria-pressed=true]{background:#223047;color:#fff;border-color:#223047}
+.fday{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;padding:7px 0;border-top:1px solid #f0f2f6}
+.fday b{font-size:15px}.fday small{color:#8190a4;display:block}
+.ftrack{position:relative;height:26px;background:#e3f4ea;border-radius:7px;overflow:hidden}
+.ftrack i{position:absolute;top:0;bottom:0;background:#c8ced8}
+.ftrack i.busy-other{background:#e4e8ef}
+.ftext{font-size:14px;color:#2f8f5b;margin-top:4px}.ftext.full{color:#8190a4}
+.fhours{font-size:13px;color:#68788d}.fhours input{width:52px;font:inherit;padding:3px 5px;border:1px solid #dce1e9;border-radius:6px}
+#freetext{width:100%;min-height:120px;margin-top:12px;font:15px/1.7 -apple-system,'PingFang SC',sans-serif;border:1px solid #dce1e9;border-radius:10px;padding:8px 10px}
+</style>
+<dialog id="freedlg">
+ <div style="display:flex;align-items:center;gap:10px"><b style="font-size:19px">空档</b><span class="muted" style="color:#8190a4;font-size:13px">灰色＝已经排了课，绿色＝空着（只列 30 分钟以上）</span><span style="flex:1"></span><button type="button" id="freeclose" style="font:inherit;border:1px solid #dce1e9;border-radius:10px;padding:6px 12px;background:#fff">关闭</button></div>
+ <div class="fbar">
+  <select id="freewho"></select>
+  <span class="seg" id="freeweek"></span>
+  <span style="flex:1"></span>
+  <button type="button" id="freecopy" style="background:#275de0;color:#fff;border-color:#275de0">复制空档（发微信）</button>
+ </div>
+ <div class="fhours" id="freehours"></div>
+ <div id="freedays" style="margin-top:8px"></div>
+ <textarea id="freetext" spellcheck="false"></textarea>
+</dialog>
+<script>
+// ===== 空档：选老师和哪一周，按工作时间算出还空着的时间段，可以复制成文字发微信 =====
+// 工作时间（用户 10-17 定）：周一到周五 10:00–20:00，周六 8:00–21:00，周日 8:00–20:00；窗口里可以改，记在这台电脑的浏览器里
+const FREE_DEFAULT={wk:['10:00','20:00'],sat:['08:00','21:00'],sun:['08:00','20:00']};
+let freeHours=(()=>{try{return Object.assign({},FREE_DEFAULT,JSON.parse(localStorage.getItem('free-hours')||'{}'))}catch(e){return {...FREE_DEFAULT}}})();
+let freeWeekOff=1,freeTeacher=TEACHERS[0]?.key||'blue';
+const hoursOf=i=>i<5?freeHours.wk:i===5?freeHours.sat:freeHours.sun;
+const fmtD=iso=>{const d=new Date(iso+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate()};
+// 一节课占用某位老师的时间段：双师轮流按前段/后段分开算，“一起”两位都占
+function busyOf(r,t){
+ const a=minutes(r.start),b=minutes(r.end),d=r.dual;
+ if(d&&d.left==='both'&&d.right==='both')return [[a,b]];
+ if(d){const m=a+(d.minutes||0),out=[];if(d.left===t||d.left==='both')out.push([a,m]);if(d.right===t||d.right==='both')out.push([m,b]);return out}
+ return (r.teacher===t||(r.teachers||[]).includes(t))?[[a,b]]:[];
+}
+async function paintFree(){
+ const week=addDays(mondayISO(codaNow()),7*freeWeekOff);
+ $('freewho').innerHTML=TEACHERS.map(t=>'<option value="'+t.key+'"'+(t.key===freeTeacher?' selected':'')+'>'+t.name+'</option>').join('')+'<option value="*"'+(freeTeacher==='*'?' selected':'')+'>教室（所有老师都没课）</option>';
+ $('freeweek').innerHTML=[['本周',0],['下周',1],['下下周',2]].map(([l,o])=>'<button type="button" data-off="'+o+'" aria-pressed="'+(o===freeWeekOff)+'">'+l+' '+fmtD(addDays(mondayISO(codaNow()),7*o))+'–'+fmtD(addDays(mondayISO(codaNow()),7*o+6))+'</button>').join('');
+ $('freehours').innerHTML='工作时间：周一到周五 <input data-h="wk0" value="'+freeHours.wk[0]+'">–<input data-h="wk1" value="'+freeHours.wk[1]+'">　周六 <input data-h="sat0" value="'+freeHours.sat[0]+'">–<input data-h="sat1" value="'+freeHours.sat[1]+'">　周日 <input data-h="sun0" value="'+freeHours.sun[0]+'">–<input data-h="sun1" value="'+freeHours.sun[1]+'">';
+ let rowsW=[];try{const r=await fetch('/api/adjust?week='+week,{cache:'no-store'});rowsW=(await r.json()).effective||[]}catch(e){$('freedays').innerHTML='读取课表失败';return}
+ const now=codaNow(),today=now.toLocaleDateString('sv'),nowMin=now.getHours()*60+now.getMinutes();
+ const tname=freeTeacher==='*'?'琴行':(TEACHERS.find(t=>t.key===freeTeacher)?.name||'');
+ const lines=[tname+(freeWeekOff===0?' 本周':freeWeekOff===1?' 下周':' 下下周')+'（'+fmtD(week)+'–'+fmtD(addDays(week,6))+'）可以约的时间：'];let html='';
+ days.forEach((day,i)=>{
+  const date=addDays(week,i),[hs,he]=hoursOf(i).map(minutes);let from=hs;
+  if(date<today)return;if(date===today)from=Math.max(hs,Math.ceil(nowMin/15)*15);
+  const lessons=rowsW.filter(r=>r.day===day);
+  const busy=lessons.flatMap(r=>freeTeacher==='*'?[[minutes(r.start),minutes(r.end)]]:busyOf(r,freeTeacher)).sort((a,b)=>a[0]-b[0]);
+  const free=[];let cur=from;for(const [a,b] of busy){if(a>cur)free.push([cur,Math.min(a,he)]);cur=Math.max(cur,b)}if(cur<he)free.push([cur,he]);
+  const slots=free.filter(([a,b])=>b-a>=30);const span=he-hs||1,pct=v=>Math.max(0,Math.min(100,(v-hs)/span*100));
+  html+='<div class="fday"><div><b>'+day+'</b><small>'+fmtD(date)+'</small></div><div><div class="ftrack">'+(from>hs?'<i class="busy-other" style="left:0;width:'+pct(from)+'%"></i>':'')+busy.map(([a,b])=>'<i style="left:'+pct(a)+'%;width:'+(pct(b)-pct(a))+'%"></i>').join('')+'</div>'
+   +'<div class="ftext'+(slots.length?'':' full')+'">'+(slots.length?slots.map(([a,b])=>clock(a)+'–'+clock(b)).join('、'):'已排满')+'</div></div></div>';
+  if(slots.length)lines.push(day+' '+fmtD(date)+'：'+slots.map(([a,b])=>clock(a)+'–'+clock(b)).join('、'));
+ });
+ $('freedays').innerHTML=html||'<div style="color:#8190a4;padding:10px 0">这一周已经过去了</div>';
+ $('freetext').value=lines.length>1?lines.join('\n'):tname+' 这一周已经排满了';
+}
+$('freebtn').onclick=()=>{$('freedlg').showModal();paintFree()};
+$('freeclose').onclick=()=>$('freedlg').close();
+$('freewho').onchange=()=>{freeTeacher=$('freewho').value;paintFree()};
+$('freeweek').onclick=e=>{const b=e.target.closest('[data-off]');if(b){freeWeekOff=+b.dataset.off;paintFree()}};
+$('freehours').onchange=e=>{const i=e.target.closest('[data-h]');if(!i||!/^\d{1,2}:\d{2}$/.test(i.value.trim()))return;const k=i.dataset.h.slice(0,-1),n=+i.dataset.h.slice(-1);freeHours[k]=freeHours[k].slice();freeHours[k][n]=i.value.trim().padStart(5,'0');try{localStorage.setItem('free-hours',JSON.stringify(freeHours))}catch(err){}paintFree()};
+$('freecopy').onclick=async()=>{try{await navigator.clipboard.writeText($('freetext').value);$('freecopy').textContent='已复制 ✓';setTimeout(()=>$('freecopy').textContent='复制空档（发微信）',1500)}catch(e){$('freetext').select()}};
+
+// 11-01 老师定：首页顶上提醒“有 X 张签课表待入账”，点一下进课时管理的核对；入账仍只由老师点
+(async()=>{try{const d=await (await fetch('/api/sheets',{cache:'no-store'})).json(),n=(d.pending||[]).length,el=document.getElementById('pendbanner');if(n){el.textContent='有 '+n+' 张签课表待入账，点这里去核对 ›';el.hidden=false;el.style.display='block'}}catch(e){}})();
+</script>

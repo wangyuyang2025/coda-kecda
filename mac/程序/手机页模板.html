@@ -1,0 +1,172 @@
+<!doctype html><meta charset="utf-8">
+<!-- 手机课表页模板：课程连接.py 只取用下面的样式和函数；整页旧网页已不再需要 -->
+<style>
+*{box-sizing:border-box}body{font:16px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;margin:0;background:#f4f6fa;color:#20324a}main{max-width:1150px;margin:auto;padding:22px}h1{font-size:26px;margin:0}h2{font-size:21px}p{color:#627086}nav,.bar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}button,input,select{font:inherit;border:1px solid #ccd5e2;border-radius:6px;padding:9px;background:white;color:#20324a}button{cursor:pointer}button.active,.primary{background:#245bd3;color:white}input[type=number]{width:95px}table{border-collapse:collapse;width:100%;background:white}td,th{text-align:left;padding:11px;border:1px solid #dce2eb}th{background:#eaf0fa}.wrap{overflow:auto}.red{color:#bd3939}.blue{color:#245bd3}.muted{color:#6c7685;font-size:14px}.warn{color:#a4680c}img{max-width:150px;max-height:80px}label{display:flex;gap:8px;align-items:center}.printhead,.printfoot{display:none}.signbox{width:26%;min-width:140px}.empty{padding:25px;background:white}.badge{background:#fff1d3;padding:3px 7px;border-radius:4px}footer{margin-top:20px;font-size:14px;color:#647187}@media(max-width:600px){main{padding:12px}td,th{padding:9px;font-size:14px}nav button{flex:1}h1{font-size:23px}}@media print{@page{size:A4 portrait;margin:12mm}body{background:white;color:black}main{padding:0;max-width:none}header,nav,.bar,.help,footer,.noprint{display:none!important}.printhead,.printfoot{display:block}h2{font-size:19px;margin:0 0 6px}.printhead p{font-size:12px;margin:4px 0 12px;color:black}table{table-layout:fixed;font-size:12px}th,td{border:1px solid #555;padding:6px;font-size:12px}th{background:#eee}thead{display:table-header-group}tr{break-inside:avoid}td{height:38px}th:nth-child(1){width:20%}th:nth-child(2){width:18%}th:nth-child(3){width:10%}th:nth-child(4){width:9%}th:nth-child(5){width:27%}th:nth-child(6){width:16%}.red,.blue{color:black}.printfoot{font-size:11px;margin-top:8px}.wrap{overflow:visible}.signbox{min-width:0}input{border:0;padding:0;width:100%}}
+
+.printcolumns{display:grid;grid-template-columns:1fr 1fr;gap:12px}.printcolumns table{min-width:0}.printcolumns small{font-size:10px}@media(max-width:850px){.printcolumns{grid-template-columns:1fr}}@media print{@page{size:A4 landscape;margin:7mm}body{font-size:10px}.printcolumns{display:grid!important;grid-template-columns:1fr 1fr;gap:4mm}.weeklysheet table{font-size:9px;table-layout:fixed}.weeklysheet th,.weeklysheet td{font-size:9px;padding:2px 3px;line-height:1.2;height:7mm;overflow-wrap:anywhere}.weeklysheet small{font-size:6.5px;white-space:nowrap}.weeklysheet th:nth-child(1){width:21%}.weeklysheet th:nth-child(2){width:23%}.weeklysheet th:nth-child(3){width:6%}.weeklysheet th:nth-child(4){width:8%}.weeklysheet th:nth-child(5){width:27%}.weeklysheet th:nth-child(6){width:15%}.printhead h2{font-size:16px;margin:0}.printhead p{font-size:10px;margin:3px 0 5px}.printfoot{font-size:9px;margin-top:4px}.signbox{width:auto;min-width:0}}
+@media print{.weeklysheet th:nth-child(1){width:25%}.weeklysheet th:nth-child(2){width:20%}.weeklysheet th:nth-child(3){width:35%}.weeklysheet th:nth-child(4){width:20%}}
+.studentcard{max-width:680px;background:white;padding:24px;margin:auto;border-radius:12px}.studentcard h2{font-size:24px;margin:0}.statementdate{font-size:14px}.stats{display:flex;gap:16px;border-top:2px solid #245bd3;padding-top:16px}.stats>div{flex:1;color:#627086}.stats strong{display:block;color:#20324a;font-size:26px}.paymentbrief{font-size:14px;padding:12px;background:#f2f5fa}.statementlesson{padding:16px 0;border-top:1px solid #dce2eb;break-inside:avoid}.statementlesson p{font-size:14px;margin:5px 0}.proof img{max-width:100%;max-height:140px;object-fit:contain}.proof{min-height:42px}.studentcard .muted{font-size:14px}@media print{body.printingstatement .studentcard{max-width:100%;padding:0}body.printingstatement #statement{display:block}body.printingstatement .studentcard h2{font-size:22px}body.printingstatement .proof img{max-height:120px}body.printingstatement .statementlesson{padding:10px 0}}.studentcard{max-width:1000px;padding:18px}.consumption{table-layout:auto}.consumption th,.consumption td{padding:4px 7px;font-size:14px;white-space:nowrap;height:30px}.consumption img{max-height:28px;max-width:140px;vertical-align:middle}.stats{padding-top:8px}.stats strong{font-size:22px}.paymentbrief{margin:8px 0;padding:6px}.studentcard h2{font-size:22px}#statement{overflow:auto}@media print{body.printingstatement .consumption th,body.printingstatement .consumption td{font-size:11px;height:7mm;padding:2px 4px}body.printingstatement .consumption img{max-height:6mm;max-width:28mm}body.printingstatement .consumption{table-layout:auto}body.printingstatement .stats strong{font-size:18px}body.printingstatement .studentcard h2{font-size:20px}body.printingstatement #statement{overflow:visible}}.weekcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.weekday{background:white;border:1px solid #dce2eb;border-radius:8px;overflow:hidden}.weekday h3{margin:0;padding:12px;background:#eaf0fa}.weeklesson{padding:12px;border-top:1px solid #e7ebf1}.weeklesson div{margin-top:5px}dialog{border:1px solid #ccd5e2;border-radius:12px;width:min(440px,94vw);padding:24px}dialog::backdrop{background:#172c4670}dialog label{margin:14px 0;justify-content:space-between}dialog input{min-width:0;width:70%}@media print{dialog{display:none}}
+
+.consumption{width:100%;table-layout:fixed}.consumption th,.consumption td{white-space:normal;overflow-wrap:anywhere}.consumption th:nth-child(1){width:6%}.consumption th:nth-child(2){width:16%}.consumption th:nth-child(3){width:15%}.consumption th:nth-child(4){width:6%}.consumption th:nth-child(5){width:8%}.consumption th:nth-child(6){width:14%}.consumption th:nth-child(7){width:35%}.consumption td{height:48px}.consumption img{max-height:44px;max-width:100%;object-fit:contain}@media print{body.printingstatement .consumption{table-layout:fixed}body.printingstatement .consumption td{height:8mm}body.printingstatement .consumption img{max-height:7.5mm;max-width:100%}body.printingstatement .consumption th,body.printingstatement .consumption td{font-size:10px;padding:2px}body.printingstatement .consumption th:nth-child(1){width:6%}body.printingstatement .consumption th:nth-child(2){width:16%}body.printingstatement .consumption th:nth-child(3){width:15%}body.printingstatement .consumption th:nth-child(4){width:6%}body.printingstatement .consumption th:nth-child(5){width:8%}body.printingstatement .consumption th:nth-child(6){width:14%}body.printingstatement .consumption th:nth-child(7){width:35%}}
+#namecandidates{display:flex;flex-wrap:wrap;gap:6px}#namecandidates button{color:#245bd3}
+.editablecourse{cursor:pointer;outline:1px dashed #9aabc8;outline-offset:-3px}.editablecourse:hover{background:#edf3ff}#namecandidates{max-height:210px;overflow:auto;display:block;border-radius:6px}#namecandidates:empty{display:none}#namecandidates button{display:block;width:100%;text-align:left;border-radius:0;border:0;border-bottom:1px solid #edf0f5;background:#f5f8ff;padding:10px}
+@media print{body.printingstatement .consumption th:nth-child(6),body.printingstatement .consumption td:nth-child(6){display:none}body.printingstatement .consumption th:nth-child(7){width:49%}}
+@media screen{.wrap:has(table){max-height:72vh;overflow:auto;position:relative;isolation:isolate}.wrap thead th{position:sticky;top:0;z-index:5;background:#eaf0fa;box-shadow:0 1px 0 #bbc9dc}.weeklysheet.wrap{max-height:none}.weeklysheet thead th{position:static}#statement{max-height:75vh;overflow:auto}.consumption thead th{position:sticky;top:0;z-index:5;background:#eaf0fa}}@media print{.wrap,#statement{max-height:none!important;overflow:visible!important}thead th{position:static!important;box-shadow:none!important}}
+.inlinefield{display:block;margin:7px 0;font-size:14px}.inlinefield input{display:block;width:100%;margin-top:3px;color:#20324a}.inlinenamematches button{display:block;width:100%;text-align:left;background:#edf3ff;border:0;border-bottom:1px solid white}.weeklesson select{margin-top:6px}
+[hidden]{display:none!important}
+.unitbuttons{display:flex;gap:6px;margin-top:8px}.unitbuttons button{flex:1;font-size:14px}
+.colorbuttons{display:flex;gap:6px;margin:8px 0}.colorbuttons button{flex:1}.redchoice{color:#b62e2e;border-color:#c65b5b}.bluechoice{color:#245bd3;border-color:#537dd5}.redchoice.chosen{background:#c13737;color:white}.bluechoice.chosen{background:#245bd3;color:white}
+.signday{margin-bottom:12px;break-inside:avoid}.signday h3{background:#eaf0fa;padding:6px 9px;margin:0;font-size:16px}.weeklysheet td{height:34px}.weeklysheet th:nth-child(1){width:24%}.weeklysheet th:nth-child(2){width:22%}.weeklysheet th:nth-child(3){width:40%}.weeklysheet th:nth-child(4){width:14%}@media print{@page{size:A4 portrait;margin:8mm}.printcolumns{grid-template-columns:1fr 1fr!important;gap:4mm}.signday{margin-bottom:3mm}.signday h3{padding:2mm;font-size:11px;background:#eee}.weeklysheet th,.weeklysheet td{font-size:9px;padding:1mm;line-height:1.2}.weeklysheet td{height:7.5mm}.weeklysheet th:nth-child(1){width:24%}.weeklysheet th:nth-child(2){width:22%}.weeklysheet th:nth-child(3){width:40%}.weeklysheet th:nth-child(4){width:14%}.weeklysheet .signbox{min-width:0}.printhead h2{font-size:15px}.printhead p{font-size:10px}}
+@media print{@page{size:A4 portrait;margin:5mm}.signday{margin-bottom:2mm}.signday h3{font-size:13px;padding:1.5mm 2mm}.weeklysheet td{height:9mm;padding:1mm;font-size:11px}.weeklysheet td:nth-child(2){font-size:12px;font-weight:600;line-height:1.25}.weeklysheet th{font-size:10px}.weeklysheet th:nth-child(1){width:26%}.weeklysheet th:nth-child(2){width:26%}.weeklysheet th:nth-child(3){width:38%}.weeklysheet th:nth-child(4){width:10%}.printhead h2{font-size:17px}.printhead p{margin:2px 0 4px;font-size:11px}.printcolumns{gap:3mm}}@media print{.weeklysheet td{height:7.4mm;padding:0.6mm 0.8mm;line-height:1.1}.weeklysheet td:nth-child(2){font-size:13px;line-height:1.1}.weeklysheet th{padding:0.7mm;font-size:10px}.signday{margin-bottom:1.5mm}.signday h3{font-size:12px;padding:1mm 2mm}.printhead h2{font-size:16px;line-height:1.1}.printhead p{margin:2px 0 3px;line-height:1.1}.printfoot:empty{display:none}}.dualblocks{display:flex;gap:3px;margin:10px 0}.dualpart{min-width:0;padding:8px 4px;border-radius:5px;color:white;font-size:12px;overflow-wrap:anywhere}.dualpart.red{background:#bf4141}.dualpart.blue{background:#3465c0}.dualpart b,.dualpart span{display:block}.dualpart b{font-weight:400}.dualslider{width:100%;padding:0}.dualchoices{display:flex;gap:8px}.dualchoices>div{flex:1}.dualchoices button{padding:6px;margin:3px;font-size:14px}@media print{.weeklysheet td:nth-child(2){font-weight:400}}
+
+/* Course editing controls */
+.colorbuttons{display:flex;flex-wrap:nowrap;gap:4px}
+.colorbuttons button{flex:1;min-width:0;white-space:nowrap;padding:7px 3px;font-size:13px}
+.colorbuttons [data-deletecourse]{font-size:11px}
+.dualchoices{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;width:100%}
+.dualchoices>div{display:flex;flex-wrap:nowrap;align-items:center;gap:2px;min-width:0}
+.dualchoices button{box-sizing:border-box;white-space:nowrap;min-width:0;margin:0;padding:6px 2px;font-size:12px;flex:0 0 25px}
+.dualchoices button[data-dualboth]{flex:1 1 auto;min-width:28px}
+.dualblocks .dualpart.both,.dualchoices button[data-dualboth][aria-pressed="true"]{background:linear-gradient(to right,#bf4141 0%,#bf4141 50%,#3465c0 50%,#3465c0 100%);color:#fff;border:1px solid #bf4141}
+@media screen{.weeklesson.editready{outline:none;border:2px dashed #a6b8d5;border-radius:12px;background:#f5f8fe;margin:10px 8px;padding:16px 12px;min-height:88px;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}.weeklesson.editready:hover{background:#edf3ff;border-color:#5b83c7;box-shadow:0 0 0 3px #e7effc}.weeklesson.editready:focus-within{background:#fff;border-color:#3973d5;box-shadow:0 0 0 3px #e7effc}}
+.unitbuttons{display:flex;gap:4px;flex-wrap:nowrap}
+.unitbuttons button{flex:1;min-width:0;padding:7px 3px;font-size:12px;white-space:nowrap}
+@media print{.weeklesson.editready{outline:none}}
+.videocard{background:white;border:1px solid #ccd5e2;border-radius:10px;padding:16px;margin:12px 0}.videomodel{margin:12px 0}.videonames{display:flex;gap:10px;flex-wrap:wrap;max-height:180px;overflow:auto}.videonames label{white-space:nowrap}.videocard summary{cursor:pointer;margin-top:12px}.videocard summary{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.videocard summary>span:before{content:"▸ ";color:#627086}.videocard details[open] summary>span:before{content:"▾ "}.videocard summary button{padding:6px 12px;font-size:14px}
+@media screen{main:has(.weekcards){max-width:1480px}.dualblocks{gap:4px;margin:6px 0}.dualblocks .dualpart{min-width:100px;padding:5px 4px;font-size:12px;white-space:nowrap;overflow-wrap:normal}.dualblocks .dualpart b{white-space:nowrap}.weeklesson{padding:10px}.weeklesson .dualblocks>div{margin-top:0}}@media screen and (max-width:600px){.weekcards{grid-template-columns:minmax(0,1fr)}}
+
+@media screen{.weeklesson .dualblocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:224px;max-width:100%;gap:4px}.weeklesson .dualblocks .dualpart{min-width:0;padding:5px 3px;text-align:center}}
+
+@media screen and (max-width:600px){main{padding:14px 10px}nav{gap:6px}nav button{padding:8px;font-size:14px}.bar{gap:7px;margin:12px 0}.bar label{max-width:100%}button{min-height:40px}dialog{width:94vw;padding:16px}dialog input{max-width:100%}.studentcard{padding:12px}.wrap{max-width:100%;-webkit-overflow-scrolling:touch}#docnote{width:100%}#docform input[type=file]{max-width:100%}}
+ .handoffbadge{display:inline-block;background:#fff0cd;color:#8a4b00;border-radius:6px;padding:3px 6px;font-size:12px;margin:3px}.handoffsummary{padding:10px;background:#fff8e9;border:1px solid #efd9a1;border-radius:8px;margin:10px 0}.handoffsummary button{margin:3px}@media print{.handoffbadge,.handoffsummary{display:none}}.bulkname{display:block;margin:4px 0;max-width:100%;color:inherit;text-align:left}.bulkname.recorded{background:#e8f4e9;border-color:#4b985a}#bulkdialog{width:440px;max-width:90vw}#bulkdialog input,#bulkdialog select{max-width:65%}.docgallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}.docpreview{display:flex;flex-direction:column;gap:8px;background:white;padding:10px;border:1px solid #dce3ef;border-radius:10px;text-decoration:none;color:inherit}.docpreview img{width:100%;height:240px;object-fit:contain}.docpreview small{color:#627086}.phoneDays{display:block}.phoneDay{width:100%;box-sizing:border-box;padding:0 4px;margin-bottom:24px}.phoneCourse{background:white;border:1px solid #dce3ef;border-radius:12px;padding:12px;margin:12px 0}.phoneRow{display:flex;gap:12px;align-items:flex-start}.phoneRow b{font-size:16px;white-space:nowrap;font-weight:500}.phoneRow>span{font-size:18px;overflow-wrap:anywhere}.phoneTeachers{display:flex;gap:4px;margin-top:10px}.phoneTeachers span{flex:1;text-align:center;color:white;font-size:13px;padding:6px 2px;border-radius:6px}.phoneTimes{display:flex;flex-direction:column;gap:5px;flex:0 0 116px}.phoneTime{display:block;border-radius:7px;padding:7px 4px;color:white;text-align:center;font-size:14px;white-space:nowrap}.phoneRow{align-items:center}.phoneRow>span{flex:1;min-width:0}.phoneCourse{width:fit-content;max-width:100%;box-sizing:border-box;padding:9px 11px}.phoneCourse .phoneRow{gap:10px}.phoneCourse .phoneRow>span{flex:0 1 auto;min-width:0}.phoneCourse .phoneTimes{flex:0 0 auto;width:116px}
+.phoneDays{padding:0 2px}.phoneDay{margin:0 0 28px;padding:0}.phoneDay h3{font-size:22px;letter-spacing:1px;margin:20px 0 8px;color:#20324a}.phoneCourse{width:100%;max-width:100%;border:0;border-bottom:1px solid #e1e6ee;border-radius:0;background:transparent;margin:0;padding:17px 0}.phoneCourse:last-child{border-bottom:0}.phoneCourse .phoneRow{gap:17px;align-items:center}.phoneCourse .phoneTimes{width:112px;flex:0 0 112px;gap:8px}.phoneTime{display:flex;align-items:center;position:relative;border-radius:0;padding:0;color:#5b687a;font-size:14px;line-height:23px;white-space:nowrap;text-align:left;background:transparent}.phoneTime i{display:block;width:4px;height:21px;border-radius:3px;margin-right:9px;flex-shrink:0}.phoneCourse .phoneRow>span{flex:1;font-size:19px;font-weight:500;line-height:1.55;color:#20324a;min-width:0}#phoneRefresh{border:0;background:transparent;color:#527094;font-size:14px;padding:6px 8px}.phoneToday{font-size:13px;font-weight:600;color:#fff;background:#3e70cb;border-radius:10px;padding:2px 8px;margin-left:6px;vertical-align:3px;letter-spacing:0}.phoneTag{font-style:normal;font-size:12px;font-weight:600;color:#9a5b00;background:#fff0cd;border-radius:6px;padding:2px 6px;margin-left:8px;vertical-align:3px}.phoneTag.off{color:#8a94a3;background:#eef0f4}.phoneCourse.cancelled .phoneTime,.phoneCourse.cancelled .phoneRow>span{color:#a6afbb;text-decoration:line-through}.phoneCourse.cancelled .phoneTag{text-decoration:none}
+
+.phoneStudent{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.phoneTag.leave{color:#b23b3b;background:#fde8e8}.phoneTag.done{color:#2f8f5b;background:#e3f4ea}
+.leavemenu{position:fixed;z-index:70;background:#fff;border:1px solid #d7dde6;border-radius:12px;box-shadow:0 8px 24px #0003;padding:6px;min-width:200px;font-size:16px}.leavemenu[hidden]{display:none}.leavemenu div{padding:6px 10px 8px;color:#68788d;font-size:13px}.leavemenu button{display:block;width:100%;text-align:left;border:0;background:none;padding:12px 10px;border-radius:8px;font-size:17px;color:#223047;min-height:44px}.leavemenu button:active{background:#f1f4f8}.phoneStudent.onleave{color:#a6afbb!important}
+</style>
+<script>
+let phoneTeacher=(()=>{let value;try{value=localStorage.getItem('lesson-phone-filter')}catch(e){}value=value||window.__lessonTeacher;return ['all','red','blue'].includes(value)?value:'all'})();
+window.setPhoneFilter=setPhoneFilter;
+function setPhoneFilter(value){
+ phoneTeacher=value;try{localStorage.setItem('lesson-phone-filter',value)}catch(e){}window.__lessonTeacher=value;
+ if(window.webkit?.messageHandlers?.lessonNative)nativeMobile('setTeacher',{teacher:value});
+ renderPhoneSchedule();
+}
+
+function renderPhoneSchedule(){
+ document.querySelector('header').style.display='none';document.querySelector('nav').style.display='none';$('editdevice').parentElement.style.display='none';$('foot').style.display='none';document.body.style.background=phoneTeacher==='blue'?'#edf3ff':phoneTeacher==='red'?'#fff0f0':'#ffffff';
+ // 从今天起 7 天实际要上的课（服务端已算好临时安排）：r[8] 变动 move/add/cancel，r[9] 日期
+ const days=initial.dates,tag={move:'改时间',add:'临时',cancel:'停课'};
+ const color=c=>c==='red'?'#cf4747':c==='both'?'linear-gradient(90deg,#cf4747 50%,#3e70cb 50%)':'#3e70cb';
+ const badge=(time,teacher)=>'<span class="phoneTime"><i aria-hidden="true" style="background:'+color(teacher)+'"></i>'+esc(time)+'</span>';
+ const myStart=r=>{const d=r[6],b=timeBounds(r);if(!b)return 0;if(!d||phoneTeacher==='all')return b[0];return (d.left===phoneTeacher||d.left==='both')?b[0]:b[0]+d.minutes};
+ $('view').innerHTML='<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button type="button" id="phoneRefresh">刷新</button></div><div class="phoneDays">'+days.map(({date,day},di)=>{
+ const rows=schedule.filter(r=>r[9]===date&&!r[7]&&r[2]!=='练习'&&r[3]!=='基本功'&&(phoneTeacher==='all'||(r[6]?[r[6].left,r[6].right]:[r[4]]).some(c=>c===phoneTeacher||c==='both'))).sort((a,b)=>myStart(a)-myStart(b)||a[1].localeCompare(b[1]));if(!rows.length)return '';
+ return '<section class="phoneDay"><h3>'+date.slice(5).replace('-','/').replace(/^0/,'')+' '+day+(di===0?' <small class="phoneToday">今天</small>':'')+'</h3>'+rows.map(r=>{
+ const dual=r[6],bounds=timeBounds(r);let times=badge(r[1],r[4]);
+ if(dual&&bounds&&dual.left==='both'&&dual.right==='both'){times=badge(r[1],'both')}else if(dual&&bounds){const split=bounds[0]+dual.minutes;times=[{time:clock(bounds[0])+'–'+clock(split),teacher:dual.left},{time:clock(split)+'–'+clock(bounds[1]),teacher:dual.right}].filter(p=>phoneTeacher==='all'||p.teacher===phoneTeacher||p.teacher==='both').map(p=>badge(p.time,p.teacher)).join('')}
+ const mark=r[8]?'<em class="phoneTag'+(r[8]==='cancel'?' off':'')+'">'+tag[r[8]]+'</em>':'';
+ if(r[8]==='cancel')return '<article class="phoneCourse cancelled"><div class="phoneRow"><div class="phoneTimes">'+times+'</div><span>'+esc(names(r).join('、'))+mark+'</span></div></article>';
+ return '<article class="phoneCourse"><div class="phoneRow"><div class="phoneTimes">'+times+'</div><span>'+names(r).map(n=>{const done=(r[13]||{})[n],marked=(r[12]||[]).includes(n),off=done==='leave'||(!done&&marked);return '<button class="phoneStudent'+(off?' onleave':'')+'" data-student="'+esc(n)+'" data-student-id="'+esc(db.studentIds?.[n]||n)+'" data-course="'+esc(r[10]||'')+'" data-week="'+esc(r[11]||'')+'" data-date="'+esc(r[9])+'" data-time="'+esc(r[1])+'" data-units="'+(r[5]||1)+'" data-booked="'+(done||'')+'" data-marked="'+(marked?'1':'')+'" style="border:0;background:none;padding:4px;font:inherit;color:inherit">'+esc(n)+(done==='lesson'?'<em class="phoneTag done">已上</em>':off?'<em class="phoneTag leave">请假</em>':'')+'</button>'}).join('、')+mark+'</span>'+'</div></article>';
+ }).join('')+'</section>';
+ }).join('')+'</div>';
+ const host=$('view');let start=null;
+ host.ontouchstart=e=>{start=null;if(e.touches.length!==1||e.target.closest('button,a,input,select,dialog'))return;start={x:e.touches[0].clientX,y:e.touches[0].clientY,top:window.scrollY<=0}};
+ host.ontouchend=e=>{if(window.__nameDrag||Date.now()-(window.__nameDragJustEnded||0)<400){start=null;return}if(!start)return;const origin=start;start=null;const touch=e.changedTouches[0];if(touch&&touch.clientX-origin.x < -80&&Math.abs(touch.clientY-origin.y)<60){nativeMobile('captureQueue');return}if(touch&&origin.top&&touch.clientY-origin.y>=80&&Math.abs(touch.clientX-origin.x)<50)setPhoneFilter(phoneTeacher==='blue'?'red':'blue')};
+ host.ontouchcancel=()=>{start=null};
+ host.querySelectorAll('[data-student]').forEach(b=>{
+  // 1.1 名字上的手势（10-18 用户定）：
+  //  点一下＝打开相机（720p，相机里可一键换 1080p/4K），随记也换成他
+  //  按住 0.4 秒（轻震）＝菜单出现在手指上方：手指不松滑到某一项再松手＝选它；原地松手＝菜单留着，用点的
+  //  一直按到 1.2 秒（重震）＝直接录语音给他，松手保存
+  //  按住拖到最底下＝打字记给他
+  // 松手由 window 上的监听统一收尾（见 nameDragEnd）：App 为“下拉刷新”注入的脚本会在往下拖后吞掉松手事件，名字上的监听收不到
+  let t1=null,t2=null,held=false,x0=0,y0=0;
+  const stop=()=>{clearTimeout(t1);clearTimeout(t2)};
+  b.addEventListener('touchstart',e=>{held=false;stop();const t=e.touches?.[0];if(!t)return;x0=t.clientX;y0=t.clientY;
+   t1=setTimeout(()=>{held=true;window.__nameDrag={b,x0,y0,last:{x:x0,y:y0},stage:1,stop};nativeMobile('haptic',{style:'light'});openLessonMenu(b,x0,y0);nameChip(b.dataset.student,x0,y0,true)},400);
+   t2=setTimeout(()=>{const d=window.__nameDrag;if(!d||d.b!==b||d.moved)return;d.stage=2;nativeMobile('haptic',{style:'heavy'});hideLessonMenu();nameChip(null);
+    nativeMobile('voiceStart',{name:b.dataset.student,studentId:b.dataset.studentId})},1200)});
+  b.addEventListener('touchmove',e=>{const t=e.touches?.[0];if(!t)return;const d=window.__nameDrag;
+   if(!held){if(Math.hypot(t.clientX-x0,t.clientY-y0)>10)stop();return}
+   e.preventDefault();if(!d||d.stage!==1)return;d.last={x:t.clientX,y:t.clientY};
+   if(Math.hypot(t.clientX-x0,t.clientY-y0)>14){d.moved=true;clearTimeout(t2)}
+   const item=menuItemAt(t.clientX,t.clientY);hotMenuItem(item);nameChip(b.dataset.student,t.clientX,t.clientY,!item)},{passive:false});
+  b.addEventListener('touchend',stop);b.addEventListener('touchcancel',stop);
+  b.oncontextmenu=e=>e.preventDefault();
+  b.onclick=e=>{if(held){held=false;e.preventDefault();return}nativeMobile('pinNote',{name:b.dataset.student,studentId:b.dataset.studentId})};
+ });
+ const refresh=$('phoneRefresh');refresh.onclick=()=>{if(window.webkit?.messageHandlers?.lessonNative){nativeMobile('refreshSchedule');return}location.reload()};
+ if(window.webkit?.messageHandlers?.lessonNative&&!window.phoneCaching)cachePhoneSchedule();
+
+}
+
+// 按住名字之后的松手：挂在 window 的捕获阶段（比 App 注入的下拉刷新脚本更早），保证一定收得到
+function nameDragEnd(){
+ const d=window.__nameDrag;if(!d)return;window.__nameDrag=null;d.stop?.();nameChip(null);
+ const b=d.b,last=d.last||{x:d.x0,y:d.y0},toBar=last.y>=innerHeight-70;
+ window.__nameDragJustEnded=Date.now();
+ if(d.stage===2){nativeMobile('voiceStop');return}                      // 一直按着在说话：松手保存
+ const item=menuItemAt(last.x,last.y);hotMenuItem(null);
+ if(item&&d.moved){item.click();return}                                  // 滑到菜单某一项松手＝选它
+ if(toBar){hideLessonMenu();nativeMobile('pinNote',{name:b.dataset.student,studentId:b.dataset.studentId});return}  // 拖到底部＝打字
+ if(!d.moved){nativeMobile('pinNote',{name:b.dataset.student,studentId:b.dataset.studentId,focus:false});return}  // 原地松手＝菜单留着点
+ hideLessonMenu();
+}
+if(!window.__nameDragHooked){window.__nameDragHooked=true;addEventListener('touchend',nameDragEnd,true);addEventListener('touchcancel',nameDragEnd,true)}
+function menuItemAt(x,y){const m=$('lessonmenu');if(!m||m.hidden)return null;const el=document.elementFromPoint(x,y);return el&&m.contains(el)?el.closest('[data-kind]'):null}
+function hotMenuItem(item){const m=$('lessonmenu');if(!m)return;m.querySelectorAll('[data-kind]').forEach(x=>x.style.background=x===item?'#dbe6ff':'');if(item&&item!==window.__hot)nativeMobile('haptic',{style:'light'});window.__hot=item}
+function hideLessonMenu(){const m=$('lessonmenu');if(m)m.hidden=true}
+// 按住名字时底部的提示条；拖动时名字变成小标签跟着手指走。name 为 null＝收起；showChip=false＝只亮提示条
+function nameChip(name,x,y,showChip){
+ let c=$('namechip'),bar=$('namebar');
+ if(!c){c=document.createElement('div');c.id='namechip';c.style.cssText='position:fixed;z-index:80;pointer-events:none;background:#245bd3;color:#fff;border-radius:16px;padding:6px 14px;font-size:17px;font-weight:600;box-shadow:0 6px 18px #0004;transform:translate(-50%,-140%)';document.body.appendChild(c);
+  bar=document.createElement('div');bar.id='namebar';bar.style.cssText='position:fixed;left:0;right:0;bottom:0;height:70px;z-index:79;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:15px;color:#245bd3;background:linear-gradient(transparent,#dbe6ff);transition:opacity .15s;text-align:center;padding:0 10px';document.body.appendChild(bar)}
+ if(!name){c.hidden=true;bar.style.opacity=0;return}
+ const near=y>=innerHeight-70,moved=window.__nameDrag?.moved;c.hidden=!(showChip&&moved);c.textContent=name;c.style.left=x+'px';c.style.top=y+'px';c.style.background=near?'#2f8f5b':'#245bd3';
+ bar.style.opacity=1;bar.textContent=near?'松手：打字记给 '+name:moved?'滑到菜单选一项 · 拖到这里打字记给 '+name:'继续按住＝说话记给 '+name+' · 滑到菜单选一项';bar.style.fontWeight=near?'700':'400';
+}
+
+// 按住学生名字弹出的菜单（出现在手指上方，手指不挡字）；点了或滑过去松手，交给 App 转给 Mac，成功后 App 会重新读课表
+function openLessonMenu(b,x,y){
+ let m=$('lessonmenu');if(!m){m=document.createElement('div');m.id='lessonmenu';m.className='leavemenu';document.body.appendChild(m);
+  document.addEventListener('touchstart',e=>{if(!m.hidden&&!m.contains(e.target))m.hidden=true},true)}
+ const mates=[...b.parentElement.querySelectorAll('[data-student]:not(.onleave)')].map(x=>({name:x.dataset.student,id:x.dataset.studentId}));  // 同一行＝同一节课的学生；请假的不算
+ const d=b.dataset,n=esc(d.student),day=(d.date||'').slice(5).replace('-','/').replace(/^0/,'');
+ // 全班上课了（请假的、已记的不算）
+ const today=(typeof initial!=='undefined'&&initial.dates&&initial.dates[0]&&initial.dates[0].date)||'',future=!!(d.date&&today&&d.date>today);
+ const todo=[...b.parentElement.querySelectorAll('[data-student]:not(.onleave)')].filter(x=>!x.dataset.booked).map(x=>x.dataset.student);
+ m.innerHTML='<div>'+n+(day?' · '+day+' '+esc(d.time||''):'')+'</div>'
+  +(!d.course?'':d.booked?'<div>'+(d.booked==='lesson'?'已记上课':'已记请假')+'（要改到 Mac 课时管理撤销）</div>':
+   '<button type="button" data-kind="attend">上课了（扣 '+(Number(d.units)||1)+' 节）</button><button type="button" data-kind="leave">'+(d.marked?'取消请假':'请假')+'</button>')
+  +(mates.length>1&&d.course&&!future&&todo.length?'<button type="button" data-kind="attendall">全班上课了（'+todo.length+' 人，各扣 '+(Number(d.units)||1)+' 节）</button>':'')
+  +'<button type="button" data-kind="type">打字记给 '+n+'</button>';
+ m.onclick=e=>{const k=e.target.closest('[data-kind]');if(!k)return;m.hidden=true;
+  if(k.dataset.kind==='type'){nativeMobile('pinNote',{name:d.student,studentId:d.studentId});return}
+  if(k.dataset.kind==='attendall'){nativeMobile('attendAll',{week:d.week,course:d.course,students:todo,units:Number(d.units)||1});return}
+  nativeMobile('lessonAction',{kind:k.dataset.kind,week:d.week,course:d.course,student:d.student,on:k.dataset.kind==='attend'||!d.marked,units:Number(d.units)||1})};
+ m.hidden=false;const w=m.offsetWidth,h=m.offsetHeight;
+ m.style.left=Math.max(8,Math.min(x-w/2,innerWidth-w-8))+'px';m.style.top=(y-h-30>=8?y-h-30:Math.min(y+40,innerHeight-h-8))+'px';
+}
+
+function cachePhoneSchedule(){
+ const who=n=>({id:db.studentIds?.[n]||n,name:n});
+ const lessons=schedule.filter(r=>!r[7]&&r[8]!=='cancel'&&r[2]!=='练习'&&r[3]!=='基本功').map((r,i)=>({id:String(i),day:r[0],time:r[1],teacher:r[4],dual:r[6]||null,students:names(r).filter(n=>studentState(n)==='active').map(who)}));
+ const dates=Object.fromEntries(Object.entries(db.dateSchedules||{}).map(([date,c])=>[date,{replace:!!c.replace,courses:(c.courses||[]).map(r=>({id:r.id,time:r.time,teacher:r.teacher,students:r.names.filter(n=>studentState(n)==='active').map(who)}))}]));
+ nativeMobile('noteContext',{context:{lessons,dates,roster:students.filter(n=>studentState(n)==='active').map(n=>({...who(n),teachers:[...new Set(schedule.filter(r=>!r[7]&&names(r).includes(n)).flatMap(r=>r[6]?[r[6].left,r[6].right]:[r[4]]))].join(',')}))}});
+ window.phoneCaching=true;const original=phoneTeacher,pages={};
+ try{
+ for(const filter of ['all','blue','red']){phoneTeacher=filter;renderPhoneSchedule();pages[filter]=$('view').innerHTML}
+ phoneTeacher=original;renderPhoneSchedule();
+ const payload=btoa(unescape(encodeURIComponent(JSON.stringify(pages))));
+ const css=Array.from(document.querySelectorAll('style')).map(x=>x.textContent).join('\n');
+ const script=`const pages=JSON.parse(decodeURIComponent(escape(atob('${payload}'))));let mode=window.__lessonTeacher||'all';
+ function send(action,data={}){window.webkit.messageHandlers.lessonNative.postMessage({action,...data})}
+ function show(){document.body.style.background=mode==='blue'?'#edf3ff':mode==='red'?'#fff0f0':'white';document.getElementById('view').innerHTML=pages[mode]||pages.all;document.querySelectorAll('[data-student]').forEach(b=>b.onclick=()=>send('pinNote',{name:b.dataset.student,studentId:b.dataset.studentId}));document.getElementById('phoneRefresh').onclick=()=>send('refreshSchedule')}
+ function change(next){mode=next;send('setTeacher',{teacher:mode});show()}
+ let start=null;document.ontouchstart=e=>{if(e.touches.length!==1){start=null;return}start={x:e.touches[0].clientX,y:e.touches[0].clientY,top:scrollY<=0}};document.ontouchend=e=>{if(!start)return;const p=start,t=e.changedTouches[0];start=null;if(!t)return;const x=t.clientX-p.x,y=t.clientY-p.y;if(x < -80&&Math.abs(y)<60)send('captureQueue');else if(p.top&&y>=80&&Math.abs(x)<50)change(mode==='blue'?'red':'blue')};document.ontouchcancel=()=>start=null;document.ondblclick=e=>{if(e.target.closest('button'))return;e.preventDefault();change('all')};show();`;
+ nativeMobile('cacheSchedule',{html:'<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style></head><body><main><section id="view"></section></main><scr'+'ipt>'+script+'</scr'+'ipt></body></html>'});
+ }finally{phoneTeacher=original;window.phoneCaching=false}
+}
+
+function paintStudentFlow</script>

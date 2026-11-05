@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>操作日志</title>
+<!-- 操作日志（10-22）：Mac 和手机上每一次改动。攒使用经验，以后变智能体时当规则和例子。资料只在这台电脑上。
+     数据来自 /api/log（资料/操作日志/年-月.jsonl）；原因可以在这里补写（/api/log/reason）。 -->
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7fa;color:#223047;font:16px -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
+main{max-width:1320px;margin:auto;padding:18px 24px 90px}
+.muted{color:#8190a4}
+button,select,input{font:inherit;border:1px solid #dce1e9;border-radius:10px;padding:7px 12px;background:#fff;color:#223047;font-size:14px}
+button{cursor:pointer}
+.card{background:#fff;border:1px solid #e5e9ef;border-radius:16px;padding:16px 20px;margin-bottom:14px}
+h2{font-size:18px;margin:0 0 4px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 4px}
+.bar label{font-size:14px;color:#46566d;display:flex;gap:5px;align-items:center}
+.day{font-size:13px;color:#8190a4;margin:16px 0 4px}
+.row{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:9px 0;border-top:1px solid #eef1f5;font-size:15px;line-height:1.55}
+.t{color:#8190a4;font-size:13px;padding-top:2px}
+.tag{font-size:12px;border-radius:6px;padding:1px 7px;margin-right:6px;white-space:nowrap}
+.mac{background:#eef1f6;color:#5a6a80}.phone{background:#e6eefc;color:#275de0}.bad{background:#fdeaea;color:#b33a3a}
+.sub{font-size:13px;color:#68788d}
+.chg{font-size:13px;color:#2f8f5b;margin-left:6px}
+.why{font-size:13px;color:#a56a00;cursor:pointer}.why.none{color:#b5bfcc}
+.why input{width:min(360px,70vw);padding:4px 8px;font-size:13px}
+details{font-size:12px;color:#8190a4;margin-top:2px}details pre{white-space:pre-wrap;word-break:break-all;background:#f7f9fc;border-radius:8px;padding:8px;margin:4px 0 0}
+.empty{text-align:center;color:#8190a4;padding:36px 10px;line-height:1.9}
+</style>
+<main>
+@@NAV@@
+<section class="card">
+ <h2>操作日志</h2>
+ <div class="muted" style="font-size:14px">Mac 和手机上的每一次改动都记在这里，只存在这台电脑上。点“补原因”可以写当时为什么这么做，以后变智能体时就是经验。</div>
+ <div class="bar">
+  <select id="month"></select>
+  <input id="q" placeholder="学生名字或动作，比如：请假" style="width:240px">
+  <label><input type="checkbox" id="onlyWhy"> 只看有原因的</label>
+  <label><input type="checkbox" id="hideBad" checked> 不看没成功的</label>
+  <span class="muted" id="count" style="font-size:13px"></span>
+ </div>
+ <div id="list"></div>
+</section>
+</main>
+<script>
+const HEAD={'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let data={items:[],months:[]};
+async function load(month){
+ const r=await fetch('/api/log'+(month?'?month='+encodeURIComponent(month):''),{cache:'no-store'});
+ data=await r.json();
+ $('month').innerHTML=(data.months.length?data.months:['']).map(m=>'<option'+(m===data.month?' selected':'')+'>'+esc(m||'还没有记录')+'</option>').join('');
+ render();
+}
+function render(){
+ const q=$('q').value.trim(),onlyWhy=$('onlyWhy').checked,hideBad=$('hideBad').checked;
+ const items=data.items.filter(e=>(!q||[e.summary,e.action,...(e.students||[])].join(' ').includes(q))&&(!onlyWhy||e.reason)&&(!hideBad||e.result==='ok'));
+ $('count').textContent=items.length+' 条';
+ if(!items.length){$('list').innerHTML='<div class="empty">'+(data.items.length?'没有符合的记录':'从现在开始，改课表、记上课、请假、补记录……都会记在这里')+'</div>';return}
+ let html='',last='';
+ for(const e of items){
+  const d=e.at.slice(0,10);
+  if(d!==last){const w='日一二三四五六'[new Date(d+'T12:00').getDay()];html+='<div class="day">'+d.slice(5).replace('-','/')+' 周'+w+'</div>';last=d}
+  const chg=Object.entries(e.change||{}).map(([n,[a,b]])=>esc(n)+' 剩 '+(a??'—')+' → '+(b??'—')).join('，');
+  html+='<div class="row"><span class="t">'+e.at.slice(11,16)+'</span><div>'
+   +'<span class="tag '+(e.from==='手机'?'phone':'mac')+'">'+esc(e.from+(e.page?' · '+e.page:''))+'</span>'
+   +(e.result!=='ok'?'<span class="tag bad">'+esc(e.result)+'</span>':'')
+   +esc(e.summary)+(chg?'<span class="chg">'+chg+'</span>':'')
+   +'<div class="why'+(e.reason?'':' none')+'" data-id="'+esc(e.id)+'">'+(e.reason?'原因：'+esc(e.reason):'补原因')+'</div>'
+   +'<details><summary>当时的请求</summary><pre>'+esc(JSON.stringify(e.request,null,1))+'</pre></details>'
+   +'</div></div>';
+ }
+ $('list').innerHTML=html;
+}
+$('list').onclick=e=>{
+ const w=e.target.closest('.why');if(!w||w.querySelector('input'))return;
+ const item=data.items.find(x=>x.id===w.dataset.id);
+ w.innerHTML='<input value="'+esc(item.reason||'')+'" placeholder="写完按回车，Esc 不改">';
+ const input=w.querySelector('input');input.focus();
+ input.onkeydown=async ev=>{
+  if(ev.key==='Escape'){render();return}
+  if(ev.key!=='Enter')return;
+  const r=await fetch('/api/log/reason',{method:'POST',headers:HEAD,body:JSON.stringify({id:item.id,reason:input.value})});
+  if(!r.ok){input.style.borderColor='#d64545';return}
+  item.reason=input.value.trim();render();
+ };
+};
+$('month').onchange=()=>load($('month').value);
+['q','onlyWhy','hideBad'].forEach(id=>$(id).oninput=render);
+load();
+</script>
+</html>

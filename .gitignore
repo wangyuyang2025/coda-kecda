@@ -1,0 +1,9 @@
+# 你自己的资料（学生、账本、签课表、手机传来的照片视频）只留在你电脑上，不进 git
+mac/我的资料/
+# 装的时候编译出来的识别工具
+mac/程序/纸质表单识别工具
+iPhone/build/
+xcuserdata/
+*.xcuserstate
+__pycache__/
+.DS_Store

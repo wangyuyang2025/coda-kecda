@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="课达">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="/m/manifest.json">
+<link rel="apple-touch-icon" href="/m/icon.png">
+<title>课达</title>
+<!-- 手机网页版第一块（10-23）：7 天课表、切老师、点名字出菜单（上课了 / 请假）、没网先存手机连上补交。
+     由 手机网关.py 在 18767 端口发；数据 /m/data，操作 /m/act，配对 /m/join（扫码）或 /m/pair（6 位数）。
+-->
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#f6f7fa;color:#223047;font:16px/1.45 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
+main{max-width:560px;margin:auto;padding:calc(10px + env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:10px;margin:4px 0 10px}
+header h1{font-size:22px;margin:0}
+.status{font-size:13px;color:#68788d;flex:1;line-height:1.3}
+.status .on{color:#2f8f5b}.status .off{color:#b23b3b}
+button{font:inherit;color:#223047;background:#fff;border:1px solid #dce1e9;border-radius:10px;padding:7px 12px}
+.chips{display:flex;gap:8px;margin:6px 0 4px;overflow-x:auto}
+.chip{border-radius:999px;padding:6px 14px;font-size:15px;white-space:nowrap}
+.chip.on{background:#223047;color:#fff;border-color:#223047}
+.chip.red.on{background:#c13737;border-color:#c13737}.chip.blue.on{background:#275de0;border-color:#275de0}
+.day{margin:18px 0 4px;font-size:15px;color:#68788d;display:flex;justify-content:space-between}
+.day b{color:#223047;font-size:19px;margin-right:6px}
+details.past summary{list-style:none;color:#68788d;font-size:15px;margin:12px 0 0;padding:6px 0}
+details.past summary::-webkit-details-marker{display:none}
+details.past summary b{margin-right:6px}
+.row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #e5e9ef;align-items:flex-start}
+.row .time{width:56px;flex:none;font-size:14px;color:#46566d;padding-top:7px;border-left:3px solid #4778d8;padding-left:7px;line-height:1.25}
+.row .time.red{border-color:#d45858}.row .time.dual{border-image:linear-gradient(#d45858 50%,#4778d8 50%) 1}
+.row .time small{display:block;color:#8190a4;font-size:12px}
+.names{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.name{position:relative;font-size:17px;padding:7px 12px;border-radius:10px;background:#fff;border:1px solid #dce1e9;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.name.done{background:#e3f4ea;border-color:#bfe3cc;color:#22744a}
+.name.leave{background:#fff3d6;border-color:#f1dca6;color:#8a5a00;text-decoration:line-through}
+.name.pending{border-style:dashed;border-color:#8aa4d8}
+.name .shot{display:block;font-size:11px;color:#8190a4}
+.row.cancel .names{opacity:.45}.row.cancel .name{pointer-events:none;text-decoration:line-through}
+.classbtn{font-size:15px;padding:7px 12px;border-radius:10px;background:#eef3ff;border:1px solid #c9d7f5;color:#275de0}
+.tag{font-size:12px;border-radius:6px;padding:1px 6px;background:#eef1f6;color:#5a6a80;margin-left:4px;white-space:nowrap}
+.empty{color:#8190a4;font-size:14px;padding:10px 0}
+.card{background:#fff;border:1px solid #e5e9ef;border-radius:14px;padding:14px 16px;margin:10px 0}
+.card.warn{border-color:#f1c27d;background:#fff8eb}
+.card h2{font-size:17px;margin:0 0 6px}
+.card p{margin:4px 0;color:#5a6a80;font-size:14px}
+.pin{display:flex;gap:8px;margin-top:8px}.pin input{flex:1;font:inherit;font-size:22px;letter-spacing:6px;text-align:center;border:1px solid #dce1e9;border-radius:10px;padding:8px;min-width:0}
+.primary{background:#275de0;color:#fff;border-color:#275de0}
+.problem{display:flex;gap:8px;align-items:center;font-size:14px;padding:6px 0;border-top:1px solid #f1dfb8}.problem span{flex:1}
+#menu{position:fixed;inset:0;background:#0006;display:flex;align-items:flex-end;justify-content:center;z-index:20}
+#menu[hidden]{display:none}
+#menu .sheet{background:#fff;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:12px 12px calc(14px + env(safe-area-inset-bottom))}
+#menu .title{color:#68788d;font-size:14px;padding:4px 8px 8px}
+#menu button{display:block;width:100%;text-align:left;font-size:18px;border:0;border-radius:10px;padding:14px 10px;background:none}
+#menu button:active{background:#eef3ff}
+#menu button.cancel{text-align:center;color:#68788d;margin-top:4px;background:#f2f4f8}
+#menu .note{font-size:13px;color:#8190a4;padding:0 10px 6px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom));background:#223047;color:#fff;border-radius:12px;padding:10px 16px;font-size:15px;max-width:92vw;z-index:30;text-align:center}
+#toast[hidden]{display:none}
+.tip{font-size:13px;color:#68788d;display:flex;gap:8px;align-items:center}.tip span{flex:1}
+</style>
+<main>
+<header><h1>课达</h1><div class="status" id="status">…</div><button type="button" id="refresh">刷新</button></header>
+<div id="notice"></div>
+<div class="chips" id="chips"></div>
+<div id="list"></div>
+</main>
+<div id="menu" hidden><div class="sheet" id="sheet"></div></div>
+<div id="toast" hidden></div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+// ---- 连接：扫码进来时网址后面带着 #t=令牌（存起来，添加到主屏幕后也能用）；#expired＝二维码过期
+let token=store.get('coda-token','');
+if(location.hash.startsWith('#t=')){token=decodeURIComponent(location.hash.slice(3));store.set('coda-token',token);history.replaceState(null,'','/m')}
+const expired=location.hash==='#expired';if(expired)history.replaceState(null,'','/m');
+// 主屏幕图标的起始网址带着 ?k=令牌（见 remember）：手机把本地存的清掉了也能自己连上
+const urlKey=new URLSearchParams(location.search).get('k');if(urlKey){token=urlKey;store.set('coda-token',token)}
+function remember(){   // 连上以后：网址和“添加到主屏幕”用的清单都换成带令牌的
+ if(!token)return;
+ if(new URLSearchParams(location.search).get('k')!==token)history.replaceState(null,'','/m?k='+encodeURIComponent(token));
+ document.querySelector('link[rel=manifest]').href='/m/manifest.json?k='+encodeURIComponent(token);
+}
+let data=store.get('coda-week',null);          // 上次从 Mac 拿到的课表（没网时就显示它）
+let queue=store.get('coda-queue',[]);          // 还没交给 Mac 的操作
+let teacher=store.get('coda-teacher','all');
+let online=null,needPair=false,lastError='';
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(16)+Math.random().toString(16).slice(2)).replace(/[^A-Za-z0-9-]/g,'');
+const pad=n=>String(n).padStart(2,'0');
+const localISO=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+// “今天”按 Mac 的算法（中文＝北京时间），不按手机所在地
+const macDay=(ms=Date.now())=>new Date(ms+((data&&data.tz!=null?data.tz:-new Date().getTimezoneOffset())*60000)).toISOString().slice(0,10);
+const todayStr=()=>macDay();
+const hm=s=>s?s.slice(11,16):'';
+function save(){store.set('coda-queue',queue)}
+async function call(path,opt={},ms=6000){
+ const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms);
+ try{return await fetch(path,{...opt,signal:ctl.signal,cache:'no-store',credentials:'same-origin',headers:{...(opt.headers||{}),...(token?{Authorization:'Bearer '+token}:{})}})}
+ finally{clearTimeout(t)}
+}
+// ---- 拿课表、交操作
+async function load(){
+ try{
+  const r=await call('/m/data');
+  if(r.status===401){needPair=true;online=true;if(urlKey)history.replaceState(null,'','/m');render();return}   // 令牌在 Mac 上被取消了：网址里的也不要了
+  if(!r.ok)throw new Error('Mac 回了 '+r.status);
+  data=await r.json();store.set('coda-week',data);online=true;needPair=false;lastError='';remember();
+ }catch(e){online=false;lastError=e.name==='AbortError'?'连不上 Mac':e.message}
+ render();
+}
+let flushing=false;
+async function flush(){
+ const items=queue.filter(x=>x.status!=='error');if(!items.length||flushing||needPair)return;
+ flushing=true;
+ try{
+  const r=await call('/m/act',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(({status,error,label,...x})=>x)})},15000);
+  if(r.status===401){needPair=true;return}
+  if(!r.ok)throw new Error();
+  const out=await r.json();online=true;
+  for(const res of out.results){
+   const q=queue.find(x=>x.id===res.id);if(!q)continue;
+   if(res.ok){queue=queue.filter(x=>x!==q);if(res.note)toast(q.label+'：'+res.note)}
+   else{q.status='error';q.error=res.error}
+  }
+  save();await load();
+ }catch(e){online=false}
+ finally{flushing=false;render();if(online&&!needPair&&queue.some(x=>x.status!=='error'))setTimeout(flush,50)}   // 交的时候又排进来的（全班上课了一次排好几条），接着交
+}
+function enqueue(item,label){
+ // 同一件事还没交又改了（再点一次请假）：只留最新的
+ queue=queue.filter(x=>!(x.status!=='error'&&x.kind===item.kind&&(x.course===item.course&&x.student===item.student&&x.week===item.week)));
+ item.id=uid();
+ item.label=label;item.at=localISO();queue.push(item);save();render();flush();
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)load().then(flush)});
+// ---- 一个学生在这节课的状态（Mac 的数据 + 还没交的操作）
+function stateOf(row,name){
+ const pend=queue.filter(x=>x.status!=='error'&&x.course===row.course&&x.week===row.week&&x.student===name);
+ let booked=row.booked[name]||null,leave=row.leave.includes(name),pending=false;
+ for(const x of pend){pending=true;if(x.kind==='attend')booked='lesson';if(x.kind==='leave')leave=!!x.on}
+ return {booked,leave:leave||booked==='leave',pending};
+}
+function visible(row){
+ if(teacher==='all')return true;
+ const d=row.dual;return row.teacher===teacher||(d&&(d.left===teacher||d.right===teacher));
+}
+// ---- 画页面
+function render(){
+ const pendingN=queue.filter(x=>x.status!=='error').length;
+ const when=data?new Date(data.fetchedAt):null;
+ $('status').innerHTML=(needPair||!token?'<span class="off">○ 这台手机还没连上 Mac</span>':online===false?'<span class="off">○ 没连上 Mac</span>'+(when?' · 显示 '+(when.getMonth()+1)+'/'+when.getDate()+' '+pad(when.getHours())+':'+pad(when.getMinutes())+' 的课表':''):online?'<span class="on">● 已连 Mac</span>':'连接中…')
+  +(pendingN?' · 待交 '+pendingN:'');
+ let notice='';
+ if(needPair||!token&&!data){
+  notice+='<div class="card warn"><h2>'+(expired?'二维码过期了':'连接 Mac')+'</h2><p>连上以后再“添加到主屏幕”，以后从桌面打开就不用再输了。</p><p>在 Mac 的“服务管理”点“连接手机网页版”，用相机扫二维码，或者在这里输入它显示的 6 位数。</p>'
+   +'<div class="pin"><input id="pin" inputmode="numeric" maxlength="6" placeholder="6 位数" autocomplete="one-time-code"><button type="button" class="primary" id="pinbtn">连接</button></div><p id="pinmsg" style="color:#b23b3b"></p></div>';
+ }
+ const bad=queue.filter(x=>x.status==='error');
+ if(bad.length)notice+='<div class="card warn"><h2>有 '+bad.length+' 条没交上</h2>'+bad.map(x=>'<div class="problem"><span><b>'+esc(x.label)+'</b><br>'+esc(x.error)+'</span><button type="button" data-retry="'+x.id+'">再试</button><button type="button" data-drop="'+x.id+'">不要了</button></div>').join('')+'</div>';
+ if(!navigator.standalone&&!store.get('coda-tip-home',false)&&/iPhone|iPad/.test(navigator.userAgent))
+  notice+='<div class="card tip"><span>点 Safari 下面的“分享”→“添加到主屏幕”，以后像 App 一样从桌面打开。</span><button type="button" id="tipclose">知道了</button></div>';
+ if($('notice').dataset.html!==notice){$('notice').innerHTML=notice;$('notice').dataset.html=notice}   // 没变就不重画（不然正在输的 6 位数会被清掉）
+ const tn=data?data.teachers:{red:'红老师',blue:'蓝老师'};
+ const has=k=>data&&data.rows.some(r=>r.teacher===k||(r.dual&&(r.dual.left===k||r.dual.right===k)));
+ $('chips').innerHTML=has('red')&&has('blue')?[['all','全部'],['red',tn.red],['blue',tn.blue]].map(([k,n])=>'<button type="button" class="chip '+k+(teacher===k?' on':'')+'" data-t="'+k+'">'+esc(n)+'</button>').join(''):'';
+ if(!data){$('list').innerHTML='';return}
+ const today=todayStr(),tomorrow=macDay(Date.now()+864e5),yesterday=macDay(Date.now()-864e5);
+ let html='';
+ for(const d of data.days){
+  if(d.date<yesterday)continue;
+  const rows=data.rows.filter(r=>r.date===d.date&&visible(r));
+  const label=d.date===today?'今天':d.date===tomorrow?'明天':d.date<today?'昨天':'';
+  const head='<b>'+(label||d.day)+'</b>'+(label?d.day+' ':'')+(+d.date.slice(5,7))+'/'+(+d.date.slice(8));
+  const body=rows.length?rows.map(rowHTML).join(''):'<div class="empty">没有课</div>';
+  if(d.date<today){html+='<details class="past"><summary>'+head+' · '+rows.length+' 节（点开补记）</summary>'+body+'</details>';continue}
+  html+='<div class="day"><span>'+head+'</span><span>'+rows.length+' 节</span></div>'+body;
+ }
+ $('list').innerHTML=html;
+}
+function rowHTML(r){
+ const i=data.rows.indexOf(r),cancel=r.changed==='cancel';
+ const tag=cancel?'<span class="tag">停课</span>':r.changed==='move'?'<span class="tag">调过时间</span>':r.changed==='add'?'<span class="tag">临时加课</span>':'';
+ const names=r.students.map(n=>{
+  const s=stateOf(r,n);
+  const cls=['name',s.booked==='lesson'?'done':'',s.leave?'leave':'',s.pending?'pending':''].join(' ');
+  return '<span class="'+cls+'" data-row="'+i+'" data-name="'+esc(n)+'">'+(s.booked==='lesson'?'✓ ':'')+esc(n)+'</span>';
+ }).join('');
+ // 班课一行末尾放“全班”按钮
+ const cls=!cancel&&r.students.length>1?'<button type="button" class="classbtn" data-class="'+i+'">全班</button>':'';
+ return '<div class="row'+(cancel?' cancel':'')+'"><div class="time '+(r.dual?'dual':r.teacher)+'">'+r.start+'<small>'+r.end+'</small></div><div class="names">'+names+cls+tag+'</div></div>';
+}
+// ---- 点名字、按住都出菜单
+let press=null;
+$('list').addEventListener('pointerdown',e=>{
+ const el=e.target.closest('.name');if(!el)return;
+ press={el,x:e.clientX,y:e.clientY,long:false,timer:setTimeout(()=>{press.long=true;navigator.vibrate&&navigator.vibrate(10);openMenu(el)},450)};
+});
+$('list').addEventListener('pointermove',e=>{if(press&&Math.hypot(e.clientX-press.x,e.clientY-press.y)>10){clearTimeout(press.timer);press=null}});
+['pointerup','pointercancel'].forEach(t=>$('list').addEventListener(t,e=>{
+ if(!press)return;clearTimeout(press.timer);const p=press;press=null;
+ if(t==='pointerup'&&!p.long)tapName(p.el);
+}));
+$('list').addEventListener('contextmenu',e=>{if(e.target.closest('.name'))e.preventDefault()});
+function tapName(el){
+ openMenu(el);
+}
+function classAttendable(r){return r.students.filter(x=>{const s=stateOf(r,x);return !s.leave&&!s.booked})}
+function classButtons(r){
+ let h='';const can=classAttendable(r);
+ if(r.date>todayStr())h+='<div class="note">这节课还没到，到了才能记上课</div>';
+ else if(can.length)h+='<button type="button" data-act="attendall">全班上课了（'+can.length+' 人，各扣 '+(r.units||1)+' 节）</button>';
+ else h+='<div class="note">全班都记过了（或请假）</div>';
+ return h;
+}
+function openClassMenu(i){
+ const r=data.rows[i],off=r.students.filter(x=>stateOf(r,x).leave),done=r.students.filter(x=>stateOf(r,x).booked==='lesson');
+ let h='<div class="title">班课 · '+(+r.date.slice(5,7))+'/'+(+r.date.slice(8))+' '+r.start+' · '+esc(r.students.join('、'))+'</div>';
+ if(off.length||done.length)h+='<div class="note">'+[off.length?esc(off.join('、'))+' 请假，不算':'',done.length?esc(done.join('、'))+' 已经记过':''].filter(Boolean).join('；')+'</div>';
+ h+=classButtons(r)+'<button type="button" class="cancel" data-act="close">取消</button>';
+ $('sheet').innerHTML=h;$('sheet').dataset.row=i;$('sheet').dataset.name='';$('menu').hidden=false;
+}
+$('list').addEventListener('click',e=>{const b=e.target.closest('.classbtn');if(b)openClassMenu(+b.dataset.class)});
+function openMenu(el){
+ const r=data.rows[+el.dataset.row],n=el.dataset.name,s=stateOf(r,n);
+ const others=r.students.filter(x=>!stateOf(r,x).leave);
+ const future=r.date>todayStr();
+ let h='<div class="title">'+esc(n)+' · '+(+r.date.slice(5,7))+'/'+(+r.date.slice(8))+' '+r.start+(r.students.length>1?' · 班课':'')+'</div>';
+ if(s.booked==='lesson')h+='<div class="note">已经记过上课（要撤销请在 Mac 课时管理里）</div>';
+ else if(s.booked==='leave')h+='<div class="note">账本里已经记了请假</div>';
+ else if(future)h+='<div class="note">这节课还没到，到了才能记上课</div>';
+ else if(!s.leave)h+='<button type="button" data-act="attend">上课了（扣 '+(r.units||1)+' 节）</button>';
+ if(s.booked!=='lesson'&&s.booked!=='leave')h+='<button type="button" data-act="leave">'+(s.leave?'取消请假':'请假')+'</button>';
+ if(r.students.length>1)h+=classButtons(r);
+ h+='<button type="button" class="cancel" data-act="close">取消</button>';
+ $('sheet').innerHTML=h;$('sheet').dataset.row=el.dataset.row;$('sheet').dataset.name=n;$('menu').hidden=false;
+}
+$('menu').onclick=e=>{
+ if(e.target===$('menu')){$('menu').hidden=true;return}
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const r=data.rows[+$('sheet').dataset.row],n=$('sheet').dataset.name,act=b.dataset.act;$('menu').hidden=true;
+ if(act==='attend')enqueue({kind:'attend',week:r.week,course:r.course,student:n},n+' 上课了');
+ if(act==='leave'){const on=!stateOf(r,n).leave;enqueue({kind:'leave',week:r.week,course:r.course,student:n,on},n+(on?' 请假':' 取消请假'))}
+ if(act==='attendall'){const can=classAttendable(r);can.forEach(x=>enqueue({kind:'attend',week:r.week,course:r.course,student:x},x+' 上课了'));toast(can.join('、')+' 都记上课了')}
+};
+// ---- 其他按钮
+document.addEventListener('click',async e=>{
+ const t=e.target;
+ if(t.dataset.t){teacher=t.dataset.t;store.set('coda-teacher',teacher);render()}
+ if(t.dataset.retry){const q=queue.find(x=>x.id===t.dataset.retry);if(q){q.status='';q.error='';save();flush()}}
+ if(t.dataset.drop){queue=queue.filter(x=>x.id!==t.dataset.drop);save();render()}
+ if(t.id==='tipclose'){store.set('coda-tip-home',true);render()}
+ if(t.id==='pinbtn'){
+  const pin=$('pin').value.trim();if(!/^\d{6}$/.test(pin)){$('pinmsg').textContent='要 6 位数字';return}
+  try{const r=await call('/m/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});const o=await r.json();
+   if(!r.ok)throw new Error(o.error||'没连上');token=o.token;store.set('coda-token',token);needPair=false;toast('连上了');await load();flush()}
+  catch(err){$('pinmsg').textContent=err.name==='AbortError'?'连不上 Mac：手机和 Mac 要在同一个 Wi-Fi':err.message}
+ }
+});
+$('refresh').onclick=()=>load().then(flush);
+let toastTimer;function toast(s){$('toast').textContent=s;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500)}
+window.addEventListener('online',()=>load().then(flush));
+setInterval(()=>{if(!document.hidden)load().then(flush)},60000);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/m/sw.js',{scope:'/m'}).catch(()=>{});
+render();load().then(flush);
+</script>
+</html>

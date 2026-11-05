@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>课时管理</title>
+<style>[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7fa;color:#223047;font:16px -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
+main{max-width:900px;margin:auto;padding:32px 20px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+h1{font-size:28px;margin:0 0 4px}
+small,.muted{color:#8190a4}
+nav a{color:#275de0;text-decoration:none;margin-left:16px;font-size:14px}
+button,input,select,textarea{font:inherit;border:1px solid #dce1e9;border-radius:10px;padding:10px 12px;background:#fff;color:inherit}
+button{cursor:pointer}
+button.primary{background:#275de0;color:#fff;border-color:#275de0}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.bar input{flex:1;min-width:160px}
+.chips button{padding:8px 12px;font-size:14px}
+.chips button[aria-pressed=true]{background:#223047;color:#fff;border-color:#223047}
+.row{display:grid;grid-template-columns:1fr 110px auto;gap:12px;align-items:center;background:#fff;border:1px solid #e5e9ef;border-radius:14px;padding:12px 16px;margin-bottom:8px}
+.who b{font-size:17px}
+.tag{margin-left:8px;font-size:12px;color:#a56a00;background:#fff3d6;border-radius:6px;padding:2px 6px}.tag.gap{color:#fff;background:#d45858;cursor:pointer}#gapbtn{background:#d45858;border-color:#d45858;color:#fff}.gaprow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #eef0f4;font-size:14px}.gapseg{display:flex;gap:4px;flex-wrap:wrap}.gapmove{grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:13px;background:#f6f7fa;border-radius:8px;padding:6px 8px}.gapmove[hidden]{display:none}.gapmove input{width:auto;padding:4px 6px;margin:0}.gapseg label{margin:0;display:flex;align-items:center;gap:3px;font-size:13px;padding:4px 8px;border:1px solid #d5dbe5;border-radius:8px;cursor:pointer;white-space:nowrap}.gapseg input{display:inline;width:auto;margin:0}.gapseg label:has(input:checked){background:#223047;color:#fff;border-color:#223047}.unitsbadge{font-size:12px;font-weight:600;color:#275de0;background:#e8efff;border-radius:6px;padding:1px 6px;margin-left:4px}.unitsbadge.two{color:#b83e3e;background:#fce8e8}.mates{color:#68788d;font-size:12px}.pkgbox{border:1px solid #e5e9ef;border-radius:10px;padding:10px 12px;margin-bottom:8px}.pkgweeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 12px;margin-top:8px;font-size:13px}.pkgweeks label{margin:0;display:flex;align-items:center;gap:4px;white-space:nowrap}.pkgweeks input{width:52px;padding:4px 6px}.mates b{font-weight:600}.mates .ston{color:#2f8f5b}.mates .stlv{color:#c27c0e}.mates .stno{color:#8190a4;font-weight:400}.gapstart{background:#f6f7fa;border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:10px}
+.bal{text-align:right;font-size:26px;font-weight:600}
+.bal small{font-size:13px;font-weight:400}
+.neg{color:#d45858}
+.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.acts button{padding:7px 10px;font-size:14px}
+dialog{border:0;border-radius:16px;padding:22px;width:min(440px,92vw);box-shadow:0 12px 40px #0003}
+dialog::backdrop{background:#0006}
+dialog h2{margin:0 0 14px;font-size:19px}
+label{display:block;font-size:14px;color:#68788d;margin-top:12px}
+label input,label select,label textarea{display:block;width:100%;margin-top:4px;color:#223047}
+.err{color:#d45858;font-size:14px;min-height:20px;margin-top:10px}
+.foot{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+.tx{display:grid;grid-template-columns:92px 74px 54px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #eef0f4;font-size:14px}
+.tx.void{color:#a5b0c0;text-decoration:line-through}
+.tx .pos{color:#2f8f5b}.tx .neg{color:#d45858}
+#hint{font-size:14px;color:#2f8f5b}
+@media(max-width:640px){.row{grid-template-columns:1fr auto}.acts{grid-column:1/3;justify-content:flex-start}}
+.more{position:relative}
+.lvtags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.tag.green{background:#e3f6e8;color:#14833b}.bal .grn{color:#14833b;font-size:.7em;font-weight:700}.tag.lv{background:#e8f5e9;color:#1b5e20}.tag.lv.mid{background:#fff4e0;color:#8a5a00}.tag.lv.hi{background:#fde8e8;color:#a32d2d}.tag.ns{background:#fde8e8;color:#a32d2d}
+.more summary{list-style:none;cursor:pointer;border:1px solid #dce1e9;border-radius:10px;padding:7px 12px;font-size:14px;background:#fff}
+.more summary::-webkit-details-marker{display:none}
+.more .menu{position:absolute;right:0;top:38px;background:#fff;border:1px solid #e5e9ef;border-radius:12px;box-shadow:0 8px 24px #0002;padding:6px;display:flex;flex-direction:column;z-index:5;min-width:130px}
+.more .menu button{border:0;text-align:left;padding:8px 12px;font-size:14px}
+.more .menu.up{top:auto;bottom:38px}
+.more .menu button:hover{background:#f3f5f9}
+.wkpick{display:flex;align-items:center;gap:12px;margin:4px 0 10px}.wkpick b{min-width:170px;text-align:center}.wkpick button{padding:6px 12px}
+#rvlist{max-height:56vh;overflow:auto;border-top:1px solid #eef0f4}
+.rvday{font-size:13px;color:#68788d;font-weight:600;padding:10px 2px 4px}
+.rvrow{display:grid;grid-template-columns:100px 90px 220px 36px 150px 1fr;gap:10px;align-items:center;padding:5px 2px;border-bottom:1px solid #f0f2f6;font-size:14px}
+.rvwrong{display:inline;font-size:12px;color:#8190a4;margin:0 0 0 4px;white-space:nowrap}.rvwrong input{display:inline;width:auto;margin:0 2px 0 0}
+.rvrow img{width:220px;height:44px;object-fit:contain;background:#fafafa;border:1px solid #eef0f4;border-radius:4px}
+.rvrow select{padding:6px 8px;font-size:14px}
+.rvrow select[data-s="上课"]{color:#2f8f5b;border-color:#9fd3b4}.rvrow select[data-s="请假"]{color:#a56a00;border-color:#e5c76b}.rvrow select[data-s="待确认"]{color:#d45858;border-color:#f0b4b4}
+.rvrow small{color:#8190a4;font-size:12px}.rvrow.booked{opacity:.55}.rvbooked{font-size:12px;color:#2f8f5b}
+.rvt{color:#68788d;font-size:13px}
+.split{display:inline-flex}.split>button:first-child{border-top-right-radius:0;border-bottom-right-radius:0}.split>button:last-child{border-top-left-radius:0;border-bottom-left-radius:0;border-left:0;padding-left:9px;padding-right:9px}
+#paperdialog .foot button,#stmtdialog .foot button{white-space:nowrap}.tag.paused{background:#eef0f4;color:#68788d}.pausedhead{margin:22px 0 8px;font-size:15px;color:#68788d;font-weight:600;border-top:1px dashed #d5dbe5;padding-top:14px}.pausedhead small{font-weight:400}.paperform{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-top:10px}.paperform label{margin:0}.papercheck{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:14px;color:#223047}.papercheck input{width:auto;margin:0}.papercheck .muted{margin-left:6px;font-size:13px}.paperstrip{display:flex;gap:8px;overflow-x:auto;padding:8px 0 0}.paperstrip button{flex:0 0 auto;padding:3px;border-radius:8px;background:#fff;border:2px solid transparent;font-size:12px;color:#68788d}.paperstrip button[aria-pressed=true]{border-color:#275de0;color:#275de0}.paperstrip img{display:block;height:64px;border-radius:5px}.paperstrip button span{display:block;text-align:center;margin-top:2px}.paperstrip .stmtchip{height:72px;padding:0 12px}
+.rvrow img.rvleave{height:34px;width:34px;object-fit:contain;image-rendering:pixelated}
+/* 左边学生列表（紧凑一行），右边看板 */
+.lay{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media(max-width:1000px){.lay{grid-template-columns:1fr}#board{order:-1}}
+.row{grid-template-columns:minmax(0,1fr) 72px auto;padding:7px 12px;margin-bottom:6px;border-radius:12px}
+.who b{font-size:16px;cursor:pointer}.who b:hover{color:#275de0}.who small{margin-left:8px;font-size:12px}
+.bal{font-size:20px}.bal small{font-size:12px}
+.acts button,.more summary{padding:5px 10px;font-size:13px}.acts{flex-wrap:nowrap}.acts>button{width:76px}.acts>button.wide{width:240px}.more .menu{top:32px}
+#bulkopen{display:none!important}
+#board{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border:1px solid #e5e9ef;border-radius:14px;padding:14px 16px}
+.card h3{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+.card h3 small{font-weight:400}
+.card.todo{border-color:#f0d58a;background:#fffaf0}.card.todo button{margin-top:8px;width:100%}
+.names{display:flex;flex-wrap:wrap;gap:6px}
+.names button{padding:4px 9px;font-size:13px;border-radius:8px}
+.names button.neg{color:#d45858;border-color:#f0b4b4}.names button.low{color:#a56a00;border-color:#e5c76b}
+.seg{display:flex;gap:4px}.seg button{padding:3px 8px;font-size:12px;border-radius:7px}.seg button[aria-pressed=true]{background:#223047;color:#fff;border-color:#223047}
+.nums{display:flex;gap:18px;margin:4px 0 8px}.nums b{font-size:22px;display:block}.nums span{font-size:12px;color:#8190a4}
+.card p{margin:6px 0 0;font-size:13px;color:#68788d}
+.printed{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:6px;text-align:left;padding:8px 12px}.printed b{font-weight:500;font-size:14px}.printed small{font-size:12px}
+</style>
+<main>
+@@NAV@@
+<header>
+ <div style="display:flex;align-items:center;gap:10px;justify-content:space-between"><small>余额 = 起始余额 + 缴费 − 上课。记错了不用改，点“流水”撤销即可，历史会保留。</small><button type="button" id="hardRefresh" title="重新载入这一页（页面是旧的、数字没变时点它）" style="white-space:nowrap">↻ 刷新</button></div>
+</header>
+<script>document.getElementById('hardRefresh').onclick=()=>{location.href=location.pathname+'?t='+Date.now()}</script>
+<div class="bar">
+ <input id="search" placeholder="搜索姓名" autocomplete="off">
+ <div class="chips" id="filters">
+  <button type="button" data-f="all" aria-pressed="true">全部</button>
+  <button type="button" data-f="debt" aria-pressed="false">欠课</button>
+  <button type="button" data-f="noopen" aria-pressed="false">未登记起始余额</button>
+ </div>
+ <button type="button" id="enrollbtn">＋ 新生报名</button>
+ <span class="split"><button type="button" id="printbtn" title="一键生成本周签课表并打开 PDF">打印本周签课表</button><button type="button" id="printmore" title="打印其他周" aria-label="打印其他周">▾</button></span>
+ <button type="button" id="importbtn">导入签字扫描件</button>
+ <button type="button" id="gapbtn" hidden></button>
+ <button type="button" class="primary" id="pendingbtn" hidden></button>
+ <button type="button" class="primary" id="paperbtn" hidden></button>
+ <input type="file" id="sheetfile" accept=".pdf,.jpg,.jpeg,.png,.heic,application/pdf,image/*" multiple hidden>
+ <button type="button" class="primary" id="bulkopen" hidden></button>
+ <span id="hint"></span>
+</div>
+<div class="lay"><div><p class="muted" id="stats"></p>
+<section id="list"></section></div><aside id="board"></aside></div>
+</main>
+
+<dialog id="formdialog">
+ <form id="form" method="dialog">
+  <h2 id="formtitle"></h2>
+  <div id="formpaperwrap" hidden style="margin:2px 0 10px"><div class="muted" style="font-size:13px;margin-bottom:4px">已归档的老课表（点一张放大，对着填）</div><div id="formpaper" style="display:flex;gap:6px;flex-wrap:wrap"></div><img id="formpaperbig" alt="老课表" hidden style="width:100%;margin-top:8px;border-radius:8px;border:1px solid #d9dee8;cursor:zoom-out"></div>
+  <label>日期<input type="date" id="date" required></label>
+  <label data-for="payment">缴费课时数<input type="number" id="count" min="1" max="500" step="1"></label>
+  <label data-for="payment">金额（元，可不填）<input type="number" id="money" min="0" step="0.01"></label>
+  <label data-for="lesson leave noshow makeup">课时数<select id="units"><option value="1">1 课时</option><option value="2">2 课时</option></select></label>
+  <label data-for="lesson leave noshow">时段（可不填，例如 09:00-09:45）<input id="time" placeholder="09:00-09:45" autocomplete="off"></label>
+  <label data-for="opening adjust"><span id="deltalabel"></span><input type="number" id="delta" min="-500" max="500" step="1"></label>
+  <label>备注<span id="notehint" class="muted"></span><textarea id="note" rows="2" maxlength="200"></textarea></label>
+  <div class="err" id="formerr"></div>
+  <div class="foot"><button type="button" id="formcancel">取消</button><button type="submit" class="primary" id="formsave">保存</button></div>
+ </form>
+</dialog>
+
+<dialog id="gapdialog" style="width:min(640px,96vw)">
+ <h2 id="gaptitle" style="margin-bottom:6px"></h2>
+ <p class="muted" id="gapwhy" style="font-size:13px;margin:0 0 8px"></p>
+ <label style="margin:0 0 10px">学生<select id="gapwho"></select></label>
+ <div id="gaprecorded" class="muted" style="margin:6px 0;font-size:13px;line-height:1.6"></div><div class="gapstart"><span id="gapstartinfo"></span> <button type="button" id="gapstartbtn" style="margin-left:6px">起点登记得不对？改起点</button>
+  <div id="gapstartform" hidden style="margin-top:10px"><p class="muted" style="font-size:13px;margin:0 0 6px">填“截至哪天（算上那天的记录）还剩几节”。那天之前的缺口就不用补了；旧起点会撤销，流水里看得到。</p>
+   <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end"><label style="margin:0">截至日期<input type="date" id="gapday"></label><label style="margin:0">那天还剩几节<input type="number" id="gapleft" step="1" min="-500" max="500" placeholder="欠课填负数"></label><button type="button" class="primary" id="gapstartsave">改起点</button></div></div></div>
+ <div id="gappaperwrap" hidden style="margin:-4px 0 10px"><span class="muted" style="font-size:13px">老课表照片（点开对照）：</span><div class="paperstrip" id="gappaper"></div><img id="gappaperbig" hidden alt="老课表" style="display:block;max-width:100%;max-height:50vh;margin-top:8px;border-radius:6px;cursor:zoom-out"></div>
+ <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:4px"><span class="muted">全部选：</span><button type="button" data-all="上课">上课</button><button type="button" data-all="请假">请假</button><button type="button" data-all="没上">没这节课</button><button type="button" data-all="课包">课包</button></div>
+ <div id="gaplist" style="max-height:46vh;overflow:auto"></div>
+ <p id="gapsum" style="font-size:14px;font-weight:600;margin:10px 0 0"></p><div class="err" id="gaperr"></div>
+ <div class="foot"><button type="button" id="gappay" style="margin-right:auto">缴费</button><button type="button" id="gapclose">关闭</button><button type="button" class="primary" id="gapsave">确认选好的</button></div>
+</dialog>
+
+<dialog id="pkgdialog" style="width:min(620px,96vw)">
+ <h2 id="pkgtitle"></h2>
+ <p class="muted" style="font-size:13px;margin:0 0 10px">课包期间（比如暑假）不按课表一节节扣、也不算缺记录，<b>按周扣</b>：每周默认扣“每周节数”，哪周请了假就把那周改小；一周过完（周日）才扣。交钱照常点“缴费”。</p>
+ <div id="pkglist"></div>
+ <div style="background:#f6f7fa;border-radius:10px;padding:10px 12px;margin-top:10px">
+  <b style="font-size:14px">新建课包</b>
+  <div style="display:grid;grid-template-columns:1fr 1fr 90px;gap:8px;margin-top:6px"><label style="margin:0">开始<input type="date" id="pkgstart"></label><label style="margin:0">结束<input type="date" id="pkgend"></label><label style="margin:0">每周节数<input type="number" id="pkgper" min="1" max="20" step="1" value="4"></label></div>
+  <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:6px;align-items:end"><label style="margin:0">备注<input id="pkgnote" maxlength="40" placeholder="比如：暑假课包"></label><button type="button" class="primary" id="pkgadd">建课包</button></div>
+ </div>
+ <div class="err" id="pkgerr"></div>
+ <div class="foot"><button type="button" id="pkgclose">关闭</button></div>
+</dialog>
+
+<dialog id="mergedialog">
+ <form id="mergeform" method="dialog">
+  <h2 id="mergetitle"></h2>
+  <p class="muted" style="font-size:14px;margin:0 0 6px">同一个学生在名单里有两个名字时用：把这个名字的课时、课表、老课表都并到另一个名字下，然后这个名字就没了。</p>
+  <label>合并到（保留的名字）<select id="mergeto"></select></label>
+  <div id="mergeinfo" style="margin-top:10px;font-size:14px;line-height:1.7;background:#f6f7fa;border-radius:8px;padding:10px 12px"></div>
+  <div class="err" id="mergeerr"></div>
+  <div class="foot"><button type="button" id="mergecancel">取消</button><button type="submit" class="primary" id="mergego">合并</button></div>
+ </form>
+</dialog>
+
+<dialog id="enrolldialog">
+ <form id="enrollform" method="dialog">
+  <h2>新生报名</h2>
+  <label>学生名字<input id="enname" maxlength="40" required autocomplete="off"></label>
+  <label>报名日期<input type="date" id="endate" required></label>
+  <label>缴费课时数<input type="number" id="encount" min="1" max="500" step="1" required></label>
+  <label>金额（元，可不填）<input type="number" id="enmoney" min="0" step="0.01"></label>
+  <label class="papercheck"><input type="checkbox" id="enpaused">暂停上课（先不排课）</label>
+  <p class="muted" id="enhint" style="font-size:13px;margin:6px 0 0"></p>
+  <div class="err" id="enerr"></div>
+  <div class="foot"><button type="button" id="encancel">取消</button><button type="submit" class="primary" id="ensave">报名</button></div>
+ </form>
+</dialog>
+
+<dialog id="bulkdialog" style="width:min(520px,94vw)">
+ <form id="bulkform" method="dialog">
+  <h2>批量登记起始余额</h2>
+  <p class="muted" style="font-size:14px;margin:0 0 10px">填每位学生现在<b>剩余的课时数</b>（欠课填负数）。不填的先跳过，以后再补。按回车跳到下一个。</p>
+  <label style="margin-top:0">截至日期<input type="date" id="bulkdate" required></label>
+  <div id="bulklist" style="max-height:52vh;overflow:auto;margin-top:12px;border-top:1px solid #eef0f4"></div>
+  <div class="err" id="bulkerr"></div>
+  <div class="foot"><button type="button" id="bulkcancel">取消</button><button type="submit" class="primary" id="bulksave">保存</button></div>
+ </form>
+</dialog>
+
+<dialog id="printdialog">
+ <h2>打印其他周签课表</h2>
+ <div class="wkpick"><button type="button" id="pwprev" aria-label="上一周">‹</button><b id="pwlabel"></b><button type="button" id="pwnext" aria-label="下一周">›</button></div>
+ <p class="muted" style="font-size:14px;line-height:1.7">按这一周实际要上的课生成（临时安排里停的课不打印，临时加的课会打印），班课一人一行。打印时选“实际大小 / 100%”，四个角的黑块要完整。</p>
+ <div class="err" id="printerr"></div>
+ <div class="foot"><button type="button" id="printcancel">取消</button><button type="button" class="primary" id="printgo">生成并打开打印页</button></div>
+ <h3 style="font-size:14px;margin:16px 0 6px;color:#68788d">已生成的签课表（点一下打开，可再打印）</h3>
+ <div id="printedlist" style="max-height:30vh;overflow:auto"></div>
+</dialog>
+
+<dialog id="reviewdialog" style="width:min(860px,96vw)">
+ <h2 id="rvtitle" style="margin-bottom:2px"></h2><p class="muted" id="rvsub" style="margin:0 0 10px;font-size:13px"></p>
+ <p class="muted" style="font-size:13px;margin:0 0 8px">识别结果：签了字＝上课，勾了框＝请假，空白＝待确认。请对照签字图逐行核对，“待确认”的这次不入账，以后可以再补。</p>
+ <div id="rvlist"></div>
+ <p id="rvsum" style="font-weight:600;margin:12px 0 6px"></p>
+ <label style="color:#223047;margin-top:4px"><input type="checkbox" id="rvchecked" style="display:inline;width:auto;margin-right:6px">我已逐行核对过学生、签字和请假</label>
+ <div class="err" id="rverr"></div>
+ <div class="foot"><button type="button" id="rvtopaper" style="margin-right:auto" title="拍的是以前一人一张的老课表，不是每周签课表">这是老课表 → 放进纸质课表归档</button><button type="button" id="rvarchive" title="没入账的行不再核对，已入账的不动">归档这张，不再提醒</button><button type="button" id="rvclose">稍后再核对</button><button type="button" class="primary" id="rvgo">确认入账</button></div>
+</dialog>
+
+<dialog id="stmtdialog" style="width:min(820px,96vw)">
+ <div id="stmtwrap" style="max-height:68vh;overflow:auto;background:#f6f7fa;padding:10px;border-radius:10px"></div>
+ <div class="paperstrip" id="stmtpaper" hidden></div>
+ <div id="stmtedit" style="margin-top:10px"></div>
+ <div class="err" id="stmterr"></div>
+ <div class="foot"><button type="button" id="stmtpay" style="margin-right:auto">缴费</button><button type="button" id="stmtclose">关闭</button><button type="button" id="stmtsave">保存图片</button><button type="button" class="primary" id="stmtcopy">复制图片（粘贴到微信）</button></div>
+</dialog>
+
+<dialog id="paperdialog" style="width:min(760px,96vw)">
+ <h2 id="papertitle" style="margin-bottom:8px"></h2>
+ <div style="background:#f6f7fa;border-radius:10px;padding:8px;text-align:center"><img id="paperimg" alt="纸质课表" style="max-width:100%;max-height:60vh;border-radius:6px"></div>
+ <div class="paperform">
+  <label>名字<input id="paperwho" list="paperstudents" placeholder="输入名字" autocomplete="off"></label>
+  <label>最后一次上课 <small id="paperdateshow"></small><input id="paperdate" placeholder="10/3；别的年份写前面：25/12/20" autocomplete="off"></label>
+  <label>那时剩几节<input type="number" id="paperleft" step="1" min="-500" max="500" placeholder="欠课填负数"></label>
+ </div>
+ <label class="papercheck"><input type="checkbox" id="paperpaused">暂停上课</label>
+ <p id="paperhint" class="muted" style="font-size:13px;margin:6px 0 0"></p>
+ <datalist id="paperstudents"></datalist>
+ <div class="err" id="papererr"></div>
+ <div id="paperundo" hidden style="margin-top:10px;padding:8px 12px;border-radius:8px;background:#fff7e0;font-size:14px;display:flex;align-items:center;gap:10px"><span id="paperundotext"></span><button type="button" id="paperundobtn" style="margin-left:auto">撤销</button></div>
+ <div id="paperbinview" hidden style="margin-top:10px"><p class="muted" style="font-size:13px;margin:0 0 8px">点“不要”的照片都在这里，没有删除。点“放回”就回到待归档。</p><div id="paperbinlist" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-height:55vh;overflow:auto"></div></div>
+ <div class="foot"><button type="button" id="paperbin" style="margin-right:auto" hidden></button><button type="button" id="paperclose">关闭</button><button type="button" id="paperskip">下一张</button><button type="button" id="papertosheet" title="拍的是每周签课表（有四角黑块和编号），不是老课表">这是签课表 → 送去识别</button><button type="button" id="paperdrop">不要</button><button type="button" class="primary" id="papergo">归档</button></div>
+</dialog>
+
+<dialog id="editdialog" style="width:min(460px,94vw)">
+ <form id="editform" method="dialog">
+  <h2 id="edittitle">改这一节</h2>
+  <label>类型<select id="editkind"><option value="lesson">上课（扣课时，先扣黑再扣绿）</option><option value="leave">请假（0 节，转成绿色待补）</option><option value="noshow">旷课（扣课时）</option><option value="package">按课包扣（这一周）</option></select></label>
+  <label>日期<input type="date" id="editdate" required></label>
+  <label data-e="lesson leave noshow">时段（可不填，例如 09:00-09:45）<input id="edittime" placeholder="09:00-09:45" autocomplete="off"></label>
+  <label data-e="lesson leave noshow">课时数<select id="editunits"><option value="1">1 课时</option><option value="2">2 课时</option></select></label>
+  <label data-e="package">这一周扣几节<input type="number" id="editper" min="1" max="20" step="1" value="1"></label>
+  <div class="err" id="editerr"></div>
+  <div class="foot"><button type="button" id="editdel" style="margin-right:auto;color:#a32d2d">删除这一节</button><button type="button" id="editcancel">取消</button><button type="submit" class="primary" id="editsave">保存</button></div>
+ </form>
+</dialog>
+<dialog id="historydialog">
+ <h2 id="historytitle"></h2>
+ <div id="historylist"></div>
+ <div class="err" id="historyerr"></div>
+ <div class="foot"><button type="button" id="historyclose">关闭</button></div>
+</dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KIND={opening:'起始余额',payment:'缴费',lesson:'上课',leave:'请假',noshow:'旷课',makeup:'补课',adjust:'手动调整',void:'撤销'};
+const kindName=t=>t.kind==='adjust'&&String(t.id||'').startsWith('pkg-')?'课包':KIND[t.kind];  // 10-27：课包按周扣的那条显示“课包”
+const TITLE={opening:'登记起始余额',payment:'缴费',lesson:'记一次上课',leave:'记一次请假（先扣课时，可补）',noshow:'记一次旷课（先扣课时，可补）',makeup:'记一次补课（加回课时）',adjust:'手动调整课时'};
+const HEAD={'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'};
+let data=null,filter='all',kind=null,student=null,recordId=null,hintTimer=null;
+const today=()=>codaNow().toLocaleDateString('sv');
+const say=t=>{$('hint').textContent=t;clearTimeout(hintTimer);hintTimer=setTimeout(()=>$('hint').textContent='',4000)};
+async function call(path,body){
+ const r=await fetch(path,{method:'POST',headers:HEAD,body:JSON.stringify(body)});
+ const out=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error(out.error||'保存失败，请重试');
+ return out;
+}
+let gaps={students:{},total:0};
+async function loadGaps(){try{gaps=await (await fetch('/api/gaps',{cache:'no-store'})).json()}catch(e){gaps={students:{},total:0}}paintGapBtn();if(data)render()}
+function paintGapBtn(){const n=Object.keys(gaps.students||{}).length;$('gapbtn').hidden=!n;$('gapbtn').textContent='缺记录 '+n+' 人 · '+gaps.total+' 节'}
+async function load(){
+ try{await call('/api/packages/sync',{})}catch(e){}
+ try{const r=await fetch('/api/ledger',{cache:'no-store'});if(!r.ok)throw Error();data=await r.json();render();loadGaps()}
+ catch(e){$('list').innerHTML='<p class="muted">读不到账本，请用“启动课程管理”打开本页。</p>'}
+}
+function actions(s){
+ const n=esc(s.name),b=(a,l,c)=>'<button data-act="'+a+'" data-n="'+n+'"'+(c?' class="'+c+'"':'')+'>'+l+'</button>';
+ const menu=items=>'<details class="more"><summary>⋯</summary><div class="menu">'+items+'</div></details>';
+ return '<div class="acts">'+(s.hasOpening
+  // 登记了的：高亮“课时单”（最常用），缴费/上课/请假平铺；没登记的：高亮“登记起始余额”（占三格宽，和上面对齐）
+  ? b('statement','课时单','primary')+b('payment','缴费')+b('lesson','上课')+b('leave','请假')+menu(b('pause',s.paused?'恢复上课':'暂停上课')+b('rename','改名字…')+b('merge','合并到另一个名字…')+b('remove','删除这个学生'))
+  : b('statement','课时单')+b('opening','登记起始余额','primary wide')+menu(b('payment','缴费')+b('lesson','上课')+b('leave','请假')+b('pause',s.paused?'恢复上课':'暂停上课')+b('rename','改名字…')+b('merge','合并到另一个名字…')+b('remove','删除这个学生')))+'</div>';
+}
+function render(){
+ const q=$('search').value.trim();
+ const all=data.students;
+ const shown=all.filter(s=>s.name.includes(q)).filter(s=>filter==='all'||(filter==='debt'&&s.balance<0)||(filter==='noopen'&&!s.hasOpening));
+ $('stats').textContent=all.length+' 名学生 · 欠课 '+all.filter(s=>s.balance<0).length+' 人 · 未登记起始余额 '+all.filter(s=>!s.hasOpening).length+' 人';
+ {const missing=all.filter(s=>!s.hasOpening).length;$('bulkopen').hidden=!missing;$('bulkopen').textContent='批量登记起始余额（'+missing+' 人）'}
+ // 正常上课的在上面，暂停上课的另起一栏放下面（10-20）
+ const row=s=>'<div class="row"><div class="who"><b data-n="'+esc(s.name)+'" title="打开课时单">'+esc(s.name)+'</b>'+(s.paused?'<span class="tag paused">暂停上课</span>':'')+(gaps.students?.[s.name]?'<span class="tag gap" data-gap="'+esc(s.name)+'" title="点这里补记录">缺 '+gaps.students[s.name].count+' 节</span>':'')+(s.hasOpening?'':'<span class="tag">未登记</span>')+(s.last?'<small>最近 '+s.last.slice(5).replace('-','/')+'</small>':'')+'<div class="lvtags">'+(s.leaveN?'<span class="tag lv'+(s.leaveRate>=0.5?' hi':s.leaveRate>=1/3?' mid':'')+'" title="请假率＝本期请假次数 ÷ 报名课数'+(s.enrolled?'（'+s.leaveN+'/'+s.enrolled+'）':'')+'；自上次缴费（'+(s.periodFrom||'')+'）起，续费后重新数">'+(s.leaveRate!=null?'请假率 '+Math.round(s.leaveRate*100)+'%':'本期请假 '+s.leaveN+' 节')+'</span>':'')+(s.noshowN?'<span class="tag ns" title="自上次缴费起">本期旷课 '+s.noshowN+' 节</span>':'')+(s.green?'<span class="tag green" title="请假后待补的课时：上课先扣黑色，黑色扣完再扣绿色；都没了黑色才变红色负数">待补 '+s.green+' 节</span>':'')+'</div>'+'</div>'
+  +'<div class="bal '+(s.balance<0?'neg':'')+'">'+s.balance+(s.balance<0?'<small> 欠 '+(-s.balance)+' 节</small>':'<small> 课时</small>')+(s.green?'<span class="grn"> +'+s.green+'</span>':'')+'</div>'
+  +actions(s)+'</div>';
+ const act=shown.filter(s=>!s.paused),off=shown.filter(s=>s.paused);
+ $('list').innerHTML=(act.map(row).join('')||(off.length?'':'<p class="muted">没有符合条件的学生</p>'))
+  +(off.length?'<h3 class="pausedhead">暂停上课 <small>'+off.length+' 人</small></h3>'+off.map(row).join(''):'');
+ renderBoard();
+}
+// ---- 看板：起始余额 → 要续费（欠课 / 剩 2 节以内）→ 销课和请假（上周 / 本周 / 本月 / 上月）
+let boardRange='lastweek';
+function rangeOf(k){
+ const t=codaNow(),iso=d=>d.toLocaleDateString('sv'),mon=new Date(t);mon.setDate(t.getDate()-(t.getDay()+6)%7);
+ if(k==='lastweek'){const a=new Date(mon);a.setDate(mon.getDate()-7);const b=new Date(mon);b.setDate(mon.getDate()-1);return [iso(a),iso(b)]}
+ if(k==='thisweek'){const b=new Date(mon);b.setDate(mon.getDate()+6);return [iso(mon),iso(b)]}
+ if(k==='thismonth')return [iso(new Date(t.getFullYear(),t.getMonth(),1)),iso(new Date(t.getFullYear(),t.getMonth()+1,0))];
+ return [iso(new Date(t.getFullYear(),t.getMonth()-1,1)),iso(new Date(t.getFullYear(),t.getMonth(),0))];
+}
+function renderBoard(){
+ const all=data.students,live=data.transactions.filter(t=>!t.voided&&t.kind!=='void');
+ const missing=all.filter(s=>!s.hasOpening).length,active=all.filter(s=>s.hasOpening&&!s.paused);
+ const debt=active.filter(s=>s.balance<0).sort((a,b)=>a.balance-b.balance),low=active.filter(s=>s.balance>=0&&s.balance<=2).sort((a,b)=>a.balance-b.balance);
+ const nb=(s,cls,label)=>'<button type="button" class="'+cls+'" data-n="'+esc(s.name)+'" title="打开课时单">'+esc(s.name)+' '+label+(s.green?' <b style="color:#14833b;font-weight:700">待补 '+s.green+' 节</b>':'')+'</button>';
+ let h='';
+ if(missing)h+='<div class="card todo"><h3>起始余额<small>'+missing+' 人未登记</small></h3><p>老课表归档时会自动登记；没有老课表的学生在这里批量填。</p><button type="button" class="primary" data-board="bulk">批量登记起始余额</button></div>';
+ h+='<div class="card"><h3>要续费<small>点名字打开课时单</small></h3>'
+  +(debt.length?'<p>欠课 '+debt.length+' 人</p><div class="names">'+debt.map(s=>nb(s,'neg','欠'+(-s.balance))).join('')+'</div>':'')
+  +(low.length?'<p>剩 2 节以内 '+low.length+' 人</p><div class="names">'+low.map(s=>nb(s,'low','剩'+s.balance)).join('')+'</div>':'')
+  +(!debt.length&&!low.length?'<p>暂时没有人需要续费</p>':'')
+  +(all.some(s=>s.paused)?'<p>暂停上课 '+all.filter(s=>s.paused).length+' 人（不提醒）</p>':'')+'</div>';
+ const [a,b]=rangeOf(boardRange),inR=live.filter(t=>t.date>=a&&t.date<=b),les=inR.filter(t=>t.kind==='lesson'),lv=inR.filter(t=>t.kind==='leave');
+ const units=les.reduce((x,t)=>x-t.delta,0),byT={};les.forEach(t=>{const k=t.teacher==='red'?(window.LESSON_TEACHERS?.red||'红老师'):t.teacher==='blue'?(window.LESSON_TEACHERS?.blue||'蓝老师'):'未标老师';byT[k]=(byT[k]||0)-t.delta});
+ const lvBy={};lv.forEach(t=>lvBy[t.student]=(lvBy[t.student]||0)+1);
+ const seg=[['lastweek','上周'],['thisweek','本周'],['thismonth','本月'],['lastmonth','上月']].map(([k,l])=>'<button type="button" data-range="'+k+'" aria-pressed="'+(k===boardRange)+'">'+l+'</button>').join('');
+ h+='<div class="card"><h3>销课<span class="seg">'+seg+'</span></h3><small>'+a.slice(5).replace('-','/')+'–'+b.slice(5).replace('-','/')+'</small>'
+  +'<div class="nums"><div><b>'+units+'</b><span>上课扣课时</span></div><div><b>'+les.length+'</b><span>上课人次</span></div><div><b>'+lv.length+'</b><span>请假人次</span></div></div>'
+  +(Object.keys(byT).length>1||byT['未标老师']===undefined&&Object.keys(byT).length?'<p>'+Object.entries(byT).map(([k,v])=>k+' '+v+' 节').join(' · ')+'</p>':'')
+  +(lv.length?'<p>请假：</p><div class="names">'+Object.entries(lvBy).sort((x,y)=>y[1]-x[1]).map(([n,c])=>'<button type="button" data-n="'+esc(n)+'">'+esc(n)+(c>1?' ×'+c:'')+'</button>').join('')+'</div>':'')+'<div id="offinfo"></div></div>';
+ $('board').innerHTML=h;
+ // 停课（休假、学校上课、调课等，不是学生请假）：来自课程管理的“临时安排”
+ const key=a+b;fetch('/api/adjust/cancelled?from='+a+'&to='+b,{cache:'no-store'}).then(r=>r.json()).then(d=>{
+  if(boardRange&&rangeOf(boardRange).join('')!==key||!$('offinfo'))return;const items=d.items||[];if(!items.length){$('offinfo').innerHTML='';return}
+  const byDay={};items.forEach(x=>{(byDay[x.date]??=[]).push(x)});const people=items.reduce((n,x)=>n+x.students.length,0);
+  $('offinfo').innerHTML='<p style="margin-top:10px"><b style="color:#68788d">停课 '+items.length+' 节 · '+people+' 人次</b>（休假、学校上课、调课等，不算请假）</p>'
+   +Object.entries(byDay).map(([dd,xs])=>'<p>'+dd.slice(5).replace('-','/')+' '+xs[0].day+'：'+(xs.length>4?xs.length+' 节':xs.map(x=>esc(x.name)).join('、'))+(xs[0].note?' · '+esc(xs[0].note):'')+'</p>').join('');
+ }).catch(()=>{});
+}
+$('board').onclick=e=>{
+ const r=e.target.closest('[data-range]');if(r){boardRange=r.dataset.range;renderBoard();return}
+ if(e.target.closest('[data-board=bulk]')){$('bulkopen').click();return}
+ const n=e.target.closest('button[data-n]');if(n)openStatement(n.dataset.n);
+};
+// 11-01 验收：页面底部学生的“⋯”菜单会被窗口截掉，放不下就向上展开
+document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.more')&&d.open){const m=d.querySelector('.menu');if(!m)return;m.classList.remove('up');if(m.getBoundingClientRect().bottom>innerHeight-8)m.classList.add('up')}},true);
+$('list').onclick=e=>{const g=e.target.closest('[data-gap]');if(g){openGap(g.dataset.gap);return}const nm=e.target.closest('.who b[data-n]');if(nm){openStatement(nm.dataset.n);return}const b=e.target.closest('button[data-act]');if(!b)return;document.querySelectorAll('details.more[open]').forEach(d=>d.open=false);({history:openHistory,statement:openStatement,pause:togglePause,remove:removeStudent,merge:openMerge,rename:renameStudent,package:openPackage}[b.dataset.act]||(n=>openForm(b.dataset.act,n)))(b.dataset.n)};
+// 删除学生（打错名字、示例学生）：只能删没上过课、没缴过费、不在课表里的人，不符合时会说明原因
+async function removeStudent(n){if(!confirm('删除“'+n+'”？\n只有没上过课、没缴过费、不在课表里的学生能删；不来了请用“暂停上课”。'))return;try{data=await call('/api/student/remove',{name:n});render();say('已删除 '+n)}catch(err){alert(err.message)}}
+let gapName='',gapItems=[];
+async function openGap(name,why){
+ gapName=name;$('gapwhy').textContent=why||'从起点到昨天，课表上有课、但没记上课也没记请假的。起点登记得不对就改起点；真的漏记了就一节节选。';$('gaperr').textContent='';$('gapstartform').hidden=true;
+ const names=Object.keys(gaps.students||{});if(!names.includes(name))names.unshift(name);
+ $('gapwho').innerHTML=names.map(n=>'<option'+(n===name?' selected':'')+'>'+esc(n)+'</option>').join('');
+ if(!$('gapdialog').open)$('gapdialog').showModal();gapPaper(name);
+ try{paintGap(await (await fetch('/api/gaps/student?name='+encodeURIComponent(name),{cache:'no-store'})).json())}catch(e){$('gaperr').textContent='读不到缺记录'}
+}
+// 10-27：有缺记录时点“课时单”会先到这里，老课表照片也放这里（不然像是照片没了），补的时候对着看
+async function gapPaper(name){
+ $('gappaperwrap').hidden=true;$('gappaperbig').hidden=true;$('gappaper').innerHTML='';
+ try{const d=await (await fetch('/api/paper/student?name='+encodeURIComponent(name),{cache:'no-store'})).json();if(name!==gapName)return;
+  const src=f=>'/api/paper/image?w='+encodeURIComponent(name)+'&f='+encodeURIComponent(f);
+  $('gappaper').innerHTML=(d.items||[]).map(x=>'<button type="button" aria-pressed="false" data-f="'+esc(x.file)+'"><img src="'+src(x.file)+'" alt="老课表">'+(x.date?'<span>'+x.date.slice(5).replace('-','/')+' 剩'+x.remaining+'</span>':'')+'</button>').join('');
+  $('gappaperwrap').hidden=!(d.items||[]).length;
+  $('gappaper').querySelectorAll('button').forEach(b=>b.onclick=()=>{const on=b.getAttribute('aria-pressed')!=='true';$('gappaper').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',on&&x===b));$('gappaperbig').hidden=!on;if(on)$('gappaperbig').src=src(b.dataset.f)});
+ }catch(e){}
+}
+$('gappaperbig').onclick=()=>{$('gappaperbig').hidden=true;$('gappaper').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'))};
+function paintGap(d){
+ gapItems=d.items||[];$('gaptitle').textContent=d.name+' · 缺 '+gapItems.length+' 节';
+ $('gaprecorded').innerHTML=(d.recorded&&d.recorded.length)?'<b>已登记（起点之后）：</b>'+d.recorded.map(r=>md(r.date)+' '+esc(r.kind)+(r.time?' '+esc(r.time.replace('-','–')):' <i>没写时间</i>')).join('；'):'';const st=d.start;$('gapstartinfo').textContent=st?'起点：'+md(st.date)+' 剩 '+st.delta+' 节'+(st.note?'（'+st.note+'）':''):'还没有起点';
+ $('gapday').value=today();$('gapleft').value='';
+ $('gaplist').innerHTML=gapItems.map((x,i)=>'<div class="gaprow"><span>'+md(x.date)+' '+esc(x.day)+' '+esc(x.time)+' <b class="unitsbadge'+(x.units===2?' two':'')+'">上课扣 '+x.units+' 节</b>'+((x.classmates||[]).length?'<br><small class="mates">同班：'+x.classmates.map(m=>esc(m.name)+' <b class="st'+(m.status==='上课'?'on':m.status==='请假'?'lv':'no')+'">'+esc(m.status)+'</b>').join(' · ')+'</small>':'')+'</span><span class="gapseg">'
+  +[['上课','上课 −'+x.units],['请假','请假'],['没上','没这节课'],['改时间','补录时间'],['课包','课包']].map(([v,l])=>'<label><input type="radio" name="g'+i+'" value="'+v+'">'+l+'</label>').join('')+'</span>'
+  // 10-27：课挪到中间别的时间上了 → 选“补录时间”，填实际哪天几点（默认原来那天那点）
+  +'<span class="gapmove" id="gm'+i+'" hidden>实际上课：<input type="date" value="'+x.date+'" max="'+yesterday()+'"> <input type="time" step="300" value="'+esc(x.time.slice(0,5))+'"> <small class="muted">扣 '+x.units+' 节</small></span>'
+  // 10-27：这周按课包扣：只在这周第一节下面问一次“这周扣几节”（默认＝这周缺的节数）
+  +(gapWeekFirst(i)?'<span class="gapmove" id="gk'+i+'" hidden>'+md(gapMon(x.date))+'–'+md(gapSun(x.date))+' 这一周按课包扣 <input type="number" min="1" max="20" step="1" value="'+gapItems.filter(y=>gapMon(y.date)===gapMon(x.date)).reduce((a,y)=>a+y.units,0)+'" style="width:64px"> 节'+(gapMon(x.date)>=gapMon(today())?' <small class="muted">（这周过完才扣）</small>':'')+'</span>':'')+'</div>').join('')||'<p class="muted">没有缺的了 🎉</p>';
+ $('gapsave').hidden=!gapItems.length;gapSum();
+}
+// 10-20：选的时候底下直接写“确认后会扣几节”，临时课表那周扣 2 节也看得出来
+function gapPicked(){return gapItems.map((x,i)=>{const r=document.querySelector('#gaplist input[name="g'+i+'"]:checked');if(!r)return null;const o={...x,status:r.value};if(r.value==='改时间'){const [d,t]=document.querySelectorAll('#gm'+i+' input');o.newDate=d.value;o.newTime=t.value}if(r.value==='课包')o.perWeek=Number(document.querySelector('#gk'+gapWeekHead(x.date)+' input').value);return o}).filter(Boolean)}
+function gapMon(d){const x=new Date(d+'T12:00');x.setDate(x.getDate()-(x.getDay()+6)%7);return x.toISOString().slice(0,10)}
+function gapSun(d){const x=new Date(gapMon(d)+'T12:00');x.setDate(x.getDate()+6);return x.toISOString().slice(0,10)}
+function gapWeekHead(d){return gapItems.findIndex(y=>gapMon(y.date)===gapMon(d))}
+function gapWeekFirst(i){return gapWeekHead(gapItems[i].date)===i}
+function yesterday(){const d=new Date(today()+'T12:00');d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
+function gapMoveShow(){gapItems.forEach((x,i)=>{const r=document.querySelector('#gaplist input[name="g'+i+'"]:checked'),m=$('gm'+i),k=$('gk'+i);if(m)m.hidden=!(r&&r.value==='改时间');if(k)k.hidden=!gapItems.some((y,j)=>gapMon(y.date)===gapMon(x.date)&&document.querySelector('#gaplist input[name="g'+j+'"][value="课包"]:checked'))})}
+function gapWeekSync(e){const r=e.target;if(!r||r.type!=='radio'||!/^g\d+$/.test(r.name))return;const i=Number(r.name.slice(1)),w=gapMon(gapItems[i].date);
+ gapItems.forEach((y,j)=>{if(j===i||gapMon(y.date)!==w)return;const o=document.querySelector('#gaplist input[name="g'+j+'"]:checked');
+  if(r.value==='课包')document.querySelector('#gaplist input[name="g'+j+'"][value="课包"]').checked=true;else if(o&&o.value==='课包')o.checked=false})}
+function gapSum(){const p=gapPicked(),on=p.filter(x=>x.status==='上课'||x.status==='改时间');$('gapsum').textContent=p.length?'选了 '+p.length+' 节：上课 '+on.length+' 节（共扣 '+on.reduce((a,x)=>a+x.units,0)+' 课时）· 请假 '+p.filter(x=>x.status==='请假').length+' · 没这节课 '+p.filter(x=>x.status==='没上').length+(p.some(x=>x.status==='课包')?' · 课包 '+[...new Set(p.filter(x=>x.status==='课包').map(x=>gapMon(x.date)))].length+' 周（共扣 '+[...new Map(p.filter(x=>x.status==='课包').map(x=>[gapMon(x.date),x.perWeek||0])).values()].reduce((a,n)=>a+n,0)+' 课时）':''):'每一节选 上课 / 请假 / 没这节课 / 补录时间 / 课包'}
+async function afterGap(out){gaps=out.overview;paintGapBtn();data=await (await fetch('/api/ledger',{cache:'no-store'})).json();render();paintGap(out);
+ if(!out.items.length){const next=Object.keys(gaps.students)[0];say(out.name+' 的缺记录补完了');if(next){openGap(next)}else{$('gapdialog').close()}}}
+$('gapwho').onchange=()=>openGap($('gapwho').value);
+$('gapbtn').onclick=()=>{const n=Object.keys(gaps.students||{});if(n.length)openGap(n[0])};
+$('gapclose').onclick=()=>$('gapdialog').close();
+$('gappay').onclick=()=>{$('gapdialog').close();openForm('payment',gapName)};
+$('stmtpay').onclick=()=>{$('stmtdialog').close();openForm('payment',stmtName)};
+$('gapstartbtn').onclick=()=>{$('gapstartform').hidden=!$('gapstartform').hidden;if(!$('gapstartform').hidden)$('gapleft').focus()};
+document.querySelectorAll('#gapdialog [data-all]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#gaplist input[value="'+b.dataset.all+'"]').forEach(r=>r.checked=true);gapMoveShow();gapSum()});
+$('gapstartsave').onclick=async()=>{
+ const left=$('gapleft').value.trim();if(left===''){$('gaperr').textContent='请填那天还剩几节';$('gapleft').focus();return}
+ if(!confirm('把 '+gapName+' 的起点改成：截至 '+$('gapday').value+' 还剩 '+left+' 节？'))return;
+ try{afterGap(await call('/api/gaps/restart',{name:gapName,date:$('gapday').value,remaining:Number(left)}));$('gapstartform').hidden=true;say('起点改好了')}catch(err){$('gaperr').textContent=err.message}
+};
+$('gaplist').onchange=e=>{gapWeekSync(e);gapMoveShow();gapSum()};
+$('gapsave').onclick=async()=>{
+ const picked=gapPicked(),items=picked.map(x=>({date:x.date,time:x.time,status:x.status,newDate:x.newDate,newTime:x.newTime,perWeek:x.perWeek}));
+ if(picked.some(x=>x.status==='课包'&&!(x.perWeek>=1&&x.perWeek<=20))){$('gaperr').textContent='课包：这周扣几节要填 1 到 20';return}
+ if(picked.some(x=>x.status==='改时间'&&(!x.newDate||!x.newTime))){$('gaperr').textContent='补录时间：请填实际上课的日期和钟点';return}
+ if(!items.length){$('gaperr').textContent='还没选：每一节选 上课 / 请假 / 没这节课（可以用上面的“全部选”）';return}
+ // 10-20：同班同学同一节也还没记的，问一句要不要按一样的记（登记晚了，全班一起补）
+ const mates={};for(const x of picked)if(x.status!=='课包')for(const m of x.classmates||[])if(m.status==='没记')(mates[m.name]=mates[m.name]||[]).push({date:x.date,time:x.time,status:x.status,newDate:x.newDate,newTime:x.newTime});
+ const names=Object.keys(mates);let withMates=false;
+ if(names.length)withMates=confirm('同班的 '+names.join('、')+' 这几节也还没记。\n\n要按一样的（上课 / 请假 / 没这节课）一起记上吗？\n\n点“取消”就只记 '+gapName+'。');
+ $('gapsave').disabled=true;
+ try{let out=await call('/api/gaps/resolve',{name:gapName,items});let more=0;
+  if(withMates)for(const n of names){try{const o=await call('/api/gaps/resolve',{name:n,items:mates[n]});more+=o.saved+o.skipped;out.overview=o.overview}catch(e){}}
+  say('已确认 '+items.length+' 节'+(more?'，同班同学一起记了 '+more+' 节':''));afterGap(out)}
+ catch(err){$('gaperr').textContent=err.message}
+ finally{$('gapsave').disabled=false}
+};
+async function renameStudent(n){
+ const to=(prompt('把「'+n+'」改成什么名字？\n（课时、课表、老课表都会跟着改）',n)||'').trim();if(!to||to===n)return;
+ try{data=await call('/api/student/rename',{from:n,to});render();loadGaps();say(n+' 已改名为 '+to);if(data.renamed?.service)alert('服务管理 / 作品管理里「'+n+'」的照片视频还在原来的名字下，没有跟着改。')}
+ catch(err){alert(err.message)}
+}
+// ---- 课包（10-20）：按周扣，和平时课时同一本账
+let pkgName='',pkgData=[];
+async function openPackage(n){pkgName=n;$('pkgtitle').textContent=n+' · 课包';$('pkgerr').textContent='';$('pkgstart').value=today();$('pkgend').value='';$('pkgper').value=4;$('pkgnote').value='';if(!$('pkgdialog').open)$('pkgdialog').showModal();await loadPackages()}
+async function loadPackages(){try{pkgData=(await (await fetch('/api/packages?student='+encodeURIComponent(pkgName),{cache:'no-store'})).json()).packages}catch(e){pkgData=[]}paintPackages()}
+function paintPackages(){
+ const ST={done:'已扣',now:'这周还没过完',later:'以后'};
+ $('pkglist').innerHTML=pkgData.map(p=>'<div class="pkgbox" data-p="'+p.id+'"><div style="display:flex;gap:8px;align-items:center"><b>'+md(p.start)+'–'+md(p.end)+' · 每周 '+p.perWeek+' 节'+(p.note?' · '+esc(p.note):'')+'</b><button type="button" data-del="'+p.id+'" style="margin-left:auto">删除这个课包</button></div>'
+  +'<div class="pkgweeks">'+p.weekList.map(w=>'<label>'+md(w.monday)+'–'+md(w.sunday)+' <input type="number" min="0" max="'+p.perWeek+'" step="1" value="'+w.count+'" data-w="'+w.monday+'"> 节 <small class="muted">'+ST[w.state]+'</small></label>').join('')+'</div>'
+  +'<p class="muted" style="font-size:12px;margin:4px 0 0">共扣 '+p.weekList.reduce((a,w)=>a+w.count,0)+' 节（已扣 '+p.weekList.filter(w=>w.state==='done').reduce((a,w)=>a+w.count,0)+' 节）。改了周数直接保存。</p></div>').join('')||'<p class="muted">还没有课包</p>';
+}
+async function pkgCall(body){try{pkgData=(await call('/api/packages/save',body)).packages;paintPackages();$('pkgerr').textContent='';data=await (await fetch('/api/ledger',{cache:'no-store'})).json();render();loadGaps()}catch(err){$('pkgerr').textContent=err.message;await loadPackages()}}
+$('pkglist').onchange=e=>{const i=e.target.closest('input[data-w]');if(!i)return;const p=pkgData.find(x=>x.id===i.closest('[data-p]').dataset.p);const v=Math.max(0,Math.min(p.perWeek,Math.round(Number(i.value)||0)));const weeks=Object.fromEntries(p.weekList.map(w=>[w.monday,w.count]));weeks[i.dataset.w]=v;pkgCall({id:p.id,student:pkgName,start:p.start,end:p.end,perWeek:p.perWeek,note:p.note,weeks})};
+$('pkglist').onclick=e=>{const b=e.target.closest('[data-del]');if(b&&confirm('删除这个课包？已经按周扣的会撤销（流水里看得到）。'))pkgCall({delete:true,id:b.dataset.del,student:pkgName})};
+$('pkgadd').onclick=async()=>{if(!$('pkgend').value){$('pkgerr').textContent='请选结束日期';return}const n=pkgData.length;await pkgCall({student:pkgName,start:$('pkgstart').value,end:$('pkgend').value,perWeek:Number($('pkgper').value),note:$('pkgnote').value});if(pkgData.length>n){$('pkgend').value='';$('pkgnote').value='';say('课包建好了')}};
+$('pkgclose').onclick=()=>$('pkgdialog').close();
+let mergeFrom='';
+function openMerge(n){
+ mergeFrom=n;$('mergetitle').textContent='合并「'+n+'」';$('mergeerr').textContent='';
+ const near=similar(n).filter(x=>x!==n),rest=data.students.map(s=>s.name).filter(x=>x!==n&&!near.includes(x)).sort((x,y)=>x.localeCompare(y,'zh'));
+ $('mergeto').innerHTML='<option value="">请选择…</option>'+(near.length?'<optgroup label="名字相近">'+near.map(x=>'<option>'+esc(x)+'</option>').join('')+'</optgroup>':'')+'<optgroup label="全部学生">'+rest.map(x=>'<option>'+esc(x)+'</option>').join('')+'</optgroup>';
+ if(near.length)$('mergeto').value=near[0];
+ mergePreview();$('mergedialog').showModal();
+}
+async function mergePreview(){
+ const to=$('mergeto').value;$('mergego').disabled=!to;
+ if(!to){$('mergeinfo').textContent='选一个要保留的名字。';return}
+ try{const i=await call('/api/student/merge',{from:mergeFrom,to,dry:true});
+  $('mergeinfo').innerHTML='「<b>'+esc(i.from)+'</b>」→「<b>'+esc(i.to)+'</b>」<br>会搬过去：流水 '+i.records+' 条'+(i.courses?' · 课表里 '+i.courses+' 节课':'')+(i.photos?' · 老课表照片 '+i.photos+' 张':'')
+   +(i.openingDropped?'<br>两边都有起始余额：保留较新的，撤销较早的那条（'+esc(i.openingDropped)+'）':'')
+   +(i.paused?'<br>「'+esc(i.from)+'」是暂停上课的；合并后按「'+esc(i.to)+'」自己的状态':'')
+   +(i.service?'<br><span style="color:#b26b00">注意：服务管理 / 作品管理里「'+esc(i.from)+'」的资料不会搬，还留在原来的名字下。</span>':'')
+   +'<br><span class="muted">合并前会自动备份。</span>';$('mergeerr').textContent=''}
+ catch(err){$('mergeinfo').textContent='';$('mergeerr').textContent=err.message;$('mergego').disabled=true}
+}
+$('mergeto').onchange=mergePreview;$('mergecancel').onclick=()=>$('mergedialog').close();
+$('mergeform').onsubmit=async e=>{
+ e.preventDefault();const to=$('mergeto').value;if(!to)return;
+ if(!confirm('确定把「'+mergeFrom+'」合并到「'+to+'」？'))return;
+ $('mergego').disabled=true;
+ try{data=await call('/api/student/merge',{from:mergeFrom,to});render();$('mergedialog').close();say('已把 '+mergeFrom+' 合并到 '+to)}
+ catch(err){$('mergeerr').textContent=err.message}
+ finally{$('mergego').disabled=false}
+};
+async function togglePause(n){const s=data.students.find(x=>x.name===n);try{data=await call('/api/student/pause',{name:n,paused:!s.paused});render();say(n+(s.paused?' 已恢复上课':' 已标为暂停上课'))}catch(err){alert(err.message)}}
+$('search').oninput=render;
+$('filters').onclick=e=>{const b=e.target.closest('button[data-f]');if(!b)return;filter=b.dataset.f;document.querySelectorAll('#filters button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+
+function openForm(k,name){
+ kind=k;student=name;recordId=crypto.randomUUID();
+ $('formtitle').textContent=name+' · '+TITLE[k];
+ $('form').reset();$('date').value=today();$('formerr').textContent='';
+ document.querySelectorAll('#form [data-for]').forEach(l=>l.hidden=!l.dataset.for.split(' ').includes(k));
+ $('deltalabel').textContent=k==='opening'?'起始余额（课时，欠课填负数）':'调整课时数（加课填正数，扣课填负数）';
+ $('notehint').textContent=k==='adjust'?'（必填）':'（可不填）';
+ $('formdialog').showModal();formPaper(k,name);
+}
+async function formPaper(k,name){
+ $('formpaperwrap').hidden=true;$('formpaperbig').hidden=true;$('formpaper').innerHTML='';
+ if(k!=='opening'&&k!=='adjust')return;
+ try{const d=await (await fetch('/api/paper/student?name='+encodeURIComponent(name),{cache:'no-store'})).json();if(name!==student)return;
+  const src=f=>'/api/paper/image?w='+encodeURIComponent(name)+'&f='+encodeURIComponent(f);
+  $('formpaper').innerHTML=(d.items||[]).map(x=>'<button type="button" aria-pressed="false" data-f="'+esc(x.file)+'" style="padding:2px;border:1px solid #d9dee8;border-radius:8px;background:#fff;text-align:center"><img src="'+src(x.file)+'" alt="老课表" style="height:80px;display:block">'+(x.date?'<small>'+x.date.slice(5).replace('-','/')+(x.remaining!=null?' 剩'+x.remaining:'')+'</small>':'')+'</button>').join('');
+  $('formpaperwrap').hidden=!(d.items||[]).length;
+  $('formpaper').querySelectorAll('button').forEach(b=>b.onclick=()=>{const on=b.getAttribute('aria-pressed')!=='true';$('formpaper').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',on&&x===b));$('formpaperbig').hidden=!on;if(on)$('formpaperbig').src=src(b.dataset.f)});
+ }catch(e){}
+}
+$('formpaperbig').onclick=()=>{$('formpaperbig').hidden=true;$('formpaper').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'))};
+$('formcancel').onclick=()=>$('formdialog').close();
+$('form').onsubmit=async e=>{
+ e.preventDefault();
+ const body={id:recordId,kind,student,date:$('date').value,note:$('note').value};
+ if(kind==='payment'){body.count=Number($('count').value);if($('money').value!=='')body.money=Number($('money').value)}
+ if(kind==='lesson'||kind==='leave'||kind==='noshow'){body.units=Number($('units').value);body.time=$('time').value.trim()}
+ if(kind==='makeup')body.units=Number($('units').value);
+ if(kind==='opening'||kind==='adjust')body.delta=Number($('delta').value);
+ $('formsave').disabled=true;
+ try{data=await call('/api/ledger/add',body);render();$('formdialog').close();say('已记录：'+student+' · '+KIND[kind])}
+ catch(err){$('formerr').textContent=err.message}
+ finally{$('formsave').disabled=false}
+};
+
+let enrollId='';
+const enrollHint=()=>$('enhint').textContent=$('enpaused').checked?'报名后标为暂停上课，不会出现在课程管理里；以后在他那一行点“恢复上课”。':'报名后会出现在课程管理左边的“未排课学生”里，拖进课表就排好时间了。';
+$('enrollbtn').onclick=()=>{enrollId=crypto.randomUUID().slice(0,20);$('enrollform').reset();$('endate').value=today();$('enerr').textContent='';enrollHint();$('enrolldialog').showModal();$('enname').focus()};
+$('enpaused').onchange=enrollHint;
+$('encancel').onclick=()=>$('enrolldialog').close();
+$('enrollform').onsubmit=async e=>{
+ e.preventDefault();
+ const name=$('enname').value.trim(),body={id:enrollId,name,date:$('endate').value,count:Number($('encount').value),paused:$('enpaused').checked};
+ if($('enmoney').value!=='')body.money=Number($('enmoney').value);
+ $('ensave').disabled=true;
+ try{data=await call('/api/student/enroll',body);render();$('enrolldialog').close();say(name+' 已报名'+(body.paused?'（暂停上课）':'，去课程管理排时间'))}
+ catch(err){$('enerr').textContent=err.message}
+ finally{$('ensave').disabled=false}
+};
+
+
+// ---- 11-05 课时单里改记录：每一节后面点“编辑”（类型/日期/时间/课时数/课包/删除），底部留改动记录；账本仍是追加式
+let editId=null;
+const EKIND={lesson:'上课',leave:'请假',noshow:'旷课',adjust:'调整',payment:'缴费',opening:'起始余额'};
+async function renderStmtEdit(name){
+ const mine=data.transactions.filter(t=>t.student===name&&!t.voided&&t.kind!=='void').sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||'')));
+ let ch=[];try{ch=(await (await fetch('/api/ledger/changes?name='+encodeURIComponent(name),{cache:'no-store'})).json()).changes||[]}catch(e){}
+ const brief=x=>x?(EKIND[x.kind]||x.kind)+' '+x.date.slice(5).replace('-','/')+(x.time?' '+x.time:'')+(x.units>1?' ×'+x.units:''):'—';
+ $('stmtedit').innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b>记录（点编辑修改）</b><span style="flex:1"></span><button type="button" id="stmtadj">加一条调整</button></div>'
+  +'<div style="max-height:30vh;overflow:auto;border:1px solid #e3e7ee;border-radius:8px">'+(mine.map(t=>'<div data-row="'+esc(t.id)+'" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:5px 8px;border-bottom:1px solid #eef0f4;font-size:14px"><span style="width:64px">'+t.date.slice(5).replace('-','/')+'</span><span style="width:48px">'+(EKIND[t.kind]||t.kind)+'</span><span style="width:44px" class="'+(t.delta>0?'pos':t.delta<0?'neg':'')+'">'+(t.delta>0?'+':'')+t.delta+'</span><span style="flex:1" class="muted">'+esc([t.time,t.kind==='payment'&&t.money?t.money+' 元':'',t.note].filter(Boolean).join(' · '))+'</span>'+((['lesson','leave','noshow'].includes(t.kind)||(t.kind==='adjust'&&!(t.note||'').startsWith('课包')))?'<button type="button" data-edit="'+esc(t.id)+'">编辑</button>':'')+'</div>').join('')||'<p class="muted" style="padding:8px">还没有记录</p>')+'</div>'
+  +'<div style="margin-top:8px"><b>改动记录</b></div><div class="muted" style="font-size:13px;max-height:16vh;overflow:auto">'+(ch.length?ch.slice().reverse().map(c=>'<div>'+esc(c.at.slice(5,16).replace('T',' '))+' · '+esc(c.label)+'：'+esc(brief(c.from))+(c.to?' → '+esc(brief(c.to)):'')+'</div>').join(''):'还没有改过')+'</div>';
+ $('stmtadj').onclick=()=>{$('stmtdialog').close();openForm('adjust',name)};
+ $('stmtedit').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit,name));
+}
+function editSync(){const k=$('editkind').value;document.querySelectorAll('#editform [data-e]').forEach(l=>l.hidden=!l.dataset.e.split(' ').includes(k))}
+$('editkind').onchange=editSync;
+function openEdit(id,name){
+ const t=data.transactions.find(x=>x.id===id);if(!t)return;editId=id;stmtName=name;
+ const row=$('stmtedit').querySelector('[data-row="'+CSS.escape(id)+'"]');if(!row)return;
+ const adj=t.kind==='adjust',inp='style="padding:3px 6px"';
+ row.style.background='#f4f7ff';
+ row.innerHTML='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%">'
+  +(adj?'<span>调整</span><input id="ie_delta" type="number" step="1" value="'+t.delta+'" style="width:70px;padding:3px 6px">'
+       :'<select id="ie_kind" '+inp+'><option value="lesson">上课</option><option value="leave">请假</option><option value="noshow">旷课</option><option value="package">按课包扣</option></select>')
+  +'<input id="ie_date" type="date" value="'+t.date+'" '+inp+'>'
+  +(adj?'':'<input id="ie_time" placeholder="时段 09:00-09:45" value="'+esc(t.time||'')+'" style="width:130px;padding:3px 6px"><select id="ie_units" '+inp+'><option value="1">1 课时</option><option value="2">2 课时</option></select><span id="ie_perw" hidden>这一周扣 <input id="ie_per" type="number" min="1" max="20" value="4" style="width:56px;padding:3px 6px"> 节</span>')
+  +'<span style="flex:1"></span><button type="button" id="ie_save" class="primary">保存</button><button type="button" id="ie_del" style="color:#a32d2d">删除</button><button type="button" id="ie_cancel">取消</button></div><div class="err" id="ie_err" style="width:100%"></div>';
+ if(!adj){$('ie_kind').value=t.kind;$('ie_units').value=String(t.units||1);const sync=()=>{const k=$('ie_kind').value;$('ie_perw').hidden=k!=='package';$('ie_time').hidden=k==='package';$('ie_units').hidden=k==='package'};$('ie_kind').onchange=sync;sync()}
+ $('ie_cancel').onclick=()=>renderStmtEdit(name);
+ $('ie_del').onclick=()=>{if(confirm('删除这一条？（改动记录里会留一行）'))editCall({action:'delete'})};
+ $('ie_save').onclick=()=>{
+  if(adj)return editCall({action:'edit',kind:'adjust',date:$('ie_date').value,delta:Number($('ie_delta').value)});
+  const k=$('ie_kind').value;
+  if(k==='package')return editCall({action:'package',perWeek:Number($('ie_per').value)});
+  editCall({action:'edit',kind:k,date:$('ie_date').value,time:$('ie_time').value.trim(),units:Number($('ie_units').value)});
+ };
+}
+$('editcancel').onclick=()=>$('editdialog').close();
+async function editCall(body){
+ try{data=await call('/api/ledger/edit',Object.assign({id:editId,student:stmtName},body));render();await renderStmtEdit(stmtName);showStmt(await statementCanvas(stmtName),'课时记录_'+today());say('已改，改动记录里留了一行')}
+ catch(err){($('ie_err')||$('editerr')).textContent=err.message}
+}
+$('editform').onsubmit=e=>{e.preventDefault();const k=$('editkind').value;
+ if(k==='package')return editCall({action:'package',perWeek:Number($('editper').value)});
+ editCall({action:'edit',kind:k,date:$('editdate').value,time:$('edittime').value.trim(),units:Number($('editunits').value)})};
+$('editdel').onclick=()=>{if(confirm('删除这一节？（改动记录里会留一行）'))editCall({action:'delete'})};
+function openHistory(name){
+ student=name;$('historytitle').textContent=name+' · 流水';$('historyerr').textContent='';
+ const mine=data.transactions.filter(t=>t.student===name);
+ $('historylist').innerHTML=mine.map(t=>'<div class="tx'+(t.voided?' void':'')+'"><span>'+t.date+'</span><span>'+kindName(t)+'</span><span class="'+(t.delta>0?'pos':t.delta<0?'neg':'')+'">'+(t.delta>0?'+':'')+t.delta+'</span><span>'+esc([t.time,t.kind==='payment'&&t.money?t.money+' 元':'',t.note].filter(Boolean).join(' · '))+'</span>'
+  +(t.kind!=='void'&&!t.voided?'<button data-void="'+esc(t.id)+'">撤销</button>':'<span></span>')+'</div>').join('')||'<p class="muted">还没有记录</p>';
+ $('historydialog').showModal();
+}
+$('historylist').onclick=async e=>{
+ const b=e.target.closest('button[data-void]');if(!b)return;
+ const note=prompt('撤销原因（可不填）：');if(note===null)return;
+ try{data=await call('/api/ledger/void',{id:b.dataset.void,note});render();openHistory(student);say('已撤销')}
+ catch(err){$('historyerr').textContent=err.message}
+};
+$('historyclose').onclick=()=>$('historydialog').close();
+document.addEventListener('click',e=>{if(!e.target.closest('details.more'))document.querySelectorAll('details.more[open]').forEach(d=>d.open=false)});
+// ---- 批量登记起始余额
+let bulkBatch=null;
+const bulkInputs=()=>[...document.querySelectorAll('#bulklist input')];
+function bulkCount(){const n=bulkInputs().filter(i=>i.value.trim()!=='').length;$('bulksave').textContent=n?'保存（'+n+' 人）':'保存';$('bulksave').disabled=!n}
+$('bulkopen').onclick=()=>{
+ const missing=data.students.filter(s=>!s.hasOpening);bulkBatch=crypto.randomUUID().slice(0,8);
+ $('bulkdate').value=today();$('bulkerr').textContent='';
+ $('bulklist').innerHTML=missing.map((s,i)=>'<div style="display:flex;align-items:center;gap:12px;padding:7px 2px;border-bottom:1px solid #eef0f4"><span style="flex:1">'+esc(s.name)+'</span><input type="number" step="1" min="-500" max="500" inputmode="numeric" placeholder="剩余课时" data-n="'+esc(s.name)+'" data-i="'+i+'" style="width:130px"></div>').join('');
+ bulkInputs().forEach((inp,i,all)=>{inp.oninput=bulkCount;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();(all[i+1]||$('bulksave')).focus()}}});
+ bulkCount();$('bulkdialog').showModal();bulkInputs()[0]?.focus();
+};
+$('bulkcancel').onclick=()=>$('bulkdialog').close();
+$('bulkform').onsubmit=async e=>{
+ e.preventDefault();$('bulkerr').textContent='';
+ const filled=bulkInputs().filter(i=>i.value.trim()!=='');
+ const bad=filled.find(i=>!/^-?\d+$/.test(i.value.trim())||Math.abs(+i.value)>500);
+ if(bad){$('bulkerr').textContent=bad.dataset.n+'：请填 -500 到 500 之间的整数';bad.focus();return}
+ const items=filled.map(i=>({id:'open-'+bulkBatch+'-'+i.dataset.i,kind:'opening',student:i.dataset.n,date:$('bulkdate').value,delta:parseInt(i.value,10),note:'批量登记'}));
+ $('bulksave').disabled=true;
+ try{const out=await call('/api/ledger/batch',{items});data=out;render();$('bulkdialog').close();say('已登记 '+out.added+' 位学生的起始余额')}
+ catch(err){$('bulkerr').textContent=err.message;bulkCount()}
+};
+// ---- 签课表：打印 → 学生签字 → 导入扫描件 → 逐行核对 → 入账
+let printWeek=null,review=null,pendingList=[],queue=[];
+const mondayOf=d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.toLocaleDateString('sv')};
+const addDays=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return d.toLocaleDateString('sv')};
+function weekLabel(w){const cur=mondayOf(codaNow()),diff=Math.round((new Date(w+'T00:00:00')-new Date(cur+'T00:00:00'))/6048e5);return (diff===0?'本周 ':diff===1?'下周 ':diff===-1?'上周 ':'')+w.slice(5).replace('-','/')+'–'+addDays(w,6).slice(5).replace('-','/')}
+async function loadPending(){
+ try{const d=await (await fetch('/api/sheets',{cache:'no-store'})).json();pendingList=d.pending;$('pendingbtn').hidden=!pendingList.length;$('pendingbtn').textContent='待核对 '+pendingList.length+' 张';if(location.hash==='#pending'){history.replaceState(null,'',location.pathname);if(pendingList.length){queue=pendingList.slice();openNext()}}}catch(e){}
+}
+// 打印
+const paintPrintWeek=()=>{$('pwlabel').textContent=weekLabel(printWeek)};
+async function printSheet(week,win){
+ const out=await call('/api/sheets/generate',{week});const url='/api/sheets/print?id='+encodeURIComponent(out.id);if(win)win.location=url;else if(!window.open(url))location.href=url;say('已打开 '+weekLabel(week)+' 签课表，共 '+out.rows+' 行。打印选 A4、实际大小、无边距')
+}
+$('printbtn').onclick=async()=>{
+ const win=window.open('about:blank');$('printbtn').disabled=true;
+ try{await printSheet(mondayOf(codaNow()),win)}catch(err){win?.close?.();alert(err.message)}finally{$('printbtn').disabled=false}
+};
+$('printmore').onclick=async()=>{printWeek=addDays(mondayOf(codaNow()),7);paintPrintWeek();$('printerr').textContent='';$('printdialog').showModal();
+ try{const d=await (await fetch('/api/sheets',{cache:'no-store'})).json();
+  $('printedlist').innerHTML=(d.printed||[]).map(p=>'<button type="button" class="printed" data-f="'+esc(p.id)+'"><b>'+esc(p.title||(p.week?weekLabel(p.week)+' 签课表':p.filename))+'</b><small>'+p.rows+' 行 · 生成于 '+p.made+'</small></button>').join('')||'<p class="muted" style="font-size:13px">还没有</p>'}catch(e){}
+};
+$('printedlist').onclick=e=>{const b=e.target.closest('button[data-f]');if(b)window.open('/api/sheets/print?id='+encodeURIComponent(b.dataset.f))};
+$('pwprev').onclick=()=>{printWeek=addDays(printWeek,-7);paintPrintWeek()};
+$('pwnext').onclick=()=>{printWeek=addDays(printWeek,7);paintPrintWeek()};
+$('printcancel').onclick=()=>$('printdialog').close();
+$('printgo').onclick=async()=>{
+ const win=window.open('about:blank');$('printgo').disabled=true;$('printerr').textContent='';
+ try{await printSheet(printWeek,win);$('printdialog').close()}catch(err){win?.close?.();$('printerr').textContent=err.message}finally{$('printgo').disabled=false}
+};
+// 导入扫描件
+$('importbtn').onclick=()=>$('sheetfile').click();
+// 照片在浏览器里识别（签课表识别.js，Mac 和 Windows 一样）：先存原件 → 读成图片 → 找四角、读编号、量格子 → 交给程序判定。PDF 扫描件暂时还走原来的方法
+let scanLib=null;
+function loadScanLib(){return scanLib||(scanLib=new Promise((ok,no)=>{const s=document.createElement('script');s.src='/assets/'+encodeURIComponent('签课表识别.js');s.onload=ok;s.onerror=()=>{scanLib=null;no(new Error('识别程序没加载上，请刷新页面再试'))};document.head.appendChild(s)}))}
+// PDF 扫描件（扫描仪扫的，可能好几页）：pdf.js 一页页画成图片（和原来一样按 2.5 倍），每页单独识别；空白页、背面跳过
+let pdfLib=null;
+function loadPdfLib(){return pdfLib||(pdfLib=new Promise((ok,no)=>{const s=document.createElement('script');s.src='/assets/pdf.min.js';s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc='/assets/pdf.worker.min.js';ok()};s.onerror=()=>{pdfLib=null;no(new Error('PDF 读取程序没加载上，请刷新页面再试'))};document.head.appendChild(s)}))}
+async function scanPdfInBrowser(f,b64){
+ await loadScanLib();await loadPdfLib();
+ const st=await call('/api/sheets/stash',{filename:f.name,data:b64});
+ const buf=await (await fetch('/api/sheets/scanfile?name='+encodeURIComponent(st.file),{cache:'no-store'})).arrayBuffer();
+ let doc;try{doc=await pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise}catch(e){throw new Error('PDF 打不开，请确认文件完整')}
+ const getCells=async t=>{const x=await fetch('/api/sheets/layout?id='+t,{cache:'no-store'});const o=await x.json();if(!x.ok)throw new Error(o.error);return o.cells};
+ const sheets=[],skipped=[];
+ for(let i=1;i<=doc.numPages;i++){
+  $('hint').textContent='正在识别 '+f.name+' 第 '+i+'/'+doc.numPages+' 页 …';
+  try{
+   const page=await doc.getPage(i),vp=page.getViewport({scale:2.5}),cv=document.createElement('canvas');cv.width=Math.floor(vp.width);cv.height=Math.floor(vp.height);
+   const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);await page.render({canvasContext:g,viewport:vp}).promise;
+   const result=await CodaScan.scan(cv,getCells);
+   sheets.push(...(await call('/api/sheets/scanned',{file:st.file,page:i-1,result})).sheets);
+  }catch(err){skipped.push({page:i,reason:err.message})}
+ }
+ if(!sheets.length)throw new Error(doc.numPages===1?skipped[0].reason:'这 '+doc.numPages+' 页里没有找到签课表（'+skipped[0].reason+'）');
+ return {sheets,skipped,pages:doc.numPages};
+}
+async function scanInBrowser(f,b64){
+ await loadScanLib();
+ const st=await call('/api/sheets/stash',{filename:f.name,data:b64});
+ if(st.cached)return {sheets:[st.cached],skipped:[]};
+ const r=await fetch('/api/sheets/scanfile?name='+encodeURIComponent(st.file),{cache:'no-store'});
+ if(!r.ok){let m='照片读不出来';try{m=(await r.json()).error||m}catch(e){}throw new Error(m)}
+ let bmp;try{bmp=await createImageBitmap(await r.blob(),{imageOrientation:'from-image'})}catch(e){throw new Error('这张照片浏览器打不开，请换成 JPG 或 PNG')}
+ const getCells=async t=>{const x=await fetch('/api/sheets/layout?id='+t,{cache:'no-store'});const o=await x.json();if(!x.ok)throw new Error(o.error);return o.cells};
+ const result=await CodaScan.scan(bmp,getCells);
+ return await call('/api/sheets/scanned',{file:st.file,page:0,result});
+}
+$('sheetfile').onchange=async()=>{const files=[...$('sheetfile').files];$('sheetfile').value='';if(files.length)await importFiles(files)};
+let lastImportNotes=[];
+async function importFiles(files){
+ const big=files.find(f=>f.size>30*1024*1024);if(big){alert(big.name+' 超过 30MB，请降低扫描分辨率（200–300dpi 就够）');return 0}
+ const sheets=[],notes=[];let skipped=0;
+ for(const [i,f] of files.entries()){
+  $('hint').textContent='正在识别 '+(files.length>1?(i+1)+'/'+files.length+' ':'')+f.name+' …';
+  try{
+   const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('读取文件失败'));r.readAsDataURL(f)});
+   const out=/\.pdf$/i.test(f.name)?await scanPdfInBrowser(f,b64):await scanInBrowser(f,b64);sheets.push(...out.sheets);skipped+=out.skipped.length;
+  }catch(err){notes.push(f.name+'：'+err.message)}
+ }
+ $('hint').textContent='';loadPending();
+ lastImportNotes=notes;if(notes.length&&!importFiles.quiet)alert('这些文件没有识别出来：\n'+notes.join('\n'));
+ if(!sheets.length)return 0;
+ say('识别出 '+sheets.length+' 张签课表'+(skipped?'，跳过 '+skipped+' 页空白或背面':''));
+ queue=sheets.filter(r=>r.booked<r.rows.length);if(queue.length)openReview(queue.shift());else say('这些签课表都已入账过');
+ return sheets.length;
+}
+async function openNext(){
+ const n=queue.shift();if(!n)return;
+ try{openReview(Array.isArray(n.rows)?n:await call('/api/sheets/review',{reviewId:n.reviewId}))}catch(err){alert(err.message)}
+}
+$('pendingbtn').onclick=()=>{queue=pendingList.slice();openNext()};
+// 核对
+function openReview(rv){
+ review=rv;const byDate={};for(const r of rv.rows)(byDate[r.entry.date]??=[]).push(r);
+ $('rvtitle').textContent=weekLabel(rv.week)+' 签课表';$('rvsub').textContent='编号 '+rv.sheetId+' · '+rv.sourceFile.replace(/^\d{8}_\d{6}_/,'')+(rv.page!=null&&/\.pdf$/i.test(rv.sourceFile)?' 第 '+(rv.page+1)+' 页':'')+(queue.length?' · 后面还有 '+queue.length+' 张':'');
+ $('rvlist').innerHTML=Object.keys(byDate).sort().map(d=>'<div class="rvday">'+d.slice(5).replace('-','/')+' '+esc(byDate[d][0].entry.day)+'</div>'+byDate[d].sort((a,b)=>a.entry.time.localeCompare(b.entry.time)).map(r=>
+  '<div class="rvrow'+(r.booked?' booked':'')+'"><span class="rvt">'+esc(r.entry.time)+'</span>'+(r.unknown?rvSwap(r.entry.name):'<b>'+esc(r.entry.name)+'</b>')+'<img src="'+r.image+'" alt="签字格">'+(r.leaveImage?'<img class="rvleave" src="'+r.leaveImage+'" alt="请假框">':'<span></span>')
+  +(r.booked?'<span class="rvbooked">已入账</span>':r.status==='停课'?'<span class="rvbooked" style="color:#8190a4">停课</span>':'<span><select data-e="'+esc(r.entry.id)+'" data-s="'+r.status+'" data-m="'+r.status+'">'+['上课','请假','待确认'].map(s=>'<option'+(s===r.status?' selected':'')+'>'+s+'</option>').join('')+'</select> <label class="rvwrong" title="机器认错了（改了上面的就自动勾上；名字、请假框认错也可以勾）"><input type="checkbox" data-w="'+esc(r.entry.id)+'">认错</label></span>')
+  +'<small>'+(r.status==='停课'?'临时安排里停了，不入账':(r.entry.units===2?'扣 2':'扣 1')+(r.status==='待确认'&&!r.booked?' · '+esc(r.reason):''))+'</small></div>').join('')).join('');
+ $('rvchecked').checked=false;$('rverr').textContent='';rvCount();if(!$('reviewdialog').open)$('reviewdialog').showModal();
+}
+// 10-27：签课表上的名字不在名单里（打印后改过名字）→ 旁边选“换成谁”，这张和别的待核对签课表一起换，换好照常入账
+function rvSwap(n){return '<span><b style="color:#d45858">'+esc(n)+'</b><br><select class="rvswap" style="max-width:100%;font-size:12px;padding:4px 6px" data-from="'+esc(n)+'" title="名单里没有这个名字，选一个换成谁"><option value="">名单里没有 · 换成…</option>'+(data?.students||[]).map(s=>s.name).sort((a,b)=>rvLike(n,b)-rvLike(n,a)||a.localeCompare(b,'zh')).map(s=>'<option>'+esc(s)+'</option>').join('')+'</select></span>'}
+function rvLike(a,b){return [...a].filter(c=>b.includes(c)).length}  // 像的名字排前面（张三 → 张山）
+function rvCount(){
+ const sel=[...document.querySelectorAll('#rvlist select[data-e]')],c={'上课':0,'请假':0,'待确认':0};
+ sel.forEach(s=>{c[s.value]++;s.dataset.s=s.value});
+ $('rvsum').textContent='上课 '+c['上课']+' · 请假 '+c['请假']+' · 待确认 '+c['待确认']+(review.booked?' · 已入账 '+review.booked:'');
+ $('rvgo').disabled=false;$('rvgo').style.opacity=$('rvchecked').checked&&sel.length?'':'.55';if($('rvchecked').checked)$('rverr').textContent='';
+}
+$('rvarchive').onclick=async()=>{
+ const left=review.rows.filter(r=>!r.booked&&r.status!=='停课').length;
+ if(!confirm('归档这张签课表？\n还没入账的 '+left+' 行不会记进账本（已入账的不动）。识别结果在备份里留着。'))return;
+ try{await call('/api/sheets/archive',{reviewId:review.reviewId});$('reviewdialog').close();queue=[];await loadPending();say('已归档，不再提醒')}
+ catch(err){$('rverr').textContent=err.message}};
+$('rvtopaper').onclick=async()=>{
+ if(!confirm('把这张当成老课表，放进“纸质课表归档”？\n这次的识别结果会拿掉（备份里留着）。'))return;
+ try{await call('/api/sheets/topaper',{reviewId:review.reviewId});$('reviewdialog').close();queue=[];await loadPending();await loadPaper();say('已放进纸质课表归档，点“待归档”去归档')}
+ catch(err){$('rverr').textContent=err.message}};
+$('rvlist').onchange=async e=>{const s=e.target;if(s.dataset?.e&&s.dataset.m!=='待确认'){const w=document.querySelector('#rvlist input[data-w="'+s.dataset.e+'"]');if(w)w.checked=s.value!==s.dataset.m}  // 改了机器认的＝认错了（机器本来就说待确认的不算）
+ if(!s.classList?.contains('rvswap'))return rvCount();if(!s.value)return;
+ if(!confirm('把签课表上的「'+s.dataset.from+'」换成「'+s.value+'」？\n别的待核对签课表里的「'+s.dataset.from+'」也一起换。'))return void(s.value='');
+ const keep={},ok=$('rvchecked').checked,bad=new Set([...document.querySelectorAll('#rvlist input[data-w]:checked')].map(w=>w.dataset.w));document.querySelectorAll('#rvlist select[data-e]').forEach(x=>keep[x.dataset.e]=x.value);
+ try{const out=await call('/api/sheets/rename',{reviewId:review.reviewId,from:s.dataset.from,to:s.value});openReview(out);document.querySelectorAll('#rvlist select[data-e]').forEach(x=>{if(keep[x.dataset.e])x.value=keep[x.dataset.e]});bad.forEach(id=>{const w=document.querySelector('#rvlist input[data-w="'+id+'"]');if(w)w.checked=true});$('rvchecked').checked=ok;rvCount();say('换好了：'+s.dataset.from+' → '+s.value+'（'+out.renamed+' 行）')}
+ catch(err){$('rverr').textContent=err.message}};$('rvchecked').onchange=rvCount;$('rvclose').onclick=()=>{queue=[];$('reviewdialog').close()};
+$('rvgo').onclick=async()=>{
+ if(!document.querySelector('#rvlist select[data-e]')){$('rverr').textContent='这张签课表都已经入账了，没有要记的，点“稍后再核对”关掉就行。';return}
+ if(!$('rvchecked').checked){$('rverr').textContent='请先对照签字图核对一遍，然后勾上下面“我已逐行核对过学生、签字和请假”，再点确认入账。';$('rvchecked').focus();return}
+ const decisions={},wrong={};document.querySelectorAll('#rvlist select[data-e]').forEach(s=>decisions[s.dataset.e]=s.value);document.querySelectorAll('#rvlist input[data-w]:checked').forEach(w=>wrong[w.dataset.w]=true);$('rvgo').disabled=true;
+ try{const out=await call('/api/sheets/commit',{reviewId:review.reviewId,decisions,wrong});data=out.ledger;render();$('reviewdialog').close();
+  say('已入账 '+out.saved+' 条'+(out.skipped?'，跳过 '+out.skipped+' 条已有记录':'')+(out.pending?'，还有 '+out.pending+' 条待确认（可在“待核对”里补）':''));if(out.notes?.length)alert(out.notes.join('\n'));loadPending();openNext()}
+ catch(err){$('rverr').textContent=err.message;rvCount()}
+};
+// ---- 学生课时单：一张图，可复制到微信
+let stmtCanvas=null,stmtName='';
+const pkgTxt=t=>{const s=new Date(t.date+'T12:00'),m=new Date(s);m.setDate(s.getDate()-6);const f=d=>String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');return '课包 '+f(m)+'–'+f(s)+' 扣'+(-t.delta)+'节'};  // 课时单一行写得下
+const KINDTXT=t=>t.kind==='opening'?'起始余额':t.kind==='payment'?'缴费 '+t.delta+' 课时'+(t.money?'（¥'+t.money+'）':''):t.kind==='lesson'?'上课'+(t.time?' '+t.time.replace('-','–'):''):t.kind==='leave'?'请假'+(t.time?' '+t.time.replace('-','–'):''):t.kind==='noshow'?'旷课'+(t.time?' '+t.time.replace('-','–'):''):t.kind==='makeup'?'补课（加回 '+t.delta+' 课时）':t.kind==='carry'?'上次缴费前结余':String(t.id||'').startsWith('pkg-')?pkgTxt(t):'调整'+(t.note?'：'+t.note:'');
+const loadImg=src=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
+async function statementCanvas(name){
+ const s=data.students.find(x=>x.name===name);
+ const txs=data.transactions.filter(t=>t.student===name&&!t.voided&&t.kind!=='void').slice().reverse().sort((a,b)=>a.date.localeCompare(b.date));
+ // 范围：最近一次缴费到今天（发给家长续费用）；之前的流水合成一行“上次缴费前结余”。还没缴过费就从头显示。
+ const from=Math.max(0,txs.map(t=>t.kind).lastIndexOf('payment')),carry=txs.slice(0,from).reduce((a,t)=>a+t.delta,0);
+ let run=carry;const rows=(from>0?[{t:{kind:'carry',delta:0,date:''},bal:carry}]:[]).concat(txs.slice(from).map(t=>(run+=t.delta,{t,bal:run})));
+ const imgs=await Promise.all(rows.map(r=>r.t.sign?loadImg('/api/sign?f='+encodeURIComponent(r.t.sign)):null));
+ const W=760,P=28,RH=56,top=124,H=top+Math.max(1,rows.length)*RH+64,dpr=2,c=document.createElement('canvas');c.dataset.i18n='1';c.width=W*dpr;c.height=H*dpr;
+ const g=c.getContext('2d');g.scale(dpr,dpr);g.fillStyle='#fff';g.fillRect(0,0,W,H);
+ const font=(w,sz)=>w+' '+sz+'px -apple-system,"PingFang SC",sans-serif';
+ g.fillStyle='#223047';g.font=font(600,26);g.fillText(name+' · 课时记录',P,52);
+ g.font=font(400,15);g.fillStyle='#68788d';g.fillText('截至 '+today()+'，剩余',P,84);
+ const lw=g.measureText('截至 '+today()+'，剩余').width;g.font=font(700,22);g.fillStyle=s.balance<0?'#d45858':'#275de0';g.fillText(' '+s.balance+' ',P+lw,85);
+ const bw=g.measureText(' '+s.balance+' ').width;g.font=font(400,15);g.fillStyle='#68788d';g.fillText('课时'+(s.balance<0?'（已欠课）':''),P+lw+bw,84);if(s.green){const tw=g.measureText('课时'+(s.balance<0?'（已欠课）':'')).width;g.fillStyle='#14833b';g.font=font(700,18);g.fillText('  +'+s.green+' 待补',P+lw+bw+tw,84)}
+ const col=[P,P+80,P+330,P+405,W-P];g.font=font(600,13);g.fillStyle='#8190a4';
+ ['日期','内容','课时','签字','剩余'].forEach((h,i)=>g.fillText(h,i===4?W-P-28:col[i],top-12));
+ g.strokeStyle='#e5e9ef';g.beginPath();g.moveTo(P,top-4);g.lineTo(W-P,top-4);g.stroke();
+ rows.forEach((r,i)=>{
+  const y=top+i*RH;g.font=font(400,15);g.fillStyle='#223047';
+  g.fillText(r.t.date.slice(5).replace('-','/'),col[0],y+34);g.fillText(KINDTXT(r.t).slice(0,18),col[1],y+34);
+  g.fillStyle=r.t.delta>0?'#2f8f5b':r.t.delta<0?'#d45858':'#8190a4';if(r.t.kind!=='carry')g.fillText((r.t.delta>0?'+':'')+r.t.delta,col[2],y+34);
+  const im=imgs[i];if(im){const h=RH-12,w=Math.min(190,im.width*h/im.height);g.drawImage(im,col[3],y+6,w,h)}
+  g.fillStyle='#223047';g.font=font(600,15);g.textAlign='right';g.fillText(String(r.bal),W-P,y+34);g.textAlign='left';
+  g.strokeStyle='#f0f2f6';g.beginPath();g.moveTo(P,y+RH);g.lineTo(W-P,y+RH);g.stroke();
+ });
+ if(!rows.length){g.font=font(400,15);g.fillStyle='#8190a4';g.fillText('还没有记录',P,top+34)}
+ g.font=font(400,12);g.fillStyle='#9aa6b5';g.fillText((from>0?'从最近一次缴费（'+txs[from].date.slice(5).replace('-','/')+'）到今天 · ':'')+'签字为课堂签课表扫描截图 · 生成于 '+codaNow().toLocaleString('zh-CN',{hour12:false}),P,H-24);
+ return c;
+}
+async function openStatement(name){
+ if(gaps.students?.[name]){stmtName=name;$('stmterr').textContent='';$('stmtpaper').hidden=true;$('stmtwrap').innerHTML='<p class="muted">还有缺的记录，余额未必对：<button type="button" id="stmtgap">先去补缺记录</button>（下面的记录仍可修改）</p>';$('stmtdialog').showModal();$('stmtgap').onclick=()=>{$('stmtdialog').close();openGap(name,'先把缺的记录补完，课时单上的余额才是对的；补完就能生成课时单。')};renderStmtEdit(name);return}
+ stmtName=name;$('stmterr').textContent='';$('stmtwrap').innerHTML='<p class="muted">正在生成…</p>';$('stmtpaper').hidden=true;$('stmtdialog').showModal();
+ const card=await statementCanvas(name);showStmt(card,'课时记录_'+today());
+ renderStmtEdit(name);
+ try{
+  const d=await (await fetch('/api/paper/student?name='+encodeURIComponent(name),{cache:'no-store'})).json();const list=d.files||[],info=Object.fromEntries((d.items||[]).map(x=>[x.file,x]));
+  $('stmtpaper').innerHTML='<button type="button" class="stmtchip" aria-pressed="true">课时单</button>'+list.map((f,i)=>'<button type="button" data-f="'+esc(f)+'" aria-pressed="false" title="纸质课表 '+(i+1)+'"><img src="/api/paper/image?w='+encodeURIComponent(name)+'&f='+encodeURIComponent(f)+'" alt="纸质课表 '+(i+1)+'">'+(info[f]?.date?'<span>'+info[f].date.slice(5).replace('-','/')+' 剩'+info[f].remaining+'</span>':'')+'</button>').join('');
+  $('stmtpaper').hidden=!list.length;
+  $('stmtpaper').querySelectorAll('button').forEach((b,i)=>b.onclick=async()=>{
+   $('stmtpaper').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+   if(!b.dataset.f){showStmt(card,'课时记录_'+today());return}
+   const im=await loadImg(b.querySelector('img').src);if(!im){$('stmterr').textContent='这张图打不开';return}
+   const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);showStmt(c,'纸质课表_'+i);
+  });
+ }catch(e){}
+}
+function showStmt(c,label){stmtCanvas=c;stmtLabel=label;c.style.cssText='width:100%;height:auto;display:block;border-radius:8px';$('stmtwrap').innerHTML='';$('stmtwrap').appendChild(c);$('stmterr').textContent=''}
+let stmtLabel='';
+const stmtBlob=()=>new Promise(res=>stmtCanvas.toBlob(res,'image/png'));
+$('stmtcopy').onclick=async()=>{
+ try{if(!navigator.clipboard||!window.ClipboardItem)throw new Error('unsupported');await navigator.clipboard.write([new ClipboardItem({'image/png':stmtBlob()})]);say('已复制 '+stmtName+' 的'+(stmtLabel.startsWith('纸质')?'纸质课表':'课时单')+'，可直接粘贴到微信');$('stmtdialog').close()}
+ catch(err){$('stmterr').textContent=err.message==='unsupported'?'这个浏览器不支持复制图片，请点“保存图片”':'复制没有成功：请允许浏览器访问剪贴板，或点“保存图片”'}
+};
+$('stmtsave').onclick=async()=>{const a=document.createElement('a');a.href=URL.createObjectURL(await stmtBlob());a.download=stmtName+'_'+stmtLabel+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+// ---- 纸质课表归档：手机拍的老课表（不是签课表）先进“待归档”，这里一张张看图选学生
+let paper={files:[],students:[]},paperAt=0;
+async function loadPaper(){
+ try{paper=await (await fetch('/api/paper',{cache:'no-store'})).json();paintPaperBtn()}catch(e){}
+}
+function paintPaperBtn(){
+ const n=paper.files.length,b=(paper.dropped||[]).length;
+ $('paperbtn').hidden=!n&&!b;$('paperbtn').textContent=n?'待归档 '+n+' 张':'不要的 '+b+' 张';
+ $('paperbin').hidden=!b;$('paperbin').textContent=binView?'回到待归档':'不要的 '+b+' 张';
+}
+let binView=false,lastDropped='';
+function showBin(){
+ binView=true;paintPaperBtn();const list=paper.dropped||[];
+ $('papertitle').textContent='不要的 '+list.length+' 张';
+ document.querySelectorAll('#paperdialog > div:not(.foot):not(.err):not(#paperbinview):not(#paperundo), #paperdialog .paperform, #paperdialog .papercheck, #paperhint').forEach(e=>e.hidden=true);
+ ['paperskip','paperdrop','papergo','papertosheet'].forEach(id=>$(id).hidden=true);$('paperbinview').hidden=false;
+ $('paperbinlist').innerHTML=list.map(f=>'<div style="background:#f6f7fa;border-radius:8px;padding:6px;text-align:center"><img src="/api/paper/image?w='+encodeURIComponent('不要的')+'&f='+encodeURIComponent(f)+'" alt="" style="width:100%;height:150px;object-fit:contain;border-radius:4px"><button type="button" data-back="'+esc(f)+'" style="width:100%;margin-top:6px">放回</button></div>').join('')||'<p class="muted">没有了</p>';
+}
+function leaveBin(){
+ binView=false;document.querySelectorAll('#paperdialog > div:not(.foot):not(.err):not(#paperbinview):not(#paperundo), #paperdialog .paperform, #paperdialog .papercheck, #paperhint').forEach(e=>e.hidden=false);
+ ['paperskip','paperdrop','papergo','papertosheet'].forEach(id=>$(id).hidden=false);$('paperbinview').hidden=true;paintPaperBtn();
+}
+async function restorePaper(f){
+ try{const out=await call('/api/paper/restore',{file:f});paper=out;$('paperundo').hidden=true;say('已放回待归档');paintPaperBtn();
+  if(binView&&(paper.dropped||[]).length)showBin();else{leaveBin();paperAt=Math.max(0,paper.files.indexOf(out.moved));showPaper()}}
+ catch(err){$('papererr').textContent=err.message}
+}
+$('paperbin').onclick=()=>{$('papererr').textContent='';if(binView){leaveBin();showPaper()}else showBin()};
+$('paperbinlist').onclick=e=>{const b=e.target.closest('button[data-back]');if(b)restorePaper(b.dataset.back)};
+$('paperundobtn').onclick=()=>{if(lastDropped)restorePaper(lastDropped)};
+function showPaper(){
+ if(binView)leaveBin();
+ if(!paper.files.length){if((paper.dropped||[]).length){showBin();return}$('paperdialog').close();say('纸质课表都归档好了');return}
+ paperAt=paperAt%paper.files.length;const f=paper.files[paperAt];
+ $('papertitle').textContent='纸质课表归档 '+(paperAt+1)+'/'+paper.files.length;$('paperimg').src='/api/paper/image?w='+encodeURIComponent('待归档')+'&f='+encodeURIComponent(f);
+ $('paperstudents').innerHTML=paper.students.map(n=>'<option value="'+esc(n)+'">').join('');$('paperwho').value='';$('paperdate').value='';$('paperleft').value='';$('paperpaused').checked=false;paperWho();$('paperdateshow').textContent='';$('papererr').textContent='';$('paperwho').focus();
+}
+// 填了名字和日期：说明这张会不会成为起点；系统里已有这天或之前的记录时提醒（可能已经算在这张的余课里）
+const md=d=>d.slice(5).replace('-','/');
+// 日期可以直接打：10/3、10.3、10-3、10月3日、2026/10/3 都行；年份不填按 2026，若因此落在今天之后（最后一次上课不可能在将来）就算前一年
+function parseDay(v){
+ v=v.trim().replace(/[年月.\/]/g,'-').replace(/[日号]/g,'').replace(/\s+/g,'');if(!v)return '';
+ let m=v.match(/^(\d{2,4})-(\d{1,2})-(\d{1,2})$/),y,mo,d;
+ if(m){y=+m[1];if(y<100)y+=2000;mo=+m[2];d=+m[3]}else if((m=v.match(/^(\d{1,2})-(\d{1,2})$/))){y=2026;mo=+m[1];d=+m[2]}else return null;
+ const iso=(yy)=>yy+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0'),t=new Date(y,mo-1,d);
+ if(t.getMonth()!==mo-1||t.getDate()!==d)return null;
+ if(!m[3]&&iso(y)>today())y-=1;
+ return iso(y);
+}
+// 名字不在名单里：提示会新建，并列出相近的名字防打错字
+// 相近：同字越多越近；同姓且字数一样也算（打错同音字时常见，如 张晓明 / 张小明）
+function similar(n){return data.students.map(s=>s.name).map(x=>{const k=[...new Set(n)].filter(c=>x.includes(c)).length;return [x,k*2+(x[0]===n[0]?1:0)+(x.length===n.length?1:0),k]}).filter(([x,sc,k])=>k>=2||(k>=1&&x[0]===n[0]&&(x.length===n.length||n.length===1))).sort((a,b)=>b[1]-a[1]).slice(0,3).map(a=>a[0])}
+function paperWho(){
+ const n=$('paperwho').value.trim(),d=parseDay($('paperdate').value)||'',s=data.students.find(x=>x.name===n);
+ $('paperdateshow').textContent=$('paperdate').value.trim()?(d?'→ '+d:'看不懂这个日期'):'';
+ if(!n){$('paperhint').textContent='';return}
+ if(!s){const near=similar(n);$('paperhint').textContent='名单里没有「'+n+'」，归档时会新建这个学生。'+(near.length?' 相近的有：'+near.join('、')+'，是不是打错了？':'');return}
+ const mine=data.transactions.filter(t=>t.student===n&&!t.voided&&t.kind!=='void'),open=mine.find(t=>t.kind==='opening');let tip='';
+ if(open&&!open.id.startsWith('paper-'))tip='已手动登记过起始余额，这张只存档。';
+ else if(open&&d&&open.date>=d)tip='已有更晚的老课表（'+md(open.date)+' 剩 '+open.delta+'）作起点，这张只存档。';
+ else tip=open?'会换掉之前那张较早的老课表，以这张作为起点。':'这张的余课会作为'+n+'在系统里的起点。';
+ const early=d?mine.filter(t=>t.kind!=='opening'&&t.date<=d).length:0;
+ if(early)tip+=' 注意：系统里已有 '+early+' 条 '+md(d)+' 当天或之前的记录，可能已经算在这张的余课里，会重复。';
+ $('paperhint').textContent=tip;
+}
+async function filePaper(student,extra={}){
+ try{const out=await call('/api/paper/file',Object.assign({file:paper.files[paperAt],student},extra));paper=out;say(student==='不要的'?out.result:student+'：'+out.result);
+  if(student==='不要的'){lastDropped=out.moved;$('paperundotext').textContent='刚才那张已放进“不要的”（没有删除）。点错了可以撤销。';$('paperundo').hidden=false}else $('paperundo').hidden=true;data=await (await fetch('/api/ledger',{cache:'no-store'})).json();render();loadPaper();showPaper()}catch(err){$('papererr').textContent=err.message}
+}
+$('paperbtn').onclick=async()=>{await loadPaper();paperAt=0;$('paperundo').hidden=true;$('paperdialog').showModal();showPaper()};
+$('papergo').onclick=()=>{
+ const n=$('paperwho').value.trim(),d=parseDay($('paperdate').value),l=$('paperleft').value.trim();
+ if(!n){$('papererr').textContent='请填名字';$('paperwho').focus();return}
+ if(!d){$('papererr').textContent=d===null?'看不懂这个日期，可以写成 10/3':'请填最后一次上课的日期';$('paperdate').focus();return}
+ if(!/^-?\d+$/.test(l)){$('papererr').textContent='请填那时剩几节课（整数，欠课填负数）';$('paperleft').focus();return}
+ filePaper(n,{date:d,remaining:+l,paused:$('paperpaused').checked,create:!paper.students.includes(n)});
+};
+$('paperwho').oninput=paperWho;
+$('paperwho').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();paperWho();$('paperdate').focus()}};
+$('paperdate').oninput=paperWho;
+$('paperdate').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('paperleft').focus()}};
+$('paperleft').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('papergo').click()}};
+$('paperdrop').onclick=()=>filePaper('不要的');
+// 10-20：周签课表被当成老课表传上来了 → 送去签课表识别；认出来了就把这张从待归档挪走（放进“不要的”，不删）
+$('papertosheet').onclick=async()=>{
+ const f=paper.files[paperAt];if(!f)return;$('papertosheet').disabled=true;$('papererr').textContent='';
+ try{const b=await (await fetch('/api/paper/image?w='+encodeURIComponent('待归档')+'&f='+encodeURIComponent(f),{cache:'no-store'})).blob();
+  $('paperdialog').close();importFiles.quiet=true;let n=0;try{n=await importFiles([new File([b],f.replace(/^\d{8}_\d{6}_/,''),{type:b.type||'image/jpeg'})])}finally{importFiles.quiet=false}
+  if(n){paper=await call('/api/paper/file',{file:f,student:'不要的'});paintPaperBtn();say('已当成签课表识别；那张照片从待归档挪进了“不要的”')}
+  else{await loadPaper();$('paperdialog').showModal();showPaper();$('papererr').innerHTML=esc('没认出签课表：'+((lastImportNotes[0]||'').split('：').slice(1).join('：')||'要拍到四个角的黑块')+'。照片还留在待归档。')+'<br>怎么办：① 纸放平、正对着、光线均匀，四个黑角都拍进去，用手机 App「收集 → 拍签课表」重拍（拍完会直接识别）；② 用扫描仪扫一下，点上面的「导入签字扫描件」；③ 实在认不出，在课程管理里按住那节课直接记上课 / 请假。这张拍坏的可以点「不要」。'}}
+ catch(err){$('papererr').textContent=err.message}
+ finally{$('papertosheet').disabled=false}};
+$('paperskip').onclick=()=>{paperAt++;showPaper()};
+$('paperclose').onclick=()=>$('paperdialog').close();
+loadPaper();
+$('stmtclose').onclick=()=>$('stmtdialog').close();
+loadPending();
+load();
+</script>
+</html>

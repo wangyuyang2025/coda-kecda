@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>服务管理</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7fa;color:#223047;font:16px -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
+main{max-width:1320px;margin:auto;padding:18px 24px 90px}
+small,.muted{color:#8190a4}
+button,select{font:inherit;border:1px solid #dce1e9;border-radius:10px;padding:8px 14px;background:#fff;color:inherit;cursor:pointer}
+button.primary{background:#275de0;color:#fff;border-color:#275de0}
+button:disabled{opacity:.45;cursor:default}
+.card{background:#fff;border:1px solid #e5e9ef;border-radius:16px;padding:16px 20px;margin-bottom:14px}.card.missing{border-color:#f0c9c9;background:#fff8f8}.missinglist{display:flex;flex-wrap:wrap;gap:6px}.missinglist button{font-size:14px;padding:5px 10px;border-radius:8px;border:1px solid #f0c9c9;background:#fff;color:#b83e3e;cursor:pointer}.missinglist small{color:#8190a4}.missopts{display:flex;gap:6px;flex-wrap:wrap}.missopts button{padding:7px 14px;border-radius:999px;border:1px solid #d5dbe5;background:#fff;cursor:pointer;font:inherit}.missopts button[aria-pressed=true]{background:#223047;color:#fff;border-color:#223047}.missinglist button{-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top .grow{flex:1;min-width:200px}
+.ok{color:#2f8f5b}.bad{color:#d45858}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.chips{display:inline-flex;border:1px solid #dce1e9;border-radius:10px;overflow:hidden}
+.chips button{border:0;border-radius:0;padding:7px 12px;font-size:14px}
+.chips button[aria-pressed=true]{background:#223047;color:#fff}
+.day{font-size:13px;color:#8190a4;margin:16px 4px 6px}
+.item{display:grid;grid-template-columns:24px 76px 1fr auto;gap:12px;align-items:center;padding:10px 6px;border-top:1px solid #f0f2f6}
+.thumb{width:76px;height:56px;border-radius:8px;background:#eef1f6;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;cursor:pointer}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
+.who b{font-size:15px}.who .meta{font-size:13px;color:#8190a4;margin-top:2px}
+.who .txt{font-size:14px;color:#46566d;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.badge{font-size:12px;border-radius:6px;padding:2px 7px;margin-left:6px;white-space:nowrap}
+.k-video{background:#e8eefc;color:#275de0}.k-photo{background:#e3f4ea;color:#2f8f5b}.k-voice,.k-text{background:#f3e9fb;color:#7a46b0}
+.s-待剪辑{background:#fff3d6;color:#a56a00}.s-已发家长{background:#e3f4ea;color:#2f8f5b}.s-已处理{background:#eef1f6;color:#68788d}.s-已移除{background:#fde8e8;color:#b23b3b}
+.lcard{border:1px solid #e5e9ef;border-radius:14px;padding:12px 14px;margin:10px 0;background:#fcfdff}
+.lhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.lhead b{font-size:16px}.lhead .meta{font-size:13px;color:#8190a4}.lhead .grow{flex:1}
+.lhead button{padding:6px 11px;font-size:13px}
+.lcard textarea{width:100%;margin-top:10px;font:15px/1.7 -apple-system,'PingFang SC',sans-serif;border:1px solid #e5e9ef;border-radius:10px;padding:8px 10px;resize:vertical;color:#223047;background:#fff}
+.media{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.media .thumb{width:96px;height:72px;position:relative}.media .thumb span{position:absolute;right:4px;bottom:3px;font-size:12px;color:#fff;text-shadow:0 1px 2px #000}
+.tip{font-size:12px;color:#8190a4;margin-top:6px}
+.cambar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff8e6;border-color:#f0dca8}
+#camdialog{width:min(980px,96vw)}
+.camchecks div{background:#fff3d6;color:#8a5a00;border-radius:10px;padding:8px 12px;margin:6px 0;font-size:14px}
+.camchecks button{margin-left:8px;padding:4px 10px;font-size:13px}
+.camoff{display:flex;gap:8px;align-items:center;font-size:14px;color:#68788d;margin:8px 0}
+.camoff input{width:70px;font:inherit;padding:5px 8px;border:1px solid #dce1e9;border-radius:8px}
+.camlist{max-height:58vh;overflow:auto;border-top:1px solid #eef0f4;margin-top:6px}
+.camday{font-size:13px;color:#8190a4;margin:12px 4px 4px}
+.camrow{display:grid;grid-template-columns:24px 84px 1fr minmax(180px,260px);gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid #f3f5f8;font-size:14px}
+.camrow.dim{opacity:.5}.camrow .thumb{width:84px;height:56px}.camrow select{width:100%;padding:6px;border-radius:8px}
+.camfoot{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.campbar{height:8px;background:#eef1f6;border-radius:6px;overflow:hidden;flex:1;min-width:160px}.campbar i{display:block;height:100%;background:#275de0;width:0}
+.s-预删除{background:#fde8e8;color:#b23b3b}.k-final{background:#fff3d6;color:#a56a00}.arcbadge{background:#e3f4ea;color:#2f8f5b}
+.cutnote{background:#fff8e6;color:#7a5200;border-radius:10px;padding:7px 12px;margin-top:8px;font-size:13px}.cutnote button{margin-left:8px;padding:3px 10px;font-size:13px}
+.media .thumb .x,.media .thumb .tr{position:absolute;display:none;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#fffe;box-shadow:0 1px 4px #0005;font-style:normal;font-weight:700;color:#223047;z-index:2}
+.media .thumb:hover .x,.media .thumb:hover .tr{display:flex}
+.media .thumb .x{right:3px;top:3px;font-size:15px;cursor:pointer}.media .thumb .x:hover{background:#d45858;color:#fff}
+.media .thumb .tr{left:3px;bottom:3px;font-size:13px;color:#275de0;cursor:grab;touch-action:none}
+.media .thumb.spinning{overflow:visible;z-index:5}.media .thumb.spinning img,.media .thumb.spinning video{box-shadow:0 4px 16px #0006}
+.media .thumb.final{outline:3px solid #f5c400;outline-offset:-3px}.media .thumb.cut{opacity:.45}
+.media .thumb.pre{outline:3px solid #d45858;outline-offset:-3px}.media .thumb em{position:absolute;left:4px;top:3px;font-style:normal;font-size:11px;background:#fffd;border-radius:5px;padding:0 4px;color:#223047}
+.prenote{background:#fde8e8;color:#8a2f2f;border-radius:10px;padding:7px 12px;margin-top:8px;font-size:13px}.prenote button{margin-left:8px;padding:3px 10px;font-size:13px}
+#editor{width:min(900px,96vw)}
+.edstage{position:relative;height:56vh;background:#111;border-radius:12px;overflow:hidden}
+.edstage img,.edstage video{position:absolute;left:50%;top:50%;max-width:none;max-height:none}
+.edstage img.snap,.edstage video.snap{transition:transform .2s,width .2s,height .2s}
+.rot{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:#fff;border:3px solid #275de0;box-shadow:0 2px 8px #0006;cursor:grab;z-index:3;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:15px;color:#275de0}
+.rot:active{cursor:grabbing}
+.edtools{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}.edtools .grow{flex:1}
+.trim{position:relative;height:56px;margin-top:12px;border-radius:8px;background:#222;user-select:none;touch-action:none}
+.trim canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:8px}
+.trim .shade{position:absolute;top:0;bottom:0;background:#000a}
+.trim .win{position:absolute;top:0;bottom:0;border:3px solid #f5c400;border-left-width:14px;border-right-width:14px;border-radius:8px;box-sizing:border-box;cursor:grab}
+.trim .h{position:absolute;top:0;bottom:0;width:22px;cursor:ew-resize;z-index:2}
+.trim .head{position:absolute;top:-4px;bottom:-4px;width:3px;background:#fff;border-radius:2px;pointer-events:none;z-index:3}
+.trimtime{display:flex;justify-content:space-between;font-size:13px;color:#68788d;margin-top:4px}
+[hidden]{display:none!important}
+.more{position:relative}.morebox{position:absolute;right:0;top:36px;z-index:20;background:#fff;border:1px solid #dce1e9;border-radius:12px;box-shadow:0 8px 24px #0002;padding:6px;min-width:170px}.morebox button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;font-size:14px}.morebox button:hover{background:#f1f4f8}.morebox button.danger{color:#b23b3b}
+.quick{display:inline-flex;border:1px solid #dce1e9;border-radius:10px;overflow:hidden}.quick button{border:0;border-radius:0;padding:7px 14px}.quick button[aria-pressed=true]{background:#223047;color:#fff}
+.lhead .name{font-size:17px;font-weight:700;border:0;background:none;padding:0;color:#223047;cursor:pointer}.lhead .name:hover{color:#275de0}
+.empty{text-align:center;color:#8190a4;padding:46px 10px;line-height:1.9}
+#actions{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#223047;color:#fff;border-radius:14px;padding:10px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;box-shadow:0 8px 30px #0005;max-width:94vw}
+#actions[hidden]{display:none}
+#actions button,#actions select{background:#fff;color:#223047;padding:7px 12px;font-size:14px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;background:#fff;border:1px solid #e5e9ef;border-radius:12px;padding:10px 16px;box-shadow:0 6px 24px #0003;font-size:14px;display:flex;gap:10px;align-items:center}
+#toast[hidden]{display:none}
+details.card summary{cursor:pointer;color:#68788d;font-size:15px}
+.kv{display:grid;grid-template-columns:100px 1fr;gap:6px 10px;font-size:14px;margin-top:12px}
+.kv dt{color:#8190a4}.kv dd{margin:0;word-break:break-all}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}th,td{text-align:left;padding:5px 4px;border-bottom:1px solid #eef0f4}th{color:#8190a4;font-weight:400}
+pre{margin:10px 0 0;background:#101826;color:#c9d6e8;border-radius:10px;padding:12px;font-size:12.5px;line-height:1.55;overflow:auto;max-height:220px;white-space:pre-wrap}
+dialog{border:0;border-radius:16px;padding:18px;box-shadow:0 12px 40px #0003;max-width:min(860px,94vw)}
+dialog::backdrop{background:#0007}
+dialog video,dialog img{max-width:100%;max-height:70vh;display:block;margin:auto;border-radius:8px}
+dialog audio{width:100%}
+#qr{display:block;width:240px;max-width:100%;margin:10px auto;border:14px solid #fff;outline:1px solid #e5e9ef}
+#qr[hidden]{display:none}
+@media(max-width:700px){.item{grid-template-columns:24px 64px 1fr}.item>.go{grid-column:3}}
+</style>
+<main>
+@@NAV@@
+<!-- 局域网里的其他电脑：那台电脑打开地址 → 这里出现请求 → 允许·能改 / 允许·只能看 / 拒绝 -->
+<div class="card" id="deskreq" hidden style="border-color:#f0dca8;background:#fff8e6"></div>
+</div>
+
+<div class="card cambar" id="cambar" hidden><span>📷</span><b id="camname"></b><span class="muted" id="camnote">插着相机存储卡</span><span style="flex:1"></span><button type="button" class="primary" id="camopen">从相机导入</button></div>
+<div class="card missing" id="missingcard" hidden><b id="missingtitle"></b><p class="muted" style="margin:4px 0 8px;font-size:13px">课表上已经上过（没请假、没停课）、但那天没有任何照片 / 视频 / 语音 / 文字的课（本周 + 上周）。点名字只看这个学生。</p><div id="missinglist" class="missinglist"></div><details id="misseddone" hidden style="margin-top:8px;font-size:13px"><summary style="cursor:pointer;color:#68788d"></summary><div id="misseddonelist" style="margin-top:6px"></div></details></div>
+<dialog id="missdlg" style="width:min(420px,94vw)"><b id="misstitle" style="font-size:17px"></b><p class="muted" style="font-size:13px;margin:4px 0 10px">标了以后这节就不再提醒“没传资料”；标错了在卡片下面的“已处理”里撤销。</p><div class="missopts" id="missopts"><button type="button" data-st="已发送">已发送</button><button type="button" data-st="不用发">不用发</button></div><input id="missreason" placeholder="理由（选填），比如：剪好的视频直接发了 / 作品" maxlength="200" style="width:100%;box-sizing:border-box;margin-top:10px;padding:9px 10px;border:1px solid #d7dde6;border-radius:10px;font:inherit"><p class="err" id="misserr" style="color:#b83e3e;font-size:13px;min-height:16px;margin:6px 0 0"></p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button type="button" id="misswrite" style="margin-right:auto">＋ 写上课内容</button><button type="button" id="misscancel">取消</button><button type="button" class="primary" id="missok">确定</button></div></dialog>
+<div class="card">
+ <div class="bar">
+  <div class="quick" id="quick"><button data-q="还没发" aria-pressed="false">还没发</button><button data-q="" aria-pressed="true">全部</button></div>
+  <select id="who"><option value="">所有学生</option></select><select id="tfilter" hidden title="按老师（课表颜色）分类"></select>
+  <span style="flex:1"></span><button type="button" id="filtbtn">筛选 ▾</button>
+ </div>
+ <div class="bar" id="morefilt" hidden>
+  <div class="chips" id="views"><button data-v="lesson" aria-pressed="true">按课汇总</button><button data-v="all" aria-pressed="false">全部资料</button></div>
+  <div class="chips" id="kinds"><button data-k="" aria-pressed="true">全部</button><button data-k="video" aria-pressed="false">视频</button><button data-k="photo" aria-pressed="false">照片</button><button data-k="note" aria-pressed="false">语音和文字</button></div>
+  <div class="chips" id="stats"><button data-s="" aria-pressed="true">全部状态</button><button data-s="还没发" aria-pressed="false">还没发</button><button data-s="新" aria-pressed="false">新</button><button data-s="预删除" aria-pressed="false">预删除</button><button data-s="待剪辑" aria-pressed="false">待剪辑</button><button data-s="已发家长" aria-pressed="false">已发家长</button><button data-s="已移除" aria-pressed="false">已移除</button></div>
+  <button type="button" id="selall">全选当前</button>
+ </div>
+ <div id="list"></div>
+</div>
+
+<details class="card"><summary>服务详情（连接手机和电脑、地址、数据、日志、使用说明）</summary>
+ <div class="top" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px"><div class="grow" style="flex:1"><b id="phone">手机：检查中…</b><br><small id="mini"></small></div><button type="button" id="webpairbtn" class="primary">连接手机网页版</button><button type="button" id="pairbtn">连接新手机（App）</button><button type="button" id="deskbtn">连接其他电脑</button></div>
+ <div id="deskhelp" style="margin-top:12px" hidden><b>连接其他电脑（同一个 Wi‑Fi）</b>
+ <ol style="margin:8px 0 0;padding-left:20px;line-height:2;font-size:15px">
+  <li>在那台电脑的浏览器打开：<code id="deskurl" style="background:#eef1f6;padding:3px 8px;border-radius:6px;font-size:15px"></code> <button type="button" id="deskcopy" style="padding:3px 10px;font-size:13px">复制地址</button></li>
+  <li>第一次会提示“连接不是私密连接 / 证书不受信任”：点“<b>高级</b>”→“<b>继续前往</b>”（这是你自己的 Mac，安全的）。</li>
+  <li>那台电脑会显示一个 6 位代码，这里会弹出请求，核对代码后点“允许”。</li>
+ </ol>
+ <div id="deskpaired" style="margin-top:10px;font-size:14px"></div>
+
+ <div class="tip" style="margin-top:12px;line-height:1.8">使用说明：点照片视频可以转方向、剪头尾（空格播放/暂停）；缩略图上 × 移除、按住 ⟳ 拖动转方向。“发家长”分两步：先照片视频到微信 ⌘V，再点“第 2 步：复制文字”再 ⌘V；照片也可以直接拖进微信。发好点“已发”就存进学生档案。点学生名字可以改成别的学生。</div>
+ <dl class="kv" id="info"></dl><div id="paired"></div><pre id="log"></pre>
+</details>
+</main>
+
+<div id="actions" hidden>
+ <span id="selcount"></span>
+ <button type="button" id="copytext">复制文字</button>
+ <button type="button" id="toedit">整理到待剪辑</button>
+ <button type="button" id="toparent">整理发家长</button>
+ <select id="markas"><option value="">标记为…</option><option>新</option><option>待剪辑</option><option>已发家长</option><option>已处理</option><option>预删除</option><option>已移除</option></select>
+ <button type="button" id="removesel">移除</button>
+ <button type="button" id="clear">取消选择</button>
+</div>
+<div id="toast" hidden><span id="toasttext"></span><button type="button" id="toastopen">打开文件夹</button><button type="button" class="primary" id="toastnext" hidden></button></div>
+
+<dialog id="camdialog"><div style="display:flex;align-items:center;gap:10px"><b style="font-size:18px">从相机导入</b><span class="muted" id="camsub"></span><span style="flex:1"></span><button type="button" id="camclose">关闭</button></div>
+<div class="camchecks" id="camchecks"></div>
+<div class="camoff">相机时间整批调整 <input type="number" id="camoffh" value="0" step="1"> 小时 <input type="number" id="camoffm" value="0" step="1"> 分钟 <button type="button" id="camapply">重新对课表</button><span id="camnow"></span></div>
+<div class="camlist" id="camlist"></div>
+<div class="camfoot"><span class="muted" id="camsum"></span><div class="campbar" id="campbar" hidden><i></i></div><button type="button" class="primary" id="camgo">导入</button></div></dialog>
+<dialog id="editor"><div style="display:flex;align-items:center;gap:10px"><b id="edtitle" style="font-size:17px"></b><span class="muted" id="ednote"></span></div>
+<div class="edstage" id="edstage"></div>
+<div id="edtrim" hidden><div class="trim" id="trim"><canvas id="strip"></canvas><div class="shade" id="shl"></div><div class="shade" id="shr"></div><div class="win" id="win"></div><div class="h" id="hl"></div><div class="h" id="hr"></div><div class="head" id="head"></div></div><div class="trimtime"><span id="tstart"></span><span id="tlen"></span><span id="tend"></span></div></div>
+<div class="edtools"><button type="button" id="edplay" hidden>▶ 播放</button><button type="button" id="edleft">↺ 左转</button><button type="button" id="edright">↻ 右转</button><button type="button" id="edreset">还原</button><span class="grow"></span><button type="button" id="edcancel">取消</button><button type="button" class="primary" id="eddone">完成</button></div></dialog>
+<dialog id="carddlg" style="width:min(560px,96vw)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><b style="font-size:17px">课堂卡片预览</b><span class="muted" id="cardnote"></span><span style="flex:1"></span><button type="button" id="cardclose">关闭</button></div>
+<div style="max-height:62vh;overflow:auto;border-radius:12px;background:#eef1f6"><img id="cardimg" style="width:100%;display:block"></div>
+<button type="button" class="primary" id="cardgo" style="width:100%;margin-top:12px;padding:12px;font-size:16px">放进剪贴板</button>
+<div class="muted" style="font-size:13px;margin-top:8px;text-align:center">到微信对话里按 ⌘V 一次、发送。回到这里会自动标成“已发”并存档。</div></dialog>
+<dialog id="viewer"><div id="viewbody"></div><div style="text-align:right;margin-top:10px"><button type="button" id="viewreveal">在 Finder 显示</button> <button type="button" id="viewclose">关闭</button></div></dialog>
+<dialog id="webdialog" style="max-width:560px"><b>连接手机网页版</b>
+<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-top:10px"><img id="webqr" alt="二维码" style="width:200px;height:200px;border:10px solid #fff;border-radius:8px" hidden>
+<div style="flex:1;min-width:220px;font-size:14px;line-height:1.7"><div>用 iPhone 相机扫左边的码，或者在手机网页里输入：</div><div id="webpin" style="font-size:34px;font-weight:700;letter-spacing:8px;margin:4px 0"></div><div class="muted" id="webnote"></div></div></div>
+<details style="margin-top:10px;font-size:14px;line-height:1.7"><summary style="cursor:pointer">第一次用这台手机：先装一次证书（只装一次）</summary>
+<ol style="margin:6px 0;padding-left:20px"><li>手机和 Mac 连同一个 Wi-Fi，用 Safari 打开 <b id="webcert"></b></li><li>点“允许”下载，再去 设置 → 已下载描述文件 → 安装</li><li>设置 → 通用 → 关于本机 → 证书信任设置 → 打开“Coda Local CA”</li><li>再扫上面的码；打开后点 分享 → 添加到主屏幕</li></ol>
+<div class="muted">不装证书也能在 Safari 里点“访问此网站”先用，但添加到主屏幕、没网时打开都要装了才行。</div></details>
+<div style="text-align:right;margin-top:8px"><button type="button" id="webclose">关闭</button></div></dialog>
+<dialog id="qrdialog"><b>用手机 App 扫码连接</b><img id="qr" alt="配对二维码" hidden><p class="muted" id="pairnote" style="margin:6px 0;font-size:14px"></p><div style="text-align:right"><button type="button" id="qrclose">关闭</button></div></dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const HEAD={'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'};
+const KIND={video:'上课视频',photo:'照片',voice:'语音',text:'文字'},ICON={video:'🎬',photo:'🖼',voice:'🎙',text:'📝',other:'📄'};
+let items=[],archives={},lessonTimes={},selected=new Set(),fk='',fs='',fw='',view='lesson',edited={},lastFolder=null,toastTimer=null;
+const fileUrl=(id,orig)=>'/api/inbox/file?id='+encodeURIComponent(id)+(!orig&&items.find(x=>x.id===id)?.edit?'&edited=1&v='+encodeURIComponent(JSON.stringify(items.find(x=>x.id===id).edit)):'');
+const kb=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+const dayLabel=iso=>{const d=iso.slice(0,10),t=new Date().toLocaleDateString('sv'),y=new Date(Date.now()-864e5).toLocaleDateString('sv');return d===t?'今天':d===y?'昨天':d.slice(5).replace('-','月')+'日'};
+const toast=(t,folder)=>{$('toasttext').textContent=t;lastFolder=folder||null;$('toastopen').hidden=!folder;$('toastnext').hidden=true;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,7000)};
+// 带“下一步”按钮的提示：不会自己消失，等你点
+const toastStep=(t,label,next)=>{$('toasttext').textContent=t;$('toastopen').hidden=true;const b=$('toastnext');b.textContent=label;b.hidden=false;b.onclick=next;$('toast').hidden=false;clearTimeout(toastTimer)};
+async function post(path,body){const r=await fetch(path,{method:'POST',headers:HEAD,body:JSON.stringify(body)});const o=await r.json().catch(()=>({}));if(!r.ok)throw new Error(o.error||'操作失败');return o}
+
+function shown(){return items.filter(x=>(fs==='已移除'?x.status==='已移除':x.status!=='已移除')&&(fs!=='还没发'||['新','待剪辑'].includes(x.status))&&(!fk||(fk==='note'?(x.kind==='voice'||x.kind==='text'):x.kind===fk))&&(!fs||fs==='还没发'||x.status===fs)&&(!fw||x.students.includes(fw))&&(!ft||x.students.some(n=>(lessonTeachers[x.date.slice(0,10)+'|'+n]||[]).includes(ft))))}
+function render(){
+ paintQuick();
+ if(view==='lesson')return renderLessons();
+ const list=shown();
+ const names=[...new Set(items.flatMap(x=>x.students))].sort((a,b)=>a.localeCompare(b,'zh'));
+ $('who').innerHTML='<option value="">所有学生</option>'+names.map(n=>'<option'+(n===fw?' selected':'')+'>'+esc(n)+'</option>').join('');
+ if(!items.length){$('list').innerHTML='<div class="empty">还没有收到手机传来的课堂资料。<br>在手机 App 里记的语音和文字，点“一键上传”后会出现在这里；相机卡里的照片视频可以从上面导入。</div>';updateBar();return}
+ if(!list.length){$('list').innerHTML='<div class="empty">没有符合条件的资料</div>';updateBar();return}
+ let html='',day='';
+ for(const x of list){
+  const d=x.date.slice(0,10);if(d!==day){day=d;html+='<div class="day">'+dayLabel(x.date)+'</div>'}
+  const thumb=x.kind==='photo'?'<img loading="lazy" src="'+fileUrl(x.id)+'">':x.kind==='video'?'<video preload="none" muted data-src="'+fileUrl(x.id)+'#t=0.2"></video>':ICON[x.kind];
+  html+='<div class="item"><input type="checkbox" data-sel="'+esc(x.id)+'"'+(selected.has(x.id)?' checked':'')+'><div class="thumb" data-view="'+esc(x.id)+'">'+thumb+'</div>'
+   +'<div class="who"><b>'+esc(x.students.join('、'))+'</b><span class="badge k-'+x.kind+'">'+(KIND[x.kind]||'文件')+'</span>'+(x.status!=='新'?'<span class="badge s-'+x.status+'">'+x.status+'</span>':'')
+   +'<div class="meta">'+x.date.slice(11,16)+' · '+kb(x.size)+'</div>'+(x.text?'<div class="txt">'+esc(x.text)+'</div>':'')+'</div>'
+   +'<div class="go"><button data-view="'+esc(x.id)+'">查看</button></div></div>';
+ }
+ $('list').innerHTML=html;updateBar();
+}
+function updateBar(){const n=[...selected].filter(i=>items.some(x=>x.id===i)).length;$('actions').hidden=!n;$('selcount').textContent='已选 '+n+' 项'}
+// 读收件箱。定时刷新（每 15 秒，为了看到手机新传来的）只在内容真的变了、而且你没在打字/没开着窗口和菜单时才重画（10-17 用户：打着字突然被刷掉）
+let lastSig='',pendingData=null;
+const busyTyping=()=>{const a=document.activeElement;return !!(a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&a.closest('#list,#pickbox'))))||[...document.querySelectorAll('dialog')].some(d=>d.open)||[...document.querySelectorAll('.morebox,#pickbox')].some(b=>!b.hidden)};
+function applyData(d){items=d.items;lessonTimes=d.lessons||{};archives=d.archives||{};
+ const typing=document.activeElement?.dataset?.text;for(const [k,v] of Object.entries(d.texts||{}))if(k!==typing&&!textTimers[k])edited[k]=v;  // Mac 上存着的改过的文字
+ lastSig=JSON.stringify([d.items,d.archives]);pendingData=null;  // 记下这次的内容：15 秒检查一次，没变就不重画（不跳）
+ // 重画后把光标放回原来的文字框
+ const a=document.activeElement,key=a&&a.dataset&&a.dataset.text,ss=key?a.selectionStart:0,se=key?a.selectionEnd:0;
+ render();
+ if(key){const t=document.querySelector('textarea[data-text="'+CSS.escape(key)+'"]');if(t){t.focus();t.setSelectionRange(ss,se)}}}
+// 10-20：上了课却没上传资料
+let lastMissing=[];
+function paintMissing(d){if(d){lessonTeachers=d.lessonTeachers||{};lastMissing=d.missing||[];paintTeacherFilter()}if(d)missDone=d.missingDone||{};const m=lastMissing.filter(x=>!ft||(x.teachers||[]).includes(ft));const done=Object.entries(missDone).filter(([k])=>k.slice(0,10)>=recentStart()).sort((a,b)=>b[0].localeCompare(a[0]));$('missingcard').hidden=!m.length&&!done.length;
+ $('misseddone').hidden=!done.length;$('misseddone').querySelector('summary').textContent='已处理 '+done.length+' 节（标过“已发送”等，不再提醒）';$('misseddonelist').innerHTML=done.map(([k,v])=>'<div style="display:flex;gap:8px;align-items:center;padding:3px 0"><span>'+esc(k.split('|')[1])+' <small class="muted">'+k.slice(5,10).replace('-','/')+'</small> · <b>'+esc(v.status)+'</b>'+(v.reason?'：'+esc(v.reason):'')+'</span><button type="button" data-undo="'+esc(k)+'" style="margin-left:auto;font-size:12px;padding:2px 8px">撤销</button></div>').join('');
+ if(!m.length){$('missingtitle').textContent='上了课没传资料：都处理好了';$('missinglist').innerHTML='';return}$('missingtitle').textContent=(ft?TCOLOR[ft][1]+' · ':'')+'上了课没传资料：'+m.length+' 节';
+ $('missinglist').innerHTML=m.map(x=>'<button type="button" data-miss="'+esc(x.student)+'" data-key="'+esc(x.date+'|'+x.student)+'" data-label="'+esc(x.student+' '+x.date.slice(5).replace('-','/')+' '+x.day)+'" title="点一下只看这个学生；按住（或右键）标成已发送等">'+esc(x.student)+' <small>'+x.date.slice(5).replace('-','/')+' '+esc(x.day)+(x.time?' '+esc(x.time):'')+'</small>'+(x.ongoing?' <small style="color:#275de0;font-weight:700">正在上</small>':'')+'</button>').join('')}
+let missDone={},missKey='',missStatus='',pressTimer=0,pressed=false;
+const recentStart=()=>{const t=new Date();t.setDate(t.getDate()-((t.getDay()+6)%7)-7);return t.toLocaleDateString('sv')};
+function openMiss(b){missKey=b.dataset.key;missStatus='';$('misstitle').textContent=b.dataset.label;$('missreason').value='';$('misserr').textContent='';document.querySelectorAll('#missopts button').forEach(x=>x.setAttribute('aria-pressed','false'));$('missdlg').showModal()}
+$('missinglist').addEventListener('pointerdown',e=>{const b=e.target.closest('[data-key]');if(!b)return;pressed=false;clearTimeout(pressTimer);pressTimer=setTimeout(()=>{pressed=true;openMiss(b)},550)});
+['pointerup','pointerleave','pointercancel'].forEach(t=>$('missinglist').addEventListener(t,()=>clearTimeout(pressTimer)));
+$('missinglist').addEventListener('contextmenu',e=>{const b=e.target.closest('[data-key]');if(!b)return;e.preventDefault();clearTimeout(pressTimer);pressed=true;openMiss(b)});
+$('missopts').onclick=e=>{const b=e.target.closest('[data-st]');if(!b)return;missStatus=b.dataset.st;document.querySelectorAll('#missopts button').forEach(x=>x.setAttribute('aria-pressed',x===b));$('missreason').focus()};
+$('misscancel').onclick=()=>$('missdlg').close();
+// 10-20：“写上课内容”——给这节建一张卡片（姓名、日期、星期、上课时间都填好，下面是“1. ”），光标放过去直接写
+$('misswrite').onclick=async()=>{
+ const [day,name]=missKey.split('|'),key=missKey,x=lastMissing.find(m=>m.date+'|'+m.student===key);if(x&&x.time&&!lessonTimes[key])lessonTimes[key]=x.time;
+ const text=compose({key,name,day,notes:[]})+'\n1. ';
+ try{await post('/api/inbox/text',{key,text});edited[key]=text;$('missdlg').close();
+  if(fw&&fw!==name){fw='';$('who').value=''}if(fs==='已移除'){fs=''}
+  await load();const t=document.querySelector('textarea[data-text="'+CSS.escape(key)+'"]');
+  if(t){t.scrollIntoView({behavior:'smooth',block:'center'});t.focus();t.setSelectionRange(t.value.length,t.value.length)}
+  toast('建好了：写完一条按回车，会自动出下一个编号')}
+ catch(err){$('misserr').textContent=err.message}};
+$('missok').onclick=async()=>{if(!missStatus){$('misserr').textContent='先选：已发送 或 不用发';return}
+ try{const d=await post('/api/inbox/missing',{key:missKey,status:missStatus,reason:$('missreason').value});$('missdlg').close();paintMissing(d);toast('已标成“'+missStatus+'”，不再提醒')}catch(err){$('misserr').textContent=err.message}};
+$('misseddonelist').onclick=async e=>{const b=e.target.closest('[data-undo]');if(!b)return;try{paintMissing(await post('/api/inbox/missing',{key:b.dataset.undo,clear:true}))}catch(err){toast(err.message)}};
+$('missinglist').onclick=e=>{if(pressed){pressed=false;return}const b=e.target.closest('[data-miss]');if(!b)return;const w=$('who');if(![...w.options].some(o=>o.value===b.dataset.miss))w.insertAdjacentHTML('beforeend','<option>'+esc(b.dataset.miss)+'</option>');w.value=b.dataset.miss;w.dispatchEvent(new Event('change',{bubbles:true}))};
+async function load(auto){try{const d=await (await fetch('/api/inbox',{cache:'no-store'})).json();
+ paintMissing(d);if(auto===true){if(JSON.stringify([d.items,d.archives])===lastSig)return;if(busyTyping()){pendingData=d;return}}
+ applyData(d)}catch(e){if(auto!==true)$('list').innerHTML='<div class="empty">读取失败，请确认服务正在运行。</div>'}}
+// 打完字（文字框失去焦点）或关掉窗口后，把等着的更新补上
+document.addEventListener('focusout',()=>setTimeout(()=>{if(pendingData&&!busyTyping())applyData(pendingData)},300));
+
+$('list').onclick=e=>{
+ if(spunAt&&Date.now()-spunAt<400)return;
+ const rm=e.target.closest('[data-rm]');if(rm){const card=rm.closest('.lcard');removeFor(card?card.dataset.g.split('|')[1]:'',[rm.dataset.rm]);return}
+ if(e.target.closest('[data-rot]'))return;
+ const c=e.target.closest('input[data-sel]');if(c){c.checked?selected.add(c.dataset.sel):selected.delete(c.dataset.sel);updateBar();return}
+ const ev=e.target.closest('[data-edit]');if(ev){openEditor(ev.dataset.edit);return}
+ const v=e.target.closest('[data-view]');if(v)openViewer(v.dataset.view)};
+$('kinds').onclick=e=>{const b=e.target.closest('button');if(!b)return;fk=b.dataset.k;document.querySelectorAll('#kinds button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+$('stats').onclick=e=>{const b=e.target.closest('button');if(!b)return;fs=b.dataset.s;document.querySelectorAll('#stats button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+$('who').onchange=()=>{fw=$('who').value;render()};
+// 11-01 验收：缩略视频只在滚到眼前才取（以前一打开就同时请求一百多个视频头，约 3.5 MB、最慢 0.8 秒）
+const vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const v=e.target;vio.unobserve(v);v.preload='metadata';v.src=v.dataset.src}}),{rootMargin:'300px'});
+const vscan=()=>document.querySelectorAll('video[data-src]:not([data-obs])').forEach(v=>{v.dataset.obs=1;vio.observe(v)});
+new MutationObserver(vscan).observe(document.body,{childList:true,subtree:true});vscan();
+
+// 10-20：按老师（课表颜色）分类；只有课表里出现两位以上老师时才显示
+let ft='',lessonTeachers={};try{ft=localStorage.getItem('service-teacher')||''}catch(e){}  // 记住上次选的老师：每位老师打开就是自己的
+const TCOLOR={red:['#d45858','红色老师'],blue:['#4778d8','蓝色老师'],orange:['#e58c38','橙色老师'],yellow:['#d7b633','黄色老师'],green:['#48a373','绿色老师'],cyan:['#38aeb5','青色老师'],purple:['#9164c9','紫色老师']};
+function paintTeacherFilter(){const cs=[...new Set(Object.values(lessonTeachers).flat())].filter(c=>TCOLOR[c]);const sel=$('tfilter');sel.hidden=cs.length<2;if(sel.hidden){ft='';return}sel.innerHTML='<option value="">所有老师</option>'+cs.map(c=>'<option value="'+c+'">● '+TCOLOR[c][1]+'</option>').join('');sel.value=ft;sel.style.color=ft?TCOLOR[ft][0]:''}
+$('tfilter').onchange=()=>{ft=$('tfilter').value;try{localStorage.setItem('service-teacher',ft)}catch(e){}$('tfilter').style.color=ft?TCOLOR[ft][0]:'';paintMissing();render()};
+$('selall').onclick=()=>{shown().forEach(x=>selected.add(x.id));render()};
+$('clear').onclick=()=>{selected.clear();render()};
+const chosen=()=>items.filter(x=>selected.has(x.id));
+
+$('copytext').onclick=async()=>{
+ const gs=groups(chosen()).filter(g=>g.notes.length||(edited[g.key]&&edited[g.key]!==compose(g)));
+ if(!gs.length){toast('选中的资料里没有文字内容');return}
+ try{await navigator.clipboard.writeText(gs.map(g=>edited[g.key]??compose(g)).join('\n\n'));toast('已复制 '+gs.length+' 节课的文字，可直接粘贴到微信')}catch(e){toast('复制失败，请在浏览器里允许剪贴板')}
+};
+$('removesel').onclick=()=>setStatus([...selected],'已移除');
+async function stage(target){
+ try{const o=await post('/api/inbox/stage',{ids:[...selected],target});items=o.listing.items;selected.clear();render();
+  toast('已整理 '+o.count+' 项到“'+(target==='edit'?'待剪辑':'发家长')+'”文件夹（原文件没动）',o.folders[0])}catch(e){toast(e.message)}
+}
+$('toedit').onclick=()=>stage('edit');$('toparent').onclick=()=>stage('parent');
+$('toastopen').onclick=()=>post('/api/inbox/open',{folder:lastFolder}).catch(e=>toast(e.message));
+// 从某个学生的卡片上移除（10-17 用户：班课删一个人的，结果全班的视频都没了）：
+// 班课共用的只把这个学生拿掉，其他人还在；只属于他的才标“已移除”。原文件都不删；提示条上一直有“撤销”，点了就全部恢复
+async function removeFor(name,ids){
+ const shared=items.filter(x=>ids.includes(x.id)&&x.students.length>1&&x.students.includes(name));
+ const solo=ids.filter(i=>!shared.some(x=>x.id===i)),before=shared.map(x=>({id:x.id,students:[...x.students]}));
+ try{
+  for(const x of shared){const o=await post('/api/inbox/reassign',{ids:[x.id],students:x.students.filter(n=>n!==name)});items=o.items}
+  if(solo.length){const o=await post('/api/inbox/status',{ids:solo,status:'已移除'});items=o.items}
+  ids.forEach(i=>selected.delete(i));render();
+  toastStep([shared.length?'班课共用的 '+shared.length+' 个只从 '+name+' 这里拿掉，其他人的还在':'',solo.length?'已移除 '+solo.length+' 项（原文件没删）':''].filter(Boolean).join('；'),'撤销',async()=>{
+   try{for(const b of before){const o=await post('/api/inbox/reassign',{ids:[b.id],students:b.students});items=o.items}
+    if(solo.length){const o=await post('/api/inbox/status',{ids:solo,status:'新'});items=o.items}
+    render();toast('已撤销，都恢复了')}catch(err){toast('撤销没成功：'+err.message)}});
+ }catch(err){toast(err.message)}
+}
+async function setStatus(ids,s){try{const o=await post('/api/inbox/status',{ids,status:s});items=o.items;lessonTimes=o.lessons||lessonTimes;ids.forEach(i=>selected.delete(i));render();toast(s==='已移除'?'已移除 '+ids.length+' 项（原文件没删；在“已移除”里可以标回“新”恢复）':'已标记为“'+s+'”')}catch(e){toast(e.message)}}
+$('markas').onchange=()=>{const s=$('markas').value;$('markas').value='';if(s)setStatus([...selected],s)};
+
+// ---- 按课汇总：同一位学生同一天的资料合成一张卡片。文字 / 语音转的文字 变成一条一条（1. 2. 3.），第一行写日期、学生、上课时间
+const WEEK=['周日','周一','周二','周三','周四','周五','周六'];
+function groups(list){
+ const map=new Map();
+ for(const x of list)for(const n of x.students){if(fs==='还没发'&&(x.sentTo||[]).includes(n))continue;const key=x.date.slice(0,10)+'|'+n;if(ft&&!(lessonTeachers[key]||[]).includes(ft))continue;if(fw&&n!==fw)continue;if(!map.has(key))map.set(key,{key,name:n,day:x.date.slice(0,10),items:[]});map.get(key).items.push(x)}
+ // 照片视频都移除了、但卡片里写过文字的：卡片留着（10-18 用户：去掉所有视频后文字也跟着没了）
+ if(fs!=='已移除')for(const [key,t] of Object.entries(edited)){
+  if(map.has(key)||!t||!t.trim())continue;const [day,name]=key.split('|');if(!day||!name||(fw&&fw!==name)||(fs==='还没发'&&archives[key])||(ft&&!(lessonTeachers[key]||[]).includes(ft)))continue;
+  if(t.trim()===compose({key,name,day,notes:[]}).trim())continue;map.set(key,{key,name,day,items:[]})}
+ const out=[...map.values()].sort((a,b)=>b.day.localeCompare(a.day)||a.name.localeCompare(b.name,'zh'));
+ for(const g of out){g.items.sort((a,b)=>a.date.localeCompare(b.date));g.notes=g.items.filter(x=>(x.kind==='text'||x.kind==='voice')&&x.text.trim());g.media=g.items.filter(x=>x.kind==='photo'||x.kind==='video');g.keep=g.media.filter(x=>x.status!=='预删除'&&!x.cut);g.cut=g.media.filter(x=>x.cut);g.finals=g.media.filter(x=>x.final)}
+ return out;
+}
+function compose(g){
+ const d=new Date(g.day+'T00:00:00'),time=lessonTimes[g.key]||'';
+ const points=g.notes.flatMap(x=>x.text.split(/\n+/)).map(t=>t.trim().replace(/^[(（]?\d{1,2}[.、．)）:：]\s*/,'')).filter(Boolean);
+ return [g.name+' '+(d.getMonth()+1)+'月'+d.getDate()+'日 '+WEEK[d.getDay()]+(time?' '+time:'')+' 上课内容'].concat(points.map((t,i)=>(i+1)+'. '+t)).join('\n');
+}
+function renderLessons(){
+ const names=[...new Set(items.flatMap(x=>x.students))].sort((a,b)=>a.localeCompare(b,'zh'));
+ $('who').innerHTML='<option value="">所有学生</option>'+names.map(n=>'<option'+(n===fw?' selected':'')+'>'+esc(n)+'</option>').join('');
+ const gs=groups(shown()).filter(g=>!fw||g.name===fw);
+ if(!gs.length){$('list').innerHTML='<div class="empty">'+(items.length?'没有符合条件的资料':'还没有收到手机传来的课堂资料。')+'</div>';updateBar();return}
+ $('list').innerHTML=gs.map(g=>{
+  const text=edited[g.key]??compose(g),lines=text.split('\n').length,d=new Date(g.day+'T00:00:00');
+  const st=[...new Set(g.items.map(x=>x.status))].filter(x=>x!=='新');
+  return '<div class="lcard" data-g="'+esc(g.key)+'"><div class="lhead"><button type="button" class="name" data-act="rename" title="点一下改成别的学生">'+esc(g.name)+'</button><span class="meta">'+dayLabel(g.day)+' '+WEEK[d.getDay()]+(lessonTimes[g.key]?' · '+lessonTimes[g.key]:'')+'</span>'+st.map(x=>'<span class="badge s-'+x+'">'+x+'</span>').join('')+(archives[g.key]?'<span class="badge arcbadge">已存档</span>':'')+'<span class="grow"></span>'
+   +'<button data-act="card" class="primary">发家长</button>'
+   +'<button data-act="sent">'+(archives[g.key]?'已发 ✓':'已发')+'</button>'
+   +'<span class="more"><button data-act="more" title="更多">⋯</button><div class="morebox" hidden>'
+    +(g.media.length?'<button data-act="all">文字和照片视频分开发（两步）</button>':'')+'<button data-act="text">只复制文字</button>'+(g.media.length?'<button data-act="files">只复制照片视频（'+g.keep.length+'）</button>':'')
+    +(g.media.length?'<button data-act="folder">打开文件夹（拖进微信）</button>':'')
+    +(g.items.some(x=>x.kind==='video'&&!x.final)?'<button data-act="toedit">去剪辑</button>':'')
+    +(archives[g.key]?'<button data-act="openarc">打开存档</button><button data-act="sent">按现在的内容更新存档</button>':'')
+    +'<button data-act="cardview">预览课堂卡片</button><button data-act="remove" class="danger">移除这节课的资料</button></div></span></div>'
+   +g.items.filter(x=>x.kind==='voice'&&!x.text.trim()).map(x=>'<div class="tip" style="display:flex;gap:8px;align-items:center;margin-top:8px">🎙 语音（没转出文字）<audio controls preload="none" src="'+fileUrl(x.id)+'" style="height:30px"></audio></div>').join('')
+   +'<textarea data-text="'+esc(g.key)+'" rows="'+Math.min(12,lines+1)+'" placeholder="在这里写上课内容">'+esc(text)+'</textarea>'  // 每张卡片都有文字框：手机没记文字的，在 Mac 上直接补写
+   +(g.media.length?'<div class="media">'+g.media.map(x=>'<div class="thumb'+(x.status==='预删除'?' pre':'')+(x.final?' final':'')+(x.cut?' cut':'')+'" data-edit="'+esc(x.id)+'" title="点开编辑（转方向'+(x.kind==='video'?'、剪头尾':'')+'）'+(x.kind==='photo'?'；也可以直接拖进微信':'')+'">'+(x.kind==='photo'?'<img loading="lazy" src="'+fileUrl(x.id)+'">':'<video preload="none" muted data-src="'+fileUrl(x.id)+'#t=0.2"></video><span>▶</span>')+'<b class="x" data-rm="'+esc(x.id)+'" title="不发，移除">×</b><i class="tr" data-rot="'+esc(x.id)+'" title="按住拖动转方向，松手自动保存">⟳</i>'+(x.final?'<em>成片'+(x.byStudent?'·学生剪':'')+'</em>':x.cut?'<em>已剪进成片</em>':x.status==='预删除'?'<em>预删除</em>':x.edit?'<em>'+(x.edit.auto?'自动转正':'已编辑')+'</em>':'')+'</div>').join('')+'</div>'+(g.finals.length&&g.cut.length?'<div class="cutnote">成片好了：'+g.cut.length+' 段原始素材已经剪进成片，发和存档都只用成片<button data-act="trashcut">原始素材移到废纸篓</button></div>':'')
+   +(g.media.some(x=>x.status==='预删除')?'<div class="prenote">有 '+g.media.filter(x=>x.status==='预删除').length+' 段视频开头或结尾捂了镜头，标了“预删除”（不会被复制、整理）<button data-act="prego">确认移除</button><button data-act="prekeep">不删，留着</button></div>':'')+'':'')
+   +'</div>'}).join('');
+ updateBar();
+}
+// 文字框改的内容：停手 1 秒自动存到 Mac（刷新、重启、换电脑都还在；10-17 用户：刷新后改过的又回去了）
+const textTimers={};
+// 10-20：删掉一条以后，下面的 2、3 自动变成 1、2（删字、剪切、失去焦点时重排，光标不乱跳）
+function renumber(t){const v=t.value;let n=0;const out=v.split('\n').map(l=>{const m=l.match(/^(\s*)\d+([.．、)）])(\s*)/);if(!m)return l;n++;return m[1]+n+m[2]+m[3]+l.slice(m[0].length)}).join('\n');
+ if(out===v)return false;const c=t.selectionStart,before=v.slice(0,c),nb=out.slice(0,c);let shift=0;{let k=0;const lines=before.split('\n');const outLines=out.split('\n');shift=outLines.slice(0,lines.length-1).join('\n').length-lines.slice(0,lines.length-1).join('\n').length;const last=lines[lines.length-1],olast=outLines[lines.length-1]||'';const lm=last.match(/^(\s*)\d+/),om=olast.match(/^(\s*)\d+/);if(lm&&om&&last.length>=lm[0].length)shift+=om[0].length-lm[0].length}
+ t.value=out;try{t.setSelectionRange(c+shift,c+shift)}catch(e){}return true}
+// 10-20：上课内容里按回车，下一行自动接着编号（1. → 2.）；标题行后面回车就从 1. 开始
+$('list').addEventListener('keydown',e=>{const t=e.target.closest('textarea[data-text]');if(!t||e.key!=='Enter'||e.shiftKey||e.isComposing||e.keyCode===229)return;
+ const v=t.value,c=t.selectionStart;if(c!==t.selectionEnd)return;const ls=v.lastIndexOf('\n',c-1)+1,line=v.slice(ls,c),m=line.match(/^(\s*)(\d+)([.．、)）])\s*/);
+ let ins=null;if(m){if(line.trim()===m[0].trim()){return}ins='\n'+m[1]+(Number(m[2])+1)+m[3]+' '}else if(ls===0&&/上课内容\s*$/.test(line)&&!/\n\s*\d+[.．、)）]/.test(v))ins='\n1. ';
+ if(!ins)return;e.preventDefault();t.setRangeText(ins,c,c,'end');renumber(t);t.dispatchEvent(new Event('input',{bubbles:true}))});
+$('list').addEventListener('focusout',e=>{const t=e.target.closest('textarea[data-text]');if(t&&renumber(t))t.dispatchEvent(new Event('input',{bubbles:true}))});
+$('list').addEventListener('input',e=>{const t=e.target.closest('textarea[data-text]');if(!t)return;if(/^delete|cut/.test(e.inputType||''))renumber(t);const k=t.dataset.text;edited[k]=t.value;
+ clearTimeout(textTimers[k]);textTimers[k]=setTimeout(()=>(textTimers[k]=0,post('/api/inbox/text',{key:k,text:t.value})).catch(err=>toast('文字没存上：'+err.message)),1000)});
+$('list').addEventListener('click',async e=>{
+ const b=e.target.closest('button[data-act]');if(!b)return;e.stopPropagation();
+ // “⋯”：展开这张卡片的更多操作（点别处收起）
+ if(b.dataset.act==='more'){const box=b.nextElementSibling,open=box.hidden;document.querySelectorAll('.morebox').forEach(x=>x.hidden=true);box.hidden=!open;return}
+ document.querySelectorAll('.morebox').forEach(x=>x.hidden=true);
+ const g=groups(shown()).find(x=>x.key===b.closest('.lcard').dataset.g);if(!g)return;
+ if(b.dataset.act==='rename'){pickStudent(b,g.items.map(x=>x.id),g.name);return}
+ if(b.dataset.act==='card'){sendCard(g);return}
+ if(b.dataset.act==='cardview'){openCard(g);return}
+ const ids=g.items.map(x=>x.id),act=b.dataset.act,keep=g.keep;
+ if(act==='all'){
+  // 微信不能一次粘贴“文字 + 文件”（只会出文字），所以分两步：先照片视频，粘贴好了再点一下复制文字
+  const text=edited[g.key]??compose(g);
+  try{const o=await post('/api/inbox/copyfiles',{ids:keep.map(x=>x.id)});
+   toastStep('第 1 步：'+o.copied+' 个照片视频已复制，到微信对话里按 ⌘V 发出去。','第 2 步：复制文字',async()=>{
+    try{await navigator.clipboard.writeText(text);toastStep('文字已复制，到微信里再按 ⌘V。都发好了吗？','已发 · 存档',()=>sendGroup(g))}catch(err){toast('复制文字失败，请在浏览器里允许剪贴板')}})
+  }catch(err){toast(err.message)}}
+ if(act==='prego')setStatus(g.media.filter(x=>x.status==='预删除').map(x=>x.id),'已移除');
+ if(act==='prekeep')setStatus(g.media.filter(x=>x.status==='预删除').map(x=>x.id),'新');
+ if(act==='text'){try{await navigator.clipboard.writeText(edited[g.key]??compose(g));toastStep('已复制文字，到微信里 ⌘V。发好了吗？','已发 · 存档',()=>sendGroup(g))}catch(err){toast('复制失败，请在浏览器里允许剪贴板')}}
+ if(act==='files'){try{const o=await post('/api/inbox/copyfiles',{ids:keep.map(x=>x.id)});toastStep('已把 '+o.copied+' 个照片视频放到剪贴板，到微信对话里按 ⌘V。发好了吗？','已发 · 存档',()=>sendGroup(g))}catch(err){toast(err.message)}}
+ if(act==='folder'){try{const o=await post('/api/inbox/stage',{ids:g.notes.concat(keep).map(x=>x.id),target:'parent'});items=o.listing.items;await post('/api/inbox/open',{folder:o.folders[0]});toast('已打开文件夹，可以把文件拖进微信',o.folders[0]);render()}catch(err){toast(err.message)}}
+ if(act==='sent')sendGroup(g);
+ if(act==='openarc')post('/api/archive/open',{key:g.key,what:'lesson'}).catch(err=>toast(err.message));
+ if(act==='toedit'){const v=g.media.filter(x=>x.kind==='video'&&!x.final&&x.status!=='预删除');try{const o=await post('/api/inbox/stage',{ids:v.map(x=>x.id),target:'edit'});items=o.listing.items;render();await post('/api/archive/open',{key:g.key,what:'edit'});toast('已把 '+v.length+' 段视频放进剪辑文件夹并打开。剪好后把成片导出到同一个文件夹（学生剪的文件名加“学生剪”），到“作品管理”里发和存档')}catch(err){toast(err.message)}}
+ if(act==='trashcut'){if(!confirm('把已剪进成片的 '+g.cut.length+' 段原始素材移到废纸篓？\n成片会存进学生档案“成果作品”。移到废纸篓后还能从废纸篓放回去。'))return;try{const o=await post('/api/archive/trashcut',{key:g.key});items=o.items;archives=o.archives||archives;render();toast('已把 '+o.trashed+' 段原始素材移到废纸篓，成片已存进“成果作品”')}catch(err){toast(err.message)}}
+ if(act==='remove')removeFor(g.name,ids);
+},true);
+// 缩略图上直接转方向：按住左下角的 ⟳ 拖动，画面跟着转，松手对齐到 90 度并自动保存（不用打开编辑窗口）
+let tspin=null,spunAt=0;const wrap=d=>((d%360)+540)%360-180;  // 转过左边时 atan2 会跳一整圈，换算回 -180～180
+document.addEventListener('pointerdown',e=>{
+ const h=e.target.closest('[data-rot]');if(!h)return;e.preventDefault();e.stopPropagation();
+ const th=h.closest('.thumb'),b=th.getBoundingClientRect(),m=th.querySelector('img,video');
+ tspin={id:h.dataset.rot,th,m,cx:b.left+b.width/2,cy:b.top+b.height/2,from:Math.atan2(e.clientY-(b.top+b.height/2),e.clientX-(b.left+b.width/2)),deg:0};
+ th.classList.add('spinning');try{h.setPointerCapture(e.pointerId)}catch(err){}},true);
+document.addEventListener('pointermove',e=>{if(!tspin)return;tspin.deg=wrap((Math.atan2(e.clientY-tspin.cy,e.clientX-tspin.cx)-tspin.from)*180/Math.PI);if(tspin.m){tspin.m.style.transition='none';tspin.m.style.transform='rotate('+tspin.deg+'deg)'}});
+document.addEventListener('pointerup',async()=>{
+ if(!tspin)return;const t=tspin;tspin=null;spunAt=Date.now();const snap=Math.round(t.deg/90)*90;
+ if(t.m){t.m.style.transition='transform .2s';t.m.style.transform='rotate('+snap+'deg)'}
+ if(!(((snap%360)+360)%360)){t.th.classList.remove('spinning');if(t.m)t.m.style.transform='';return}
+ const x=items.find(i=>i.id===t.id),e0=x.edit||{};
+ try{await post('/api/inbox/edit',{id:t.id,rotate:(((e0.rotate||0)+snap)%360+360)%360,start:e0.start||0,end:e0.end??null});await load();toast('已转好并保存（原文件没动）')}
+ catch(err){toast(err.message);t.th.classList.remove('spinning');if(t.m)t.m.style.transform=''}
+});
+async function sendGroup(g){
+ try{const o=await post('/api/archive/sent',{key:g.key,text:edited[g.key]??compose(g)});items=o.items;archives=o.archives||{};lessonTimes=o.lessons||lessonTimes;render();
+  toast('已标“已发家长”，并存进 '+g.name+' 的档案（'+o.archived.files+' 个照片视频'+(o.works?'，成片 '+o.works+' 个':'')+'）')}catch(err){toast(err.message)}
+}
+// ---- 改学生：点卡片上的名字（整节课一起改）或编辑窗口标题上的名字（只改这一个）
+let rosterCache=null;
+async function pickStudent(anchor,ids,current){
+ if(!rosterCache)try{rosterCache=(await (await fetch('/schedule',{cache:'no-store'})).json()).roster}catch(e){rosterCache=[]}
+ let box=$('pickbox');if(!box){box=document.createElement('div');box.id='pickbox';box.className='morebox';box.style.position='fixed';box.style.maxHeight='60vh';box.style.overflow='auto'}
+ ($('editor').open?$('editor'):document.body).appendChild(box);  // 编辑窗口开着时放进窗口里，不然点不到
+ box.innerHTML='<div class="muted" style="padding:4px 10px 6px;font-size:13px">改成哪个学生？</div><input id="pickq" placeholder="搜索名字" style="width:100%;margin-bottom:4px;padding:6px 8px;border:1px solid #dce1e9;border-radius:8px;font:inherit">'+(()=>{const x=items.find(i=>ids.includes(i.id)&&(i.classmates||[]).length>1),c=x?.classmates||[];window.__mates=c;return c.length>1?'<div class="muted" style="padding:2px 10px;font-size:12px">同班（请假的不显示）</div><button type="button" data-class="'+esc(c.join('、'))+'" style="font-weight:600">全班：'+esc(c.join('、'))+'</button>'+c.filter(n=>n!==current).map(n=>'<button type="button" data-pick="'+esc(n)+'" style="font-weight:600">'+esc(n)+'</button>').join('')+'<div class="muted" style="padding:6px 10px 2px;font-size:12px">其他学生</div>':''})()+rosterCache.filter(n=>n!==current&&!(window.__mates||[]).includes(n)).map(n=>'<button type="button" data-pick="'+esc(n)+'">'+esc(n)+'</button>').join('');
+ const r=anchor.getBoundingClientRect();box.style.left=Math.min(r.left,innerWidth-200)+'px';box.style.top=(r.bottom+6)+'px';box.hidden=false;$('pickq').focus();
+ $('pickq').oninput=()=>box.querySelectorAll('[data-pick]').forEach(x=>x.hidden=!x.dataset.pick.includes($('pickq').value.trim()));
+ box.onclick=async e=>{const cl=e.target.closest('[data-class]');if(cl){box.hidden=true;try{const o=await post('/api/inbox/reassign',{ids,students:cl.dataset.class.split('、')});items=o.items;lessonTimes=o.lessons||lessonTimes;archives=o.archives||archives;if($('editor').open)$('editor').close();render();toast('已记给全班：'+cl.dataset.class)}catch(err){toast(err.message)}return}
+  const t=e.target.closest('[data-pick]');if(!t)return;box.hidden=true;
+  try{const o=await post('/api/inbox/reassign',{ids,student:t.dataset.pick});items=o.items;lessonTimes=o.lessons||lessonTimes;archives=o.archives||archives;if($('editor').open)$('editor').close();render();toast('已改成 '+t.dataset.pick+(ids.length>1?'（'+ids.length+' 条）':''))}catch(err){toast(err.message)}};
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.more,#pickbox,[data-act="rename"],#edtitle')){document.querySelectorAll('.morebox').forEach(x=>x.hidden=true)}});
+// ---- 快速筛选：还没发 / 全部；其它筛选收在“筛选 ▾”里
+$('quick').onclick=e=>{const b=e.target.closest('button[data-q]');if(!b)return;fs=b.dataset.q;document.querySelectorAll('#stats button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.s===fs));render()};
+$('filtbtn').onclick=()=>{$('morefilt').hidden=!$('morefilt').hidden};
+function paintQuick(){
+ const unsent=new Set(items.filter(x=>['新','待剪辑'].includes(x.status)).flatMap(x=>x.students.map(n=>x.date.slice(0,10)+'|'+n)).filter(k=>!ft||(lessonTeachers[k]||[]).includes(ft))).size;  // 10-20：选了老师就只数这位老师的
+ document.querySelectorAll('#quick button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.q===fs||(b.dataset.q===''&&fs!=='还没发'));if(b.dataset.q)b.textContent='还没发'+(unsent?' '+unsent:'')});
+}
+$('views').onclick=e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;document.querySelectorAll('#views button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+// ---- 从相机导入：插卡后顶部出现提示；按拍摄时间对课表，确认后复制到 Mac 本地素材文件夹
+let cam=null,camRoster=[];
+const camFile=(v,p)=>'/api/camera/file?volume='+encodeURIComponent(v)+'&path='+encodeURIComponent(p);
+const gb=n=>n>1073741824?(n/1073741824).toFixed(1)+' GB':kb(n);
+async function pollCamera(){
+ try{const d=await (await fetch('/api/camera',{cache:'no-store'})).json();
+  $('cambar').hidden=!d.volumes.length&&!d.job.running;$('camname').textContent=d.volumes.join('、');
+  $('camnote').textContent=d.job.running?'正在复制 '+d.job.copied+'/'+d.job.count+'：'+d.job.current:'插着相机存储卡';
+  showJob(d.job)}catch(e){}
+}
+function showJob(j){
+ if(!j||j.total===undefined)return;const bar=$('campbar');
+ if(j.running){bar.hidden=false;bar.firstChild.style.width=Math.round(100*j.done/Math.max(1,j.total))+'%';$('camsum').textContent='正在复制 '+j.copied+'/'+j.count+'（'+gb(j.done)+' / '+gb(j.total)+'）';$('camgo').disabled=true;return}
+ if(bar.hidden===false){bar.hidden=true;$('camgo').disabled=false;toast('相机素材导入完成：'+j.copied+' 个'+(j.errors.length?'，'+j.errors.length+' 个没成功：'+j.errors.join('；'):''));load();if($('camdialog').open)camScan()}
+}
+setInterval(pollCamera,4000);pollCamera();
+async function camScan(){
+ const offset=(Number($('camoffh').value)||0)*60+(Number($('camoffm').value)||0);
+ $('camlist').innerHTML='<div class="empty">正在读卡、对课表…</div>';
+ try{
+  if(!camRoster.length)camRoster=(await (await fetch('/schedule',{cache:'no-store'})).json()).roster;
+  cam=await post('/api/camera/scan',{volume:$('camname').textContent.split('、')[0],offset});
+ }catch(e){$('camlist').innerHTML='<div class="empty">'+esc(e.message)+'</div>';return}
+ $('camsub').textContent=cam.volume+' · 存到 '+cam.store.replace(/^\/Users\/[^/]+/,'~');
+ $('camnow').textContent='（现在：'+cam.now.replace('T',' ')+'）';
+ $('camchecks').innerHTML=cam.checks.map(c=>'<div>⚠️ '+esc(c)+(cam.suggest&&c.startsWith('试试')?'<button type="button" id="camsuggest">按这个调整</button>':'')+'</div>').join('');
+ const rows=cam.files.filter(x=>x.recent);let html='',day='';
+ for(const [i,x] of cam.files.entries()){
+  if(!x.recent)continue;
+  const d=x.shot.slice(0,10);if(d!==day){day=d;html+='<div class="camday">'+dayLabel(d)+' '+WEEK[new Date(d+'T00:00:00').getDay()]+'</div>'}
+  const opts=x.lessons.map(l=>'<option value="'+esc(l.students.join('、'))+'">'+l.time+' '+esc(l.students.join('、'))+'</option>').join('');
+  const others=camRoster.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');
+  const pick=x.students.join('、');
+  html+='<div class="camrow'+(x.imported?' dim':'')+'"><input type="checkbox" data-cam="'+i+'"'+(!x.imported&&x.students.length?' checked':'')+'>'
+   +'<div class="thumb">'+(x.thumb?'<img loading="lazy" src="'+camFile(cam.volume,x.thumb)+'">':(x.kind==='video'?'🎬':'🖼'))+'</div>'
+   +'<div><b>'+x.shot.slice(11,16)+'</b> '+esc(x.name)+' <span class="muted">'+gb(x.size)+(x.source==='文件时间'?' · 用文件时间':'')+(x.imported?' · 已导入':'')+'</span>'+(x.lessons.length?'':'<div class="muted" style="font-size:13px">对不上课</div>')+'</div>'
+   +'<select data-camwho="'+i+'"><option value="">'+(x.lessons.length>1?'这时有几节课，请选':'请选学生')+'</option>'+(opts?'<optgroup label="那时在上的课">'+opts+'</optgroup>':'')+'<optgroup label="全部学生">'+others+'</optgroup></select></div>';
+ }
+ $('camlist').innerHTML=html||'<div class="empty">最近两周没有拍的'+(cam.older?'（更早的有 '+cam.older+' 个，不列出）':'')+'</div>';
+ cam.files.forEach((x,i)=>{const s=document.querySelector('[data-camwho="'+i+'"]');if(s&&x.students.length)s.value=x.students.join('、')});
+ camSum();
+}
+function camPicked(){return [...document.querySelectorAll('[data-cam]:checked')].map(c=>{const i=+c.dataset.cam,x=cam.files[i],who=document.querySelector('[data-camwho="'+i+'"]').value;return {path:x.path,shot:x.shot,kind:x.kind,size:x.size,students:who?who.split('、'):[]}})}
+function camSum(){const p=camPicked(),miss=p.filter(x=>!x.students.length).length;$('camsum').textContent='勾了 '+p.length+' 个，共 '+gb(p.reduce((a,x)=>a+x.size,0))+(miss?' · 有 '+miss+' 个还没选学生':'');$('camgo').textContent='导入 '+p.length+' 个'}
+$('camlist').addEventListener('change',e=>{const s=e.target.closest('[data-camwho]');if(s&&s.value){const c=document.querySelector('[data-cam="'+s.dataset.camwho+'"]');if(c)c.checked=true}camSum()});
+$('camlist').addEventListener('click',e=>{const t=e.target.closest('.thumb img');if(t)window.open(t.src)});
+$('camopen').onclick=()=>{$('camdialog').showModal();camScan()};
+$('camclose').onclick=()=>$('camdialog').close();
+$('camapply').onclick=camScan;
+$('camchecks').onclick=e=>{if(e.target.id==='camsuggest'){const m=cam.suggest.minutes;$('camoffh').value=Math.trunc(m/60);$('camoffm').value=m%60;camScan()}};
+$('camgo').onclick=async()=>{
+ const p=camPicked();if(!p.length){toast('请先勾选要导入的');return}
+ if(p.some(x=>!x.students.length)){toast('有勾选的还没选学生');return}
+ try{const j=await post('/api/camera/import',{volume:cam.volume,items:p});showJob(j);$('campbar').hidden=false;showJob(j)}catch(e){toast(e.message)}
+};
+// ---- 编辑：照片转方向；视频剪头尾 + 转方向（像苹果照片 App）。每次都按原文件重做，原文件不动
+let ed=null;
+function openEditor(id){
+ const x=items.find(i=>i.id===id);if(!x||!['photo','video'].includes(x.kind)){openViewer(id);return}
+ const e=x.edit||{};ed={id,x,rotate:e.rotate||0,start:e.start||0,end:e.end??null,dur:0};
+ $('edtitle').textContent=x.students.join('、')+' · '+x.date.slice(5,16).replace('T',' ');$('edtitle').title='点一下改成别的学生（只改这一个）';$('edtitle').style.cursor='pointer';$('edtitle').onclick=()=>pickStudent($('edtitle'),[id],x.students[0]);
+ $('ednote').textContent=x.status==='预删除'?'这段标了预删除（捂了镜头）':x.edit?.auto?'已自动转正':'';
+ $('edstage').innerHTML=x.kind==='photo'?'<img id="edm" src="'+fileUrl(id,true)+'">':'<video id="edm" playsinline src="'+fileUrl(id,true)+'"></video>';
+ $('edstage').insertAdjacentHTML('beforeend','<div class="rot" data-c="0">⟳</div><div class="rot" data-c="1">⟳</div><div class="rot" data-c="2">⟳</div><div class="rot" data-c="3">⟳</div>');
+ $('edtrim').hidden=$('edplay').hidden=x.kind!=='video';
+ const m=$('edm');ed.angle=ed.rotate;m.onload=()=>paintRotate();m.addEventListener('loadedmetadata',()=>paintRotate());
+ // 横拍 / 竖拍：浏览器读到的宽高已经按视频里的方向标记（照片按 EXIF）摆过了
+ const shape=()=>{const w=m.videoWidth||m.naturalWidth,h=m.videoHeight||m.naturalHeight;if(w&&h&&!/拍$/.test($('ednote').textContent.split(' · ').pop()))$('ednote').textContent=[$('ednote').textContent,h>w?'竖拍':w>h?'横拍':'方的'].filter(Boolean).join(' · ')};
+ m.addEventListener('load',shape);m.addEventListener('loadedmetadata',shape);
+ // 10-20：按钮文字跟着视频真实状态走（以前关掉时在播放，下次打开就一直显示“暂停”）
+ $('edplay').textContent='▶ 播放';m.addEventListener('play',()=>$('edplay').textContent='⏸ 暂停');m.addEventListener('pause',()=>$('edplay').textContent='▶ 播放');m.addEventListener('ended',()=>$('edplay').textContent='▶ 播放');
+ if(x.kind==='video'){m.onloadedmetadata=()=>{ed.dur=m.duration;if(ed.end==null||ed.end>ed.dur)ed.end=ed.dur;m.currentTime=ed.start;paintTrim();drawStrip(fileUrl(id,true))};
+  m.ontimeupdate=()=>{paintHead();if(!m.paused&&m.currentTime>=ed.end){m.pause();m.currentTime=ed.start;$('edplay').textContent='▶ 播放'}}}
+ $('editor').showModal();$('editor').addEventListener('close',()=>{const v=$('edm');if(v&&v.pause)v.pause()},{once:true});requestAnimationFrame(()=>paintRotate());
+}
+// 按当前角度（拖动时可以是任意角度）把画面整个放进框里；四个角上各有一个 ⟳ 把手，按住拖动就跟着手转，松开对齐到最近的 90 度
+function paintRotate(){
+ const m=$('edm'),st=$('edstage');if(!m||!ed)return;
+ const w=m.naturalWidth||m.videoWidth,h=m.naturalHeight||m.videoHeight,sw=st.clientWidth,sh=st.clientHeight;if(!w||!h||!sw||!sh)return;
+ const a=(ed.angle??ed.rotate)*Math.PI/180,c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a)),bw=w*c+h*s,bh=w*s+h*c,k=Math.min((sw-40)/bw,(sh-40)/bh);
+ const dw=w*k,dh=h*k;Object.assign(m.style,{width:dw+'px',height:dh+'px',transform:'translate(-50%,-50%) rotate('+(ed.angle??ed.rotate)+'deg)'});
+ st.querySelectorAll('.rot').forEach(r=>{const i=+r.dataset.c,px=(i===1||i===2?1:-1)*dw/2,py=(i>=2?1:-1)*dh/2;r.style.left=(sw/2+px*Math.cos(a)-py*Math.sin(a))+'px';r.style.top=(sh/2+px*Math.sin(a)+py*Math.cos(a))+'px'});
+}
+let spin=null;
+$('edstage').addEventListener('pointerdown',e=>{const r=e.target.closest('.rot');if(!r||!ed)return;e.preventDefault();const b=$('edstage').getBoundingClientRect();
+ spin={cx:b.left+b.width/2,cy:b.top+b.height/2,from:Math.atan2(e.clientY-(b.top+b.height/2),e.clientX-(b.left+b.width/2)),base:ed.angle??ed.rotate};$('edm').classList.remove('snap');try{r.setPointerCapture(e.pointerId)}catch(err){}});
+$('edstage').addEventListener('pointermove',e=>{if(!spin)return;const now=Math.atan2(e.clientY-spin.cy,e.clientX-spin.cx);ed.angle=spin.base+wrap((now-spin.from)*180/Math.PI);paintRotate()});
+$('edstage').addEventListener('pointerup',()=>{if(!spin)return;spin=null;const m=$('edm');m.classList.add('snap');ed.angle=Math.round(ed.angle/90)*90;ed.rotate=((ed.angle%360)+360)%360;paintRotate()});
+addEventListener('resize',()=>{if(ed)paintRotate()});
+const fmt=t=>{t=Math.max(0,t||0);return Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+'.'+Math.floor(t*10%10)};
+function paintTrim(){
+ if(!ed.dur)return;const W=$('trim').clientWidth,a=ed.start/ed.dur*W,b=ed.end/ed.dur*W;
+ Object.assign($('shl').style,{left:'0',width:a+'px'});Object.assign($('shr').style,{left:b+'px',right:'0'});
+ Object.assign($('win').style,{left:a+'px',width:(b-a)+'px'});$('hl').style.left=(a-4)+'px';$('hr').style.left=(b-18)+'px';
+ $('tstart').textContent='从 '+fmt(ed.start);$('tend').textContent='到 '+fmt(ed.end);$('tlen').textContent='留下 '+fmt(ed.end-ed.start)+' / 共 '+fmt(ed.dur);paintHead();
+}
+function paintHead(){const m=$('edm');if(ed&&ed.dur)$('head').style.left=(m.currentTime/ed.dur*$('trim').clientWidth-1)+'px'}
+async function drawStrip(url){
+ // 胶片条：隐藏的视频跳到 10 个位置各画一帧
+ const c=$('strip'),W=c.width=$('trim').clientWidth*2,H=c.height=112,v=document.createElement('video'),n=10,ctx=c.getContext('2d');
+ v.muted=true;v.src=url;await new Promise(r=>v.onloadeddata=r);
+ for(let i=0;i<n;i++){if(!ed||!$('editor').open)return;v.currentTime=(i+.5)/n*v.duration;await new Promise(r=>v.onseeked=r);
+  const w=W/n,ratio=v.videoWidth/v.videoHeight,dw=H*ratio;ctx.save();ctx.beginPath();ctx.rect(i*w,0,w,H);ctx.clip();ctx.drawImage(v,i*w+(w-dw)/2,0,dw,H);ctx.restore()}
+}
+let drag=null;
+$('trim').addEventListener('pointerdown',e=>{
+ if(!ed||!ed.dur)return;const r=$('trim').getBoundingClientRect(),t=(e.clientX-r.left)/r.width*ed.dur;
+ // 只有按住两头的把手才是剪；在中间点或拖＝移动播放位置（只在留下的那段里）
+ const px=e.clientX-r.left,ax=ed.start/ed.dur*r.width,bx=ed.end/ed.dur*r.width;
+ const which=e.target.id==='hl'||Math.abs(px-ax)<16?'start':e.target.id==='hr'||Math.abs(px-bx)<16?'end':'head';
+ drag={which,r};try{$('trim').setPointerCapture(e.pointerId)}catch(err){}move(e)});
+$('trim').addEventListener('pointermove',e=>{if(drag)move(e)});
+$('trim').addEventListener('pointerup',()=>{drag=null});
+function move(e){const t=Math.min(ed.dur,Math.max(0,(e.clientX-drag.r.left)/drag.r.width*ed.dur)),m=$('edm');
+ if(drag.which==='head'){m.currentTime=Math.min(Math.max(t,ed.start),ed.end-0.05);paintHead();return}
+ if(drag.which==='start')ed.start=Math.min(t,ed.end-0.5);else ed.end=Math.max(t,ed.start+0.5);
+ m.pause();$('edplay').textContent='▶ 播放';m.currentTime=drag.which==='start'?ed.start:ed.end;paintTrim()}
+$('edstage').addEventListener('click',e=>{if(ed&&ed.x.kind==='video'&&!e.target.closest('.rot'))$('edplay').click()});
+$('edplay').onclick=()=>{const m=$('edm');if(m.paused){if(m.currentTime<ed.start||m.currentTime>=ed.end-0.1)m.currentTime=ed.start;m.play();$('edplay').textContent='⏸ 暂停'}else{m.pause();$('edplay').textContent='▶ 播放'}};
+const turn=d=>{$('edm').classList.add('snap');ed.angle=(ed.angle??ed.rotate)+d;ed.rotate=((ed.angle%360)+360)%360;paintRotate()};
+$('edleft').onclick=()=>turn(-90);
+$('edright').onclick=()=>turn(90);
+$('edreset').onclick=()=>{ed.rotate=0;ed.angle=0;ed.start=0;if(ed.dur)ed.end=ed.dur;paintRotate();paintTrim()};
+$('edcancel').onclick=()=>$('editor').close();
+// 10-27：看视频/照片、编辑、课堂卡片这几个窗口，点窗口外面的空白处就关（编辑窗口＝取消，不保存）。按下和松开都在外面才算，拖剪辑把手拖出窗口不会误关
+for(const id of ['viewer','editor','carddlg']){const dl=$(id);let downOut=false;
+ const out=e=>{const r=dl.getBoundingClientRect();return e.target===dl&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)};
+ dl.addEventListener('pointerdown',e=>{downOut=out(e)});
+ dl.addEventListener('click',e=>{if(downOut&&out(e))dl.close();downOut=false});}
+// 空格＝播放 / 暂停（从播放位置开始；在胶片条中间点过新位置就从那里放），不让后面的页面往下滚
+document.addEventListener('keydown',e=>{
+ if(!$('editor').open||!ed||ed.x.kind!=='video'||e.code!=='Space'||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||''))return;
+ e.preventDefault();if(document.activeElement?.tagName==='BUTTON')document.activeElement.blur();$('edplay').click()},true);  // 先让按钮失去焦点，免得空格又按一次按钮
+$('editor').addEventListener('close',()=>{$('edstage').innerHTML='';ed=null});
+$('eddone').onclick=async()=>{
+ const full=ed.dur&&ed.end>=ed.dur-0.05;$('eddone').disabled=true;$('eddone').textContent='正在保存…';
+ try{await post('/api/inbox/edit',{id:ed.id,rotate:ed.rotate,start:ed.start,end:full?null:ed.end});$('editor').close();await load();toast('已保存改好的那份（原文件没动；复制、整理都用改好的）')}
+ catch(e){toast(e.message)}finally{$('eddone').disabled=false;$('eddone').textContent='完成'}
+};
+// ---- 课堂卡片：编号文字 + 当天照片画成一张图；和视频一起放进剪贴板，到微信 ⌘V 一次就全发出去（10-17 用户要“一次”）
+const loadImg=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
+// 视频截一帧（第 1 秒左右），返回一张画布，宽高和照片一样用
+const videoFrame=src=>new Promise(r=>{const v=document.createElement('video');v.muted=true;v.preload='auto';v.src=src;let done=false;const fin=c=>{if(!done){done=true;r(c)}};
+ v.onloadeddata=()=>{v.currentTime=Math.min(1,(v.duration||2)/3)};v.onseeked=()=>{const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);fin(c)};v.onerror=()=>fin(null);setTimeout(()=>fin(null),15000)});
+async function drawCard(g){
+ const text=(edited[g.key]??compose(g)).trim(),lines=text.split('\n'),head=lines[0]||'',points=lines.slice(1).filter(x=>x.trim());
+ const photos=g.keep.filter(x=>x.kind==='photo'),videos=g.keep.filter(x=>x.kind==='video');
+ let imgs=(await Promise.all(photos.slice(0,6).map(x=>loadImg(fileUrl(x.id))))).filter(Boolean),fromVideo=false;
+ // 没有照片时，从第一段视频里截一帧当照片（10-17 用户：卡片里要有上课的画面）
+ if(!imgs.length&&videos.length){const f=await videoFrame(fileUrl(videos[0].id));if(f){imgs=[f];fromVideo=true}}
+ const W=1080,P=72,c=document.createElement('canvas'),x=c.getContext('2d'),F="-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif";
+ const wrap=(t,font,max)=>{x.font=font;const out=[];let cur='';for(const ch of t){if(x.measureText(cur+ch).width>max&&cur){out.push(cur);cur=ch}else cur+=ch}if(cur)out.push(cur);return out};
+ const d=new Date(g.day+'T00:00:00'),sub=(d.getMonth()+1)+'月'+d.getDate()+'日 '+WEEK[d.getDay()]+(lessonTimes[g.key]?'　'+lessonTimes[g.key]:'');
+ const pts=points.map(t=>{const m=t.match(/^(\d+)\.\s*(.*)$/);return {n:m?m[1]:'•',body:wrap(m?m[2]:t,'36px '+F,W-2*P-64)}});
+ const gw=(W-2*P-24)/2,cells=imgs.length===1?[[P,W-2*P]]:null;
+ const photoH=imgs.length===0?0:imgs.length===1?Math.min(900,(W-2*P)*imgs[0].height/imgs[0].width):Math.ceil(imgs.length/2)*(gw*0.75+24);
+ let H=P+70+52+40+(pts.length?66:0)+pts.reduce((a,p)=>a+p.body.length*56+18,0)+(photoH?photoH+40:0)+(videos.length?70:0)+P;
+ c.width=W;c.height=Math.max(H,600);
+ x.fillStyle='#f7f4ee';x.fillRect(0,0,W,c.height);
+ const grad=x.createLinearGradient(0,0,W,0);grad.addColorStop(0,'#223047');grad.addColorStop(1,'#2b3f6e');x.fillStyle=grad;x.fillRect(0,0,W,P+150);
+ x.fillStyle='#fff';x.font='700 60px '+F;x.fillText(g.name,P,P+60);x.font='34px '+F;x.fillStyle='#d6def0';x.fillText(sub,P,P+112);
+ let y=P+150+56;
+ if(pts.length){x.fillStyle='#a56a00';x.font='700 30px '+F;x.fillText('今天的上课内容',P,y);y+=50;
+  for(const p of pts){x.fillStyle='#275de0';x.beginPath();x.arc(P+20,y-12,20,0,7);x.fill();x.fillStyle='#fff';x.font='700 24px '+F;x.textAlign='center';x.fillText(p.n,P+20,y-4);x.textAlign='left';
+   x.fillStyle='#223047';x.font='36px '+F;p.body.forEach((l,i)=>x.fillText(l,P+64,y+i*56));y+=p.body.length*56+18}
+  y+=22}
+ const cover=(img,X,Y,w,h)=>{const r=Math.max(w/img.width,h/img.height),sw=w/r,sh=h/r;x.save();x.beginPath();x.roundRect(X,Y,w,h,18);x.clip();x.drawImage(img,(img.width-sw)/2,(img.height-sh)/2,sw,sh,X,Y,w,h);x.restore()};
+ if(imgs.length===1){cover(imgs[0],P,y,W-2*P,photoH);if(fromVideo){x.fillStyle='#0008';x.beginPath();x.arc(W/2,y+photoH/2,64,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.moveTo(W/2-22,y+photoH/2-34);x.lineTo(W/2-22,y+photoH/2+34);x.lineTo(W/2+36,y+photoH/2);x.fill()}y+=photoH+40}
+ else if(imgs.length){imgs.forEach((img,i)=>cover(img,P+(i%2)*(gw+24),y+Math.floor(i/2)*(gw*0.75+24),gw,gw*0.75));y+=photoH+16}
+ if(videos.length){x.fillStyle='#68788d';x.font='32px '+F;x.fillText('🎬 另附 '+videos.length+' 段课堂视频',P,y+20);y+=70}
+ x.fillStyle='#b0a99c';x.font='24px '+F;x.textAlign='right';x.fillText('课堂记录',W-P,c.height-36);x.textAlign='left';
+ return {url:c.toDataURL('image/jpeg',0.9),videos,photosLeft:Math.max(0,photos.length-6)};
+}
+let cardState=null,cardAway=false;
+async function openCard(g){
+ $('cardimg').src='';$('cardnote').textContent='正在画…';$('carddlg').showModal();
+ try{const r=await drawCard(g);cardState={g,videos:r.videos,url:r.url};$('cardimg').src=r.url;
+  $('cardnote').textContent=(r.videos.length?'+ '+r.videos.length+' 段视频':'')+(r.photosLeft?'（照片太多，卡片里放前 6 张）':'');
+  $('cardgo').textContent='放进剪贴板（卡片'+(r.videos.length?' + '+r.videos.length+' 段视频':'')+'）'}catch(e){$('cardnote').textContent='画卡片失败：'+e.message}
+}
+$('cardclose').onclick=()=>$('carddlg').close();
+// 点“发家长”：直接画好卡片、和视频一起放进剪贴板（10-17 用户定：不要预览；想看样子在“⋯”里点“预览课堂卡片”）
+// 大视频先在后台压小，提示条上显示“压缩视频 1/3 · 45%”；压好了才放进剪贴板
+async function prepVideos(videos){
+ let first=true;
+ for(;;){const o=await post('/api/inbox/prepare',{ids:videos.map(x=>x.id),retry:first});first=false;
+  if(o.ready)return;
+  const bad=o.items.find(x=>x.state==='error');if(bad)throw new Error('视频压缩没成功：'+bad.error+'（再点一次“发家长”会重试）');
+  const w=o.items.filter(x=>x.state==='working'),done=o.items.length-w.length;
+  toast('正在把大视频压小（发微信用）：第 '+(done+1)+'/'+o.items.length+' 个 · '+(w[0]?.pct||0)+'%，压好会自动放进剪贴板');
+  await new Promise(r=>setTimeout(r,1000))}
+}
+let cardBusy=false;
+async function putCard(g,url,videos){
+ if(videos.length)await prepVideos(videos);
+ const o=await post('/api/inbox/card',{key:g.key,image:url});await post('/api/inbox/copyfiles',{ids:videos.map(x=>x.id),card:o.card});
+ cardAway=g.key;cardLeft=false;toast('已放进剪贴板：课堂卡片'+(videos.length?' + '+videos.length+' 段视频':'')+'。到微信 ⌘V、发送；回到这里会自动标“已发”');
+}
+async function sendCard(g){
+ if(cardBusy){toast('还在准备上一张卡片的视频，请稍等，好了会自动放进剪贴板');return}
+ cardBusy=true;
+ toast('正在画课堂卡片'+(g.keep.some(x=>x.kind==='video')?'、准备视频（大视频会先压小，第一次要几秒到几十秒）…':'…'));
+ try{const r=await drawCard(g);await putCard(g,r.url,r.videos)}catch(e){toast(e.message)}finally{cardBusy=false}
+}
+$('cardgo').onclick=async()=>{
+ if(!cardState)return;const {g,videos,url}=cardState;
+ try{$('carddlg').close();await putCard(g,url,videos)}catch(e){toast(e.message)}
+};
+// 去微信发完回来（这个页面重新被看到）：自动标“已发”并存档；提示条上可以撤销
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')cardBack()});
+addEventListener('focus',cardBack);
+let cardLeft=false;addEventListener('blur',()=>{if(cardAway)cardLeft=true});
+async function cardBack(){
+ if(!cardAway||!cardLeft)return;const key=cardAway;cardAway=false;cardLeft=false;
+ const g=groups(shown()).find(x=>x.key===key);if(!g)return;
+ await sendGroup(g);const ids=g.items.map(x=>x.id);
+ toastStep('已标“已发”并存进 '+g.name+' 的档案','撤销',()=>setStatus(ids,'新'));
+}
+let current=null;
+function openViewer(id){
+ const x=items.find(i=>i.id===id);if(!x)return;current=id;const u=fileUrl(id);
+ $('viewbody').innerHTML='<b>'+esc(x.students.join('、'))+'</b> <small>'+x.date.replace('T',' ')+'</small><div style="margin-top:10px">'
+  +(x.kind==='video'?'<video controls autoplay src="'+u+'"></video>':x.kind==='photo'?'<img src="'+u+'">':x.kind==='voice'?'<audio controls autoplay src="'+u+'"></audio>':'')
+  +(x.text?'<p style="white-space:pre-wrap;line-height:1.7">'+esc(x.text)+'</p>':'')+'</div>';
+ $('viewer').showModal();
+}
+$('viewclose').onclick=()=>$('viewer').close();
+$('viewer').addEventListener('close',()=>{$('viewbody').innerHTML=''});
+$('viewreveal').onclick=()=>post('/api/inbox/open',{id:current}).catch(e=>toast(e.message));
+
+// ---- 手机连接 / 服务详情
+const when=iso=>iso?new Date(iso).toLocaleString('zh-CN',{hour12:false}):'—';
+const unix=t=>t?new Date(t*1000).toLocaleString('zh-CN',{hour12:false}):'—';
+async function loadInfo(){
+ let d;try{d=await (await fetch('/api/service',{cache:'no-store'})).json()}catch(e){$('phone').innerHTML='<span class="bad">服务连不上，请在 Mac 双击“启动课程管理”</span>';return}
+ $('phone').innerHTML=d.connected.length?'<span class="ok">● 手机已连接</span>':'<span class="muted">○ 手机未连接</span>';
+ $('mini').textContent=(d.host||'')+(d.lanIP?'（'+d.lanIP+'）':'')+(d.keepAwake?' · 已防睡眠':' · 未防睡眠，Mac 睡眠时手机连不上');
+ const x=d.data;
+ $('info').innerHTML=[['运行','启动于 '+when(d.startedAt)+' · 端口 '+d.ports.mac+'/'+d.ports.phone],['课表',x.courses+' 门课 · '+x.students+' 名学生'],['账本',x.ledgerTransactions==null?'无记录':x.ledgerTransactions+' 条流水'],['备份',x.backups+' 份'+(x.lastBackup?'，最近 '+when(x.lastBackup):'')],['数据位置',esc(x.folder)]].map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('');
+ $('paired').innerHTML=d.paired.length?'<table><tr><th>已配对设备</th><th>权限</th><th>配对时间</th></tr>'+d.paired.map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+(p.role==='read-upload'?'查看+上传':esc(p.role||'—'))+'</td><td>'+unix(p.created)+'</td></tr>').join('')+'</table>':'';
+ $('log').textContent=d.log.length?d.log.join('\n'):'（没有报错）';
+}
+let timer=null,webTimer=null;
+$('webpairbtn').onclick=async()=>{
+ $('webqr').hidden=true;$('webpin').textContent='';$('webnote').textContent='正在生成…';$('webdialog').showModal();
+ try{
+  const r=await fetch('/device-pair-web?key=@@LOCAL_KEY@@',{cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();
+  $('webqr').src=d.qr;$('webqr').hidden=false;$('webpin').textContent=d.pin;$('webcert').textContent=d.cert[0];let left=d.expires;clearInterval(webTimer);
+  const tick=()=>{if(left<=0){clearInterval(webTimer);$('webqr').hidden=true;$('webpin').textContent='';$('webnote').textContent='过期了，请关掉重新点。';return}$('webnote').textContent='有效 '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0')+'，只能用一次。';left--};
+  tick();webTimer=setInterval(tick,1000);
+ }catch(e){$('webnote').textContent='生成失败，请确认服务正常运行。'}
+};
+$('webclose').onclick=()=>{clearInterval(webTimer);$('webdialog').close()};
+$('pairbtn').onclick=async()=>{
+ $('qr').hidden=true;$('pairnote').textContent='正在生成…';$('qrdialog').showModal();
+ try{
+  const r=await fetch('/device-pair?key=@@LOCAL_KEY@@',{cache:'no-store'});if(!r.ok)throw Error();
+  const src=new DOMParser().parseFromString(await r.text(),'text/html').querySelector('img')?.getAttribute('src');
+  if(!src?.startsWith('data:image/png;base64,'))throw Error();
+  $('qr').src=src;$('qr').hidden=false;let left=300;clearInterval(timer);
+  const tick=()=>{if(left<=0){clearInterval(timer);$('qr').hidden=true;$('pairnote').textContent='二维码已过期，请重新生成。';return}$('pairnote').textContent='有效 '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0')+'，只能用一次。';left--};
+  tick();timer=setInterval(tick,1000);
+ }catch(e){$('pairnote').textContent='生成失败，请确认服务正常运行。'}
+};
+// ---- 其他电脑：轮询有没有电脑在申请；允许·能改 / 允许·只能看 / 拒绝；已允许的可以取消
+const ROLE={'desk-full':'电脑 · 能改','desk-view':'电脑 · 只能看','read-upload':'手机'};
+async function pollDesk(){
+ let d;try{const r=await fetch('/api/desk',{cache:'no-store'});if(!r.ok)return;d=await r.json()}catch(e){return}
+ $('deskurl').textContent=d.url;
+ $('deskreq').hidden=!d.pending.length;
+ $('deskreq').innerHTML=d.pending.map(p=>'<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0"><b>有电脑请求连接</b><span>'+esc(p.name)+'</span><span>代码 <b style="font-size:20px;letter-spacing:3px">'+esc(p.code)+'</b></span><span style="flex:1"></span>'
+  +'<button type="button" class="primary" data-desk="'+p.rid+'" data-d="full">允许 · 能改</button><button type="button" data-desk="'+p.rid+'" data-d="view">允许 · 只能看</button><button type="button" data-desk="'+p.rid+'" data-d="deny">拒绝</button></div>').join('');
+ $('deskpaired').innerHTML=d.paired.length?'已允许的设备：'+d.paired.map(x=>'<span style="display:inline-flex;gap:6px;align-items:center;margin:4px 10px 4px 0;background:#f2f5fa;border-radius:8px;padding:3px 8px">'+esc(x.name)+' <small>'+(ROLE[x.role]||x.role)+'</small><button type="button" data-revoke="'+esc(x.id||'')+'" style="padding:1px 8px;font-size:12px">取消</button></span>').join(''):'';
+}
+$('deskbtn').onclick=()=>{$('deskhelp').hidden=!$('deskhelp').hidden;pollDesk()};
+$('deskcopy').onclick=()=>navigator.clipboard.writeText($('deskurl').textContent).then(()=>toast('地址已复制')).catch(()=>{});
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-desk]'),r=e.target.closest('[data-revoke]');
+ try{
+  if(b){await post('/api/desk/decide',{rid:b.dataset.desk,decision:b.dataset.d});toast(b.dataset.d==='deny'?'已拒绝':'已允许，那台电脑会自动进入');pollDesk()}
+  if(r){if(!confirm('取消这台设备？它以后要重新申请或扫码。'))return;await post('/api/desk/revoke',{id:r.dataset.revoke});toast('已取消');pollDesk()}
+ }catch(err){toast(err.message)}
+});
+pollDesk();setInterval(pollDesk,3000);
+$('qrclose').onclick=()=>{clearInterval(timer);$('qrdialog').close()};
+load();loadInfo();setInterval(loadInfo,5000);setInterval(()=>load(true),15000);
+</script>
+</html>

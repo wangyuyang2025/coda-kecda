@@ -1,0 +1,85 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>欢迎使用 · Coda 课达</title>
+<style>
+body{margin:0;background:#f6f7fa;color:#223047;font:16px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
+main{max-width:640px;margin:0 auto;padding:40px 20px 60px}
+h1{font-size:28px;margin:0 0 6px}.lead{color:#68788d;margin:0 0 28px;line-height:1.6}
+section{background:#fff;border:1px solid #e5e9ef;border-radius:16px;padding:20px 22px;margin-bottom:16px}
+h2{font-size:17px;margin:0 0 4px}.tip{color:#68788d;font-size:14px;margin:0 0 12px;line-height:1.5}
+label{display:flex;align-items:center;gap:10px;margin:10px 0}label[hidden],.dot[hidden]{display:none}label .dot{width:12px;height:12px;border-radius:50%;flex:none}
+input[type=text],textarea{flex:1;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d7dde6;border-radius:10px;font:inherit;background:#fff;color:inherit}
+textarea{min-height:180px;line-height:1.6;resize:vertical}
+input:focus,textarea:focus{outline:none;border-color:#4778d8;box-shadow:0 0 0 3px #4778d822}
+.count{font-size:14px;color:#2f8f5b;margin-top:8px;min-height:20px;line-height:1.7}.count .bad{color:#b83e3e;margin-top:6px}
+.keep{font-size:15px;color:#223047}.keep input{width:18px;height:18px}
+button{width:100%;padding:14px;border:0;border-radius:12px;background:#223047;color:#fff;font:inherit;font-size:17px;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}.err{position:fixed;left:50%;top:20px;transform:translateX(-50%);max-width:90vw;background:#b83e3e;color:#fff;font-size:15px;padding:10px 18px;border-radius:12px;box-shadow:0 8px 24px #0003;margin:0}.err:empty{display:none}
+</style></head><body><main>
+<h1>欢迎使用 Coda · 课达</h1>
+<p class="lead">填好老师和学生就能开始。资料只存在这台电脑上，以后都能改。</p>
+<section id="studiobox" hidden><h2>工作室名称</h2><p class="tip">显示在页面右上角，可以不填。</p>
+ <label><input type="text" id="studio" placeholder="比如：小星星音乐工作室" maxlength="30"></label></section>
+<section><h2>老师</h2><p class="tip">课表用蓝、红两种颜色分老师。只有你一位，就只填蓝色。</p>
+ <label><span class="dot" style="background:#4778d8"></span><input type="text" id="blue" placeholder="蓝色老师的名字（必填）" maxlength="12"></label>
+ <label><span class="dot" style="background:#d45858"></span><input type="text" id="red" placeholder="红色老师的名字（没有就空着）" maxlength="12"></label>
+ <div id="teacherprefs" hidden><label>课表默认看 <select id="viewpref"></select></label><label>新加的课默认给 <select id="newpref"></select></label></div></section>
+<section><h2>学生</h2><p class="tip">一行一个学生。名字后面空一格，可以写上<b>现在还剩几节课</b>，不写就是 0，以后在课时管理里补。</p>
+ <textarea id="students" placeholder="例如：&#10;小明 10&#10;小红 8&#10;小刚（不写就是 0）"></textarea>
+ <div class="count" id="count"></div>
+ <label class="keep"><input type="checkbox" id="keep"> 先留着示例学生和示例课表（想先看看怎么用）</label></section>
+<section id="aibox" hidden><h2>接入你自己的 AI</h2><p class="tip">在这个文件夹里打开 Claude Code、Codex 这类 AI，把下面这句话发给它，就能用说话的方式记课时。写入前它会先给你看清单。</p><p class="tip" id="aitext">请先读这个文件夹里的 AGENTS.md，然后帮我用课达记课时。</p><button type="button" id="copyai" style="width:auto;padding:8px 14px">复制这句话</button></section>
+<button id="go">完成，开始排课</button><p class="err" id="err"></p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+// 学生名单（10-20 新老师测试后重写）：一行可以写一个或几个学生（用 、，, 隔开），名字后面写剩几节课。
+// 以前“李四，5”会把 5 当成一个学生、“赵六 十”名字带上了“十”、“吴十 3.5”变成“吴十 3.”剩 5 节——现在都认对或明确报错。
+const CN={零:0,〇:0,一:1,二:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9};
+function cnNum(t){if(!/^[零〇一二两三四五六七八九十]+$/.test(t))return null;if(!t.includes('十'))return t.length===1?CN[t]:null;const [a,b]=t.split('十');return (a?CN[a]:1)*10+(b?CN[b]:0)}
+function parse(){
+ const half=s=>s.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).replace(/[－—]/g,'-').replace(/[．。]/g,'.').replace(/　/g,' ');
+ const out=[],bad=[],UNIT='(?:节课|节|课时|次)?';
+ for(const line of half($('students').value).split(/\n/)){
+  for(let t of line.split(/[、，,;；]+/).map(x=>x.trim()).filter(Boolean)){
+   let m=t.match(new RegExp('^(-?\\d+(?:\\.\\d+)?|[零〇一二两三四五六七八九十]+)\\s*'+UNIT+'$'));   // 只有数字：是前一个学生的课时（“李四，5”）
+   if(m){const prev=out[out.length-1];if(prev&&prev.units===null&&prev.line===line){t=prev.name+' '+t;out.pop()}else{bad.push('“'+t+'”前面没有名字');continue}}
+   m=t.match(new RegExp('^(.+?)(?:\\s*[:：]\\s*|\\s+)(-?\\d+(?:\\.\\d+)?|[零〇一二两三四五六七八九十]+)\\s*'+UNIT+'$'))||t.match(new RegExp('^(.*[^\\d\\s:：-])(-?\\d+(?:\\.\\d+)?)\\s*'+UNIT+'$'))||t.match(new RegExp('^(.+?)([零〇一二两三四五六七八九十]+)\\s*(?:节课|节|课时|次)$'));
+   let name=t,units=null;
+   if(m){name=m[1].trim();const raw=m[2];units=/\d/.test(raw)?Number(raw):cnNum(raw);
+    if(/\./.test(raw)){bad.push(name+'：剩余课时要写整数（写的是 '+raw+'）');continue}
+    if(units===null){bad.push(name+'：看不懂“'+raw+'”是几节');continue}}
+   if(/\s/.test(name)){bad.push('“'+name+'”：名字里有空格。名字和课时之间空一格，名字本身别带空格');continue}
+   if(/^\d+$/.test(name)){bad.push('“'+name+'”不像名字');continue}
+   if(name.length>12||/[|/\\]/.test(name)){bad.push('“'+name+'”：名字最长 12 个字，不能有斜杠');continue}
+   if(out.some(x=>x.name===name)){bad.push(name+' 写了两次，只留第一次');continue}
+   out.push({name,units,line});
+  }
+ }
+ return Object.assign(out.map(({name,units})=>({name,units})),{bad});
+}
+function show(){
+ const list=parse();
+ $('count').innerHTML=(list.length?'识别到 '+list.length+' 个学生：'+list.map(x=>esc(x.name)+(x.units===null?'':' <b>'+x.units+'</b> 节')).join(' · '):'')
+  +(list.bad.length?'<div class="bad">'+list.bad.map(esc).join('<br>')+'</div>':'');
+}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+$('students').oninput=show;
+// 已经设置过：只改工作室名和老师名字，学生那块藏起来
+if(window.CODA_DONE){const d=window.CODA_DONE;document.title='修改设置 · Coda 课达';document.querySelector('h1').textContent='修改设置';document.querySelector('.lead').textContent='学生和课表在课程管理、课时管理里改。';
+ document.querySelector('h1').insertAdjacentHTML('beforebegin','<a href="/" style="display:inline-block;margin:0 0 14px;color:#275de0;text-decoration:none">← 返回，不改了</a>');$('studio').value=d.studio||'';$('blue').value=d.blue||'';$('red').value=d.red||'';$('students').closest('section').hidden=true;$('go').textContent='保存';$('studiobox').hidden=false;$('teacherprefs').hidden=false;$('aibox').hidden=false;
+ const read=(k,v)=>{try{return localStorage.getItem(k)||v}catch(e){return v}};
+ const keep=(s,v,all)=>{const b=$('blue').value.trim()||'蓝色老师',r=$('red').value.trim();s.innerHTML=all?'<option value="*">全部老师</option>':'';[['blue',b]].concat(r?[['red',r]]:[]).forEach(x=>{const o=document.createElement('option');o.value=x[0];o.textContent=x[1];s.append(o)});s.value=v;if(s.selectedIndex<0)s.selectedIndex=0};
+ const fill=()=>{keep($('viewpref'),$('viewpref').value||read('view-teacher','*'),true);keep($('newpref'),$('newpref').value||read('coda-new-teacher','blue'),false)};
+ fill();$('blue').oninput=fill;$('red').oninput=fill;
+ $('copyai').onclick=async()=>{try{await navigator.clipboard.writeText($('aitext').textContent);$('copyai').textContent='已复制'}catch(e){$('copyai').textContent='没复制上，请手动选中上面这句'}};}
+if(location.protocol==='file:')$('err').textContent='请不要直接打开这个网页：回到 Coda 课达 文件夹，双击“Mac 点这里”（Windows 是“Windows 点这里”）';
+$('go').onclick=async()=>{
+ $('err').textContent='';const body={studio:$('studio').value,blue:$('blue').value,red:$('red').value,students:parse(),keepSamples:$('keep').checked,mode:window.CODA_DONE?'names':undefined};
+ if(!body.blue.trim()){$('err').textContent='请写蓝色老师的名字';$('blue').focus();return}
+ if(!window.CODA_DONE&&body.students.bad.length){show();$('err').textContent='学生名单里有 '+body.students.bad.length+' 处要改一下（下面红字），改好再点完成';$('students').focus();return}
+ if(!window.CODA_DONE&&!body.students.length&&!body.keepSamples){$('err').textContent='请写至少一个学生，或者勾选“先留着示例学生”';$('students').focus();return}
+ $('go').disabled=true;$('go').textContent='正在保存…';
+ try{const r=await fetch('/api/setup',{method:'POST',headers:{'Content-Type':'application/json','X-Local-Token':'@@LOCAL_KEY@@'},body:JSON.stringify(body)});const o=await r.json();
+  if(!r.ok)throw new Error(o.error||'保存失败，请再点一次');if(window.CODA_DONE){try{localStorage.setItem('view-teacher',$('viewpref').value);localStorage.setItem('coda-new-teacher',$('newpref').value)}catch(e){}}location.href='/'}
+ catch(e){$('err').textContent=e instanceof TypeError?'程序没在运行：请回到 Coda 课达 文件夹，双击“Mac 点这里”（Windows 是“Windows 点这里”），再在打开的网页里填':e.message;$('go').disabled=false;$('go').textContent='完成，开始排课'}
+};
+</script></body></html>
