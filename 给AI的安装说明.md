@@ -7,6 +7,16 @@
 
 ---
 
+## 如果老师用的是 Windows
+
+下面 0–2 节是 Mac 的。Windows 这样装：
+
+1. 检查 `py -3 --version`（3.9 以上）。没有就请老师到 python.org 安装，勾选 Add python.exe to PATH。只用标准库，不用 pip。
+2. 双击 `Windows 点这里.bat`，或运行它。第一次会生成证书，要等几秒。Windows 防火墙弹窗请老师点“允许”，否则手机连不上。
+3. 检查：`netstat -ano | findstr "18765 18766 18767"`，三个端口都要在听。
+4. 手机用网页版：课程管理右上角出二维码配对，浏览器打开 `https://这台电脑的IP:18767/m`。iPhone 要按页面提示装一次证书；不做 iPhone App（编译要 Mac）。
+5. 告诉老师：剪视频和压缩大视频只有 Mac 有，签课表照片要 JPG 或 PNG。
+
 ## 0. 先检查
 
 ```bash
@@ -23,7 +33,7 @@ xcodebuild -version                # 没装 Xcode 就请老师去 App Store 装�
 
 1. 编译签课表识别工具（手机拍签课表、Mac 识别要用；只用系统自带框架）：
    ```bash
-   cd mac/程序 && ./编译纸质表单识别工具.command
+   cd mac/程序 && ./编译纸质表单识别工具.command && ./编译素材编辑工具.command
    ```
    成功会打印“已编译”，生成 `mac/程序/纸质表单识别工具`。
 2. 启动：

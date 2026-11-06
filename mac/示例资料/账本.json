@@ -5,64 +5,64 @@
       "id": "demo-1",
       "kind": "opening",
       "student": "小乐",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     },
     {
       "id": "demo-2",
       "kind": "opening",
       "student": "小亮",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     },
     {
       "id": "demo-3",
       "kind": "opening",
       "student": "小刚",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     },
     {
       "id": "demo-4",
       "kind": "opening",
       "student": "小明",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     },
     {
       "id": "demo-5",
       "kind": "opening",
       "student": "小红",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     },
     {
       "id": "demo-6",
       "kind": "opening",
       "student": "小美",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     },
     {
       "id": "demo-7",
       "kind": "opening",
       "student": "小雨",
-      "date": "2026-11-05",
+      "date": "2026-11-06",
       "note": "示例：开始时剩余课时",
       "delta": 10,
-      "createdAt": "2026-11-05"
+      "createdAt": "2026-11-06"
     }
   ]
 }

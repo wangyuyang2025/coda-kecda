@@ -11,11 +11,10 @@ def configuration(root):
  folder=data_dir(root)/'手机连接';folder.mkdir(parents=True,exist_ok=True)
  config=folder/'配对.json';cert=folder/'证书.pem';key=folder/'私钥.pem'
  if not cert.exists() or not key.exists():
-  subprocess.run(['/usr/bin/openssl','req','-x509','-newkey','rsa:2048','-sha256','-nodes','-keyout',str(key),'-out',str(cert),'-days','3650','-subj','/CN=Lesson Ledger Mac'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True)
-  key.chmod(0o600)
+  import 跨平台;c,k=跨平台.self_signed('Coda Phone');cert.write_text(c,encoding='ascii');跨平台.write_private(key,k)
  if config.exists():data=json.loads(config.read_text())
  else:data={'token':secrets.token_urlsafe(32)}
- data['host']=subprocess.check_output(['/usr/sbin/scutil','--get','LocalHostName'],text=True).strip()+'.local'
+ data['host']=__import__('跨平台').host_name()
  data['port']=int(os.environ.get('LESSON_PHONE_PORT','18766'))
  der=ssl.PEM_cert_to_DER_cert(cert.read_text());data['fingerprint']=hashlib.sha256(der).hexdigest()
  config.write_text(json.dumps(data,ensure_ascii=False,indent=2));config.chmod(0o600)
@@ -234,7 +233,7 @@ def start(root,local_token,port=18766,upstream_port=18765,upload_root=None):
     self.raw_reply(200,(data_dir(root)/'手机连接'/'证书机构.pem').read_bytes(),'application/x-x509-ca-cert',[('Content-Disposition','attachment; filename="Coda-Mac.cer"')]);return
    if self.command=='GET' and p=='/m/join':   # 相机扫 Mac 上的二维码进来
     from 设备配对 import claim
-    try:out=claim(root,{'code':parse_qs(parsed.query).get('code',[''])[0],'name':'iPhone 网页版'})
+    try:out=claim(root,{'code':parse_qs(parsed.query).get('code',[''])[0],'name':'手机网页版'})
     except ValueError:self.send_response(302);self.send_header('Location','/m#expired');self.send_header('Content-Length','0');self.end_headers();return
     self.web_paired(out['token'],'/m#t='+out['token']);return
    origin=self.headers.get('Origin')
@@ -243,7 +242,7 @@ def start(root,local_token,port=18766,upstream_port=18765,upload_root=None):
     from 设备配对 import claim_pin
     length=int(self.headers.get('Content-Length','0'))
     if not 0<length<=1024:raise ValueError('请求无效')
-    out=claim_pin(root,str(json.loads(self.rfile.read(length)).get('pin','')).strip(),'iPhone 网页版')
+    out=claim_pin(root,str(json.loads(self.rfile.read(length)).get('pin','')).strip(),'手机网页版')
     self.web_paired(out['token']);return
    if not self.web_auth():self.reply(401,{'error':'这台手机还没连上 Mac'});return
    if self.command=='GET' and p=='/m/data':

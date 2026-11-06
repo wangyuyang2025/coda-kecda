@@ -16,7 +16,8 @@ def record_path(root):return data_dir(root)/'相机导入.json'
 def volumes():
  """插着的、像相机卡的磁盘：有 DCIM 或 PRIVATE/M4ROOT 或 PRIVATE/AVCHD。"""
  out=[]
- for v in sorted(Path('/Volumes').iterdir()):
+ import 跨平台
+ for v in 跨平台.volumes():
   try:
    if v.is_symlink() or not v.is_dir():continue
    if (v/'DCIM').is_dir() or (v/'PRIVATE'/'M4ROOT').is_dir() or (v/'PRIVATE'/'AVCHD').is_dir():out.append(v)

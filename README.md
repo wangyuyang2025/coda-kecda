@@ -1,10 +1,10 @@
 # Coda · 课达（开源版）
 
-一线音乐老师自己做的排课、课时、签到工具。Mac 上管课表和课时，iPhone 上看课表、记上课、标请假、记随记、拍签课表入账。
+一线老师自己做的排课、课时、签到工具。Mac 上管课表和课时，iPhone 上看课表、记上课、标请假、记随记、拍签课表入账。
 
 **所有资料只存在你自己的 Mac 上**，手机只通过家里/琴房的 Wi-Fi 连你的 Mac，不经过任何服务器。
 
-> English: Coda is a lesson scheduling / attendance tool for private music teachers. A Mac app (Python standard library, runs in your browser) plus an iPhone app (SwiftUI) that pairs with your Mac over local Wi-Fi. Non-commercial use only (PolyForm Noncommercial 1.0.0).
+> English: Coda is a lesson scheduling / attendance tool for private teachers. A Mac app (Python standard library, runs in your browser) plus an iPhone app (SwiftUI) that pairs with your Mac over local Wi-Fi. Non-commercial use only (PolyForm Noncommercial 1.0.0).
 
 ---
 
@@ -29,7 +29,32 @@
 
 **接自己的 AI**：在这个文件夹里打开 Claude Code、Codex 这类 AI，说“请先读 AGENTS.md，然后帮我用课达记课时”。之后说一句“周三小明上了，小红请假”，它查课表、列清单，你说可以它才写。说明在 `AI接入/`。
 
-**这一版没有**：作品管理、演奏录像、手机拍视频（作者另外做成单独的 App）；Windows 版。
+**这一版没有**：作品管理、演奏录像、手机拍视频（作者另外做成单独的 App）。
+
+## 安卓
+
+从本仓库的 Releases 下载 **课达安卓版.apk**，装到手机上（手机会提示允许安装未知来源的应用）。
+
+1. 手机和电脑连同一个 Wi-Fi，电脑上的课达开着。
+2. 打开 App，填电脑地址。地址在电脑课达的“服务管理”→“连接手机网页版”的网址里，比如 `192.168.1.20`。
+3. 输入电脑上显示的 6 位数，就连上了。以后打开直接进课表。
+
+功能和手机网页版一样：看课表、记上课、请假。App 第一次连接时记下这台电脑的证书，以后别的电脑冒充不了。不想装 App，也可以直接用手机浏览器打开网页版。
+
+源码在 `android/`，可以自己编译。
+
+## Windows
+
+1. 先装 Python：到 python.org 下载，安装时勾选 **Add python.exe to PATH**。
+2. 解压后双击 **Windows 点这里.bat**，浏览器会打开课达。防火墙弹窗时点“允许”，手机才连得上。
+3. 手机用**手机网页版**（iPhone、安卓都行）。iPhone App 要用 Mac 上的 Xcode 编译，Windows 上做不了。
+
+这些在 Windows 上和 Mac 不一样：
+- 剪视频、把大视频压小，只有 Mac 有。
+- 拍的签课表在电脑网页里识别，照片要是 JPG 或 PNG（iPhone 的 HEIC 打不开）。
+- AI 接入的命令把 `python3` 换成 `py -3`。
+
+文件夹叫 `mac/` 只是历史名字，Windows 也用它。
 
 ---
 

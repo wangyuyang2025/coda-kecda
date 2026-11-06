@@ -77,7 +77,7 @@ def lan_ip():
     address=ipaddress.ip_address(candidate)
     if not address.is_loopback and not address.is_unspecified:return candidate
   except (subprocess.CalledProcessError,ValueError,OSError):pass
- return None
+ import 跨平台;return 跨平台.lan_ip()
 def invitation(root):
  with LOCK:
   root=Path(root)

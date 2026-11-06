@@ -17,6 +17,7 @@ def folders(root):
  for p in out.values():p.mkdir(parents=True,exist_ok=True)
  return out
 def worker(root,action,data):
+ if __import__('os').name=='nt':raise ValueError('这个识别工具只有 Mac 版，Windows 请在课时管理里导入签课表，由网页识别')
  if not TOOL.is_file():raise ValueError('缺少 纸质表单识别工具，请在 数据/程序 里运行“编译纸质表单识别工具.command”')
  subprocess.run(['/usr/bin/xattr','-d','com.apple.quarantine',str(TOOL)],capture_output=True)  # 微信、网盘下载的会带“来自网络”标记，系统会拦住这个小程序（10-19 测试）
  try:r=subprocess.run([str(TOOL)],input=json.dumps({'action':action,'data':data},ensure_ascii=False),text=True,capture_output=True,timeout=120)

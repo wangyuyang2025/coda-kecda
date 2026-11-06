@@ -55,7 +55,7 @@ def linked_sources(student,day):
     except OSError:pass
  return out
 def open_path(path):
- subprocess.run(['/usr/bin/open',str(path)],check=False,timeout=10)
+ import 跨平台;跨平台.open_path(path)
 # ---- 档案
 def lesson_folder(student,day,time_label):
  d=datetime.date.fromisoformat(day)
@@ -93,6 +93,8 @@ def trash(paths):
   Path(fake).mkdir(parents=True,exist_ok=True)
   for p in paths:shutil.move(p,Path(fake)/(str(time.time_ns())+'_'+Path(p).name))
   return len(paths)
+ import 跨平台
+ if 跨平台.WIN:return 跨平台.trash_windows(paths)
  js='ObjC.import("Foundation");function run(a){var fm=$.NSFileManager.defaultManager,n=0;a.forEach(function(p){if(fm.trashItemAtURLResultingItemURLError($.NSURL.fileURLWithPath(p),null,null))n++});return n}'
  r=subprocess.run(['/usr/bin/osascript','-l','JavaScript','-e',js,*paths],capture_output=True,text=True,timeout=60)
  try:return int(r.stdout.strip())
@@ -189,6 +191,8 @@ def works_copy(root,data):
  """把成片放到剪贴板，到微信里 ⌘V。"""
  paths=[str(work_file(p)) for p in ((data or {}).get('paths') or [])]
  if not paths:raise ValueError('请先选成片')
+ import 跨平台
+ if 跨平台.WIN:跨平台.copy_windows(paths);return {'copied':len(paths)}
  r=subprocess.run(['/usr/bin/osascript','-l','JavaScript',str(Path(__file__).with_name('复制文件到剪贴板.js')),*paths],capture_output=True,text=True,timeout=20)
  if r.stdout.strip()!='ok':raise ValueError('没能放到剪贴板：'+(r.stderr.strip()[-200:] or '未知原因'))
  return {'copied':len(paths)}

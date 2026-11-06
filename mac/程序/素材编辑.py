@@ -11,6 +11,7 @@ import 收件箱
 from 存取公共 import LOCK,ensure,read,write
 TOOL=Path(__file__).with_name('素材编辑工具')
 def tool(job,timeout=600):
+ if __import__('os').name=='nt':raise ValueError('剪视频暂时只有 Mac 版，Windows 上可以先发原视频')
  if not TOOL.is_file():raise ValueError('缺少 素材编辑工具，请在 数据/程序 里运行“编译素材编辑工具.command”')
  r=subprocess.run([str(TOOL)],input=json.dumps(job,ensure_ascii=False),text=True,capture_output=True,timeout=timeout)
  try:out=json.loads(r.stdout.strip().splitlines()[-1])

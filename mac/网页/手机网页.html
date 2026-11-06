@@ -14,7 +14,7 @@
 -->
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#f6f7fa;color:#223047;font:16px/1.45 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
+body{margin:0;background:#f6f7fa;color:#223047;font:16px/1.45 -apple-system,Blink电脑SystemFont,'PingFang SC',sans-serif}
 main{max-width:560px;margin:auto;padding:calc(10px + env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom))}
 header{display:flex;align-items:center;gap:10px;margin:4px 0 10px}
 header h1{font-size:22px;margin:0}
@@ -51,8 +51,9 @@ details.past summary b{margin-right:6px}
 .pin{display:flex;gap:8px;margin-top:8px}.pin input{flex:1;font:inherit;font-size:22px;letter-spacing:6px;text-align:center;border:1px solid #dce1e9;border-radius:10px;padding:8px;min-width:0}
 .primary{background:#275de0;color:#fff;border-color:#275de0}
 .problem{display:flex;gap:8px;align-items:center;font-size:14px;padding:6px 0;border-top:1px solid #f1dfb8}.problem span{flex:1}
-#menu{position:fixed;inset:0;background:#0006;display:flex;align-items:flex-end;justify-content:center;z-index:20}
+#menu{position:fixed;top:0;right:0;bottom:0;left:0;background:#0006;display:flex;align-items:flex-end;justify-content:center;z-index:20}
 #menu[hidden]{display:none}
+#list,#menu{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #menu .sheet{background:#fff;width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:12px 12px calc(14px + env(safe-area-inset-bottom))}
 #menu .title{color:#68788d;font-size:14px;padding:4px 8px 8px}
 #menu button{display:block;width:100%;text-align:left;font-size:18px;border:0;border-radius:10px;padding:14px 10px;background:none}
@@ -86,14 +87,14 @@ function remember(){   // 连上以后：网址和“添加到主屏幕”用的
  if(new URLSearchParams(location.search).get('k')!==token)history.replaceState(null,'','/m?k='+encodeURIComponent(token));
  document.querySelector('link[rel=manifest]').href='/m/manifest.json?k='+encodeURIComponent(token);
 }
-let data=store.get('coda-week',null);          // 上次从 Mac 拿到的课表（没网时就显示它）
-let queue=store.get('coda-queue',[]);          // 还没交给 Mac 的操作
+let data=store.get('coda-week',null);          // 上次从电脑拿到的课表（没网时就显示它）
+let queue=store.get('coda-queue',[]);          // 还没交给电脑的操作
 let teacher=store.get('coda-teacher','all');
 let online=null,needPair=false,lastError='';
 const uid=()=>(crypto.randomUUID?crypto.randomUUID():Date.now().toString(16)+Math.random().toString(16).slice(2)).replace(/[^A-Za-z0-9-]/g,'');
 const pad=n=>String(n).padStart(2,'0');
 const localISO=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-// “今天”按 Mac 的算法（中文＝北京时间），不按手机所在地
+// “今天”按电脑的算法（中文＝北京时间），不按手机所在地
 const macDay=(ms=Date.now())=>new Date(ms+((data&&data.tz!=null?data.tz:-new Date().getTimezoneOffset())*60000)).toISOString().slice(0,10);
 const todayStr=()=>macDay();
 const hm=s=>s?s.slice(11,16):'';
@@ -107,10 +108,10 @@ async function call(path,opt={},ms=6000){
 async function load(){
  try{
   const r=await call('/m/data');
-  if(r.status===401){needPair=true;online=true;if(urlKey)history.replaceState(null,'','/m');render();return}   // 令牌在 Mac 上被取消了：网址里的也不要了
-  if(!r.ok)throw new Error('Mac 回了 '+r.status);
+  if(r.status===401){needPair=true;online=true;if(urlKey)history.replaceState(null,'','/m');render();return}   // 令牌在电脑上被取消了：网址里的也不要了
+  if(!r.ok)throw new Error('电脑 回了 '+r.status);
   data=await r.json();store.set('coda-week',data);online=true;needPair=false;lastError='';remember();
- }catch(e){online=false;lastError=e.name==='AbortError'?'连不上 Mac':e.message}
+ }catch(e){online=false;lastError=e.name==='AbortError'?'连不上 电脑':e.message}
  render();
 }
 let flushing=false;
@@ -138,7 +139,7 @@ function enqueue(item,label){
  item.label=label;item.at=localISO();queue.push(item);save();render();flush();
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load().then(flush)});
-// ---- 一个学生在这节课的状态（Mac 的数据 + 还没交的操作）
+// ---- 一个学生在这节课的状态（电脑 的数据 + 还没交的操作）
 function stateOf(row,name){
  const pend=queue.filter(x=>x.status!=='error'&&x.course===row.course&&x.week===row.week&&x.student===name);
  let booked=row.booked[name]||null,leave=row.leave.includes(name),pending=false;
@@ -153,11 +154,11 @@ function visible(row){
 function render(){
  const pendingN=queue.filter(x=>x.status!=='error').length;
  const when=data?new Date(data.fetchedAt):null;
- $('status').innerHTML=(needPair||!token?'<span class="off">○ 这台手机还没连上 Mac</span>':online===false?'<span class="off">○ 没连上 Mac</span>'+(when?' · 显示 '+(when.getMonth()+1)+'/'+when.getDate()+' '+pad(when.getHours())+':'+pad(when.getMinutes())+' 的课表':''):online?'<span class="on">● 已连 Mac</span>':'连接中…')
+ $('status').innerHTML=(needPair||!token?'<span class="off">○ 这台手机还没连上 电脑</span>':online===false?'<span class="off">○ 没连上 电脑</span>'+(when?' · 显示 '+(when.getMonth()+1)+'/'+when.getDate()+' '+pad(when.getHours())+':'+pad(when.getMinutes())+' 的课表':''):online?'<span class="on">● 已连 电脑</span>':'连接中…')
   +(pendingN?' · 待交 '+pendingN:'');
  let notice='';
  if(needPair||!token&&!data){
-  notice+='<div class="card warn"><h2>'+(expired?'二维码过期了':'连接 Mac')+'</h2><p>连上以后再“添加到主屏幕”，以后从桌面打开就不用再输了。</p><p>在 Mac 的“服务管理”点“连接手机网页版”，用相机扫二维码，或者在这里输入它显示的 6 位数。</p>'
+  notice+='<div class="card warn"><h2>'+(expired?'二维码过期了':'连接电脑')+'</h2><p>在电脑的“服务管理”点“连接手机网页版”，用相机扫二维码，或者在这里输入它显示的 6 位数。</p>'
    +'<div class="pin"><input id="pin" inputmode="numeric" maxlength="6" placeholder="6 位数" autocomplete="one-time-code"><button type="button" class="primary" id="pinbtn">连接</button></div><p id="pinmsg" style="color:#b23b3b"></p></div>';
  }
  const bad=queue.filter(x=>x.status==='error');
@@ -230,16 +231,18 @@ function openMenu(el){
  const others=r.students.filter(x=>!stateOf(r,x).leave);
  const future=r.date>todayStr();
  let h='<div class="title">'+esc(n)+' · '+(+r.date.slice(5,7))+'/'+(+r.date.slice(8))+' '+r.start+(r.students.length>1?' · 班课':'')+'</div>';
- if(s.booked==='lesson')h+='<div class="note">已经记过上课（要撤销请在 Mac 课时管理里）</div>';
+ if(s.booked==='lesson')h+='<div class="note">已经记过上课（要撤销请在电脑课时管理里）</div>';
  else if(s.booked==='leave')h+='<div class="note">账本里已经记了请假</div>';
  else if(future)h+='<div class="note">这节课还没到，到了才能记上课</div>';
  else if(!s.leave)h+='<button type="button" data-act="attend">上课了（扣 '+(r.units||1)+' 节）</button>';
  if(s.booked!=='lesson'&&s.booked!=='leave')h+='<button type="button" data-act="leave">'+(s.leave?'取消请假':'请假')+'</button>';
  if(r.students.length>1)h+=classButtons(r);
  h+='<button type="button" class="cancel" data-act="close">取消</button>';
- $('sheet').innerHTML=h;$('sheet').dataset.row=el.dataset.row;$('sheet').dataset.name=n;$('menu').hidden=false;
+ $('sheet').innerHTML=h;$('sheet').dataset.row=el.dataset.row;$('sheet').dataset.name=n;$('menu').hidden=false;menuAt=Date.now();
 }
+let menuAt=0;
 $('menu').onclick=e=>{
+ if(Date.now()-menuAt<400)return;
  if(e.target===$('menu')){$('menu').hidden=true;return}
  const b=e.target.closest('[data-act]');if(!b)return;
  const r=data.rows[+$('sheet').dataset.row],n=$('sheet').dataset.name,act=b.dataset.act;$('menu').hidden=true;
@@ -258,7 +261,7 @@ document.addEventListener('click',async e=>{
   const pin=$('pin').value.trim();if(!/^\d{6}$/.test(pin)){$('pinmsg').textContent='要 6 位数字';return}
   try{const r=await call('/m/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});const o=await r.json();
    if(!r.ok)throw new Error(o.error||'没连上');token=o.token;store.set('coda-token',token);needPair=false;toast('连上了');await load();flush()}
-  catch(err){$('pinmsg').textContent=err.name==='AbortError'?'连不上 Mac：手机和 Mac 要在同一个 Wi-Fi':err.message}
+  catch(err){$('pinmsg').textContent=err.name==='AbortError'?'连不上 电脑：手机和电脑要在同一个 Wi-Fi':err.message}
  }
 });
 $('refresh').onclick=()=>load().then(flush);

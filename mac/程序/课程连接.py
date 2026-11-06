@@ -167,6 +167,8 @@ def render_page(path):
  name,module=PAGES[path]
  out=(PAGE_DIR/name).read_bytes().replace(b'@@NAV@@',nav(module).encode()).replace(b'@@LOCAL_KEY@@',TOKEN.encode())
  if name in ('课程管理.html','课时管理.html','设置向导.html'):out=out.replace(b'</title>',b'</title><script>window.CODA_LANG='+json.dumps(saved_lang()).encode()+b';window.CODA_KEY='+json.dumps(TOKEN).encode()+b'</script><script src="/assets/i18n.js"></script>',1)  # 中文 / English 切换
+ if __import__('os').name=='nt':  # Windows 上换掉只属于 Mac 的说法
+  for a,b in (('⌘V','Ctrl+V'),('⌘Z','Ctrl+Z'),('在 Finder 显示','在文件夹中显示'),('在访达里打开','在文件夹里打开'),('废纸篓','回收站'),('这台 Mac','这台电脑'),('这台Mac','这台电脑'),('Mac 上','电脑上'),('Mac 剪贴板','电脑剪贴板'),('Mac 网页','电脑网页')):out=out.replace(a.encode(),b.encode())
  tag=b'<script>window.CODA_LOG_KEY='+json.dumps(TOKEN).encode()+b'</script><script src="/assets/%E6%93%8D%E4%BD%9C%E6%97%A5%E5%BF%97.js"></script>'
  out=out.replace(b'</body>',tag+b'</body>',1) if b'</body>' in out else out+tag  # 少见的改动后右下角问一句原因
  if LITE:
@@ -198,12 +200,11 @@ def service_info():
  def count(name,key):
   try:value=json.loads((DATA/name).read_text());return len(value[key] if key else value)
   except Exception:return None
- try:host=subprocess.check_output(['/usr/sbin/scutil','--get','LocalHostName'],text=True).strip()+'.local'
- except Exception:host=None
+ host=__import__('跨平台').host_name()
  try:log=(DATA/'连接服务.log').read_bytes()[-6000:].decode('utf-8','ignore').splitlines()[-15:]
  except Exception:log=[]
  return {'running':True,'pid':os.getpid(),'startedAt':STARTED.isoformat(timespec='seconds'),'ports':{'mac':PORT,'phone':PHONE_PORT},'host':host,'lanIP':lan_ip(),
-  'keepAwake':subprocess.run(['/usr/bin/pgrep','-f','caffeinate -s -w %d'%os.getpid()],capture_output=True).returncode==0,
+  'keepAwake':os.name!='nt' and subprocess.run(['/usr/bin/pgrep','-f','caffeinate -s -w %d'%os.getpid()],capture_output=True).returncode==0,
   'connected':connected_devices(ROOT),'paired':paired_devices(ROOT),
   'data':{'courses':count('基础排课.json',None),'students':count('学生名单.json',None),'ledgerTransactions':count('账本.json','transactions'),'adjustWeeks':count('临时调整.json','weeks'),'backups':len(backups),'lastBackup':datetime.datetime.fromtimestamp(backups[-1].stat().st_mtime).astimezone().isoformat(timespec='seconds') if backups else None,'folder':str(DATA)},
   'network':network_check(),'log':log}
@@ -297,10 +298,10 @@ class Handler(BaseHTTPRequestHandler):
     if not self.local() or g('key')!=TOKEN:return self.reply(403,b'{}')
     return self.reply(200,page(ROOT,PROGRAM),HTML)
    if p=='/device-pair-web':
-    if not self.local() or g('key')!=TOKEN or LITE:return self.reply(403,b'{}')
+    if not self.local() or g('key')!=TOKEN:return self.reply(403,b'{}')
     return self.json(web_pair())
    if not self.local():return self.reply(404,b'{}')
-   if p=='/open-uploads':(DATA/'手机上传').mkdir(exist_ok=True);subprocess.run(['/usr/bin/open',str(DATA/'手机上传')]);return self.reply(204,b'')
+   if p=='/open-uploads':(DATA/'手机上传').mkdir(exist_ok=True);__import__('跨平台').open_path(DATA/'手机上传');return self.reply(204,b'')
    if p=='/' and self.authorized() and self.headers.get('X-Lesson-Device')=='iPhone':return self.reply(200,phone_page(),HTML)
    if p in REDIRECTS:return self.redirect(REDIRECTS[p])
    if LITE and not LITE.get('setupDone') and p in ('/','/lesson'):return self.redirect('/setup')  # 测试版第一次打开：先走设置向导

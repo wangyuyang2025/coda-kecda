@@ -197,6 +197,8 @@ def copy_files(root,data):
   if cp.parent!=card_dir(root).resolve() or not cp.is_file():raise ValueError('找不到课堂卡片')
   files=[str(cp)]+files
  text=str(data.get('text') or '').strip()[:20000]
+ import 跨平台
+ if 跨平台.WIN:跨平台.copy_windows(files,text);return {'copied':len(files)}
  r=subprocess.run(['/usr/bin/osascript','-l','JavaScript',str(Path(__file__).with_name('复制文件到剪贴板.js')),*(['--text',text] if text else []),*files],capture_output=True,text=True,timeout=20)
  if r.stdout.strip()!='ok':raise ValueError('没能放到剪贴板：'+(r.stderr.strip()[-200:] or '未知原因'))
  return {'copied':len(files)}
@@ -253,7 +255,7 @@ def prepare(root,data):
    PREP_ERR.pop(str(o),None)
    threading.Thread(target=_prep_one,args=(p,),daemon=True).start()
   tmp=o.with_name(o.stem+'.part.mp4')
-  try:dur=float(subprocess.run(['/usr/bin/mdls','-raw','-name','kMDItemDurationSeconds',str(p)],capture_output=True,text=True,timeout=5).stdout or 0)
+  try:dur=0 if __import__('os').name=='nt' else float(subprocess.run(['/usr/bin/mdls','-raw','-name','kMDItemDurationSeconds',str(p)],capture_output=True,text=True,timeout=5).stdout or 0)
   except Exception:dur=0
   expect=dur*2.65e6/8 if dur>0 else p.stat().st_size/4
   out.append({'id':i,'state':'working','pct':min(99,int((tmp.stat().st_size if tmp.exists() else 0)*100/expect)) if expect else 0})
@@ -418,11 +420,11 @@ def compose(name,day,notes,times):
 def open_folder(root,data):
  """在 Finder 里打开整理文件夹或某份资料所在位置。"""
  out=paths(root)[2].resolve();target=data.get('folder');item=data.get('id')
- if item:path=resolve(root,item);cmd=['/usr/bin/open','-R',str(path)]
+ import 跨平台
+ if item:path=resolve(root,item);跨平台.reveal(path)
  else:
   path=(paths(root)[0].parent/str(target or '整理')).resolve()
   if path!=out and out not in path.parents:raise ValueError('只能打开“整理”里的文件夹')
-  out.mkdir(parents=True,exist_ok=True);path.mkdir(parents=True,exist_ok=True);cmd=['/usr/bin/open',str(path)]
- subprocess.run(cmd,check=False,timeout=10)
+  out.mkdir(parents=True,exist_ok=True);path.mkdir(parents=True,exist_ok=True);跨平台.open_path(path)
  return {'opened':True}
 def mime(path):return mimetypes.guess_type(path.name)[0] or ('audio/mp4' if path.suffix.lower()=='.m4a' else 'application/octet-stream')

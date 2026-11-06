@@ -140,6 +140,9 @@ def confirm(a):
 def reject(a):
  p=_load(a.id);p['status']='rejected';_path(a.id).write_text(json.dumps(p,ensure_ascii=False,indent=1),encoding='utf-8');return {'rejected':a.id,'note':'作废了，什么都没写'}
 def main():
+ for st in (sys.stdin,sys.stdout,sys.stderr):
+  try:st.reconfigure(encoding='utf-8',errors='replace')
+  except Exception:pass
  P=argparse.ArgumentParser(description='Coda 课达：查和写。说明见 AI接入/00_先读这个.md');S=P.add_subparsers(dest='cmd',required=True)
  def c(name,fn,*args):
   q=S.add_parser(name);q.set_defaults(fn=fn)
